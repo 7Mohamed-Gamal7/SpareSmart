@@ -19,12 +19,19 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import set_language
 
 def redirect_to_login(request):
     return redirect('accounts:login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('set_language/', set_language, name='set_language'),
+]
+
+urlpatterns += i18n_patterns(
     path('', redirect_to_login, name='home'),
     path('auth/', include('accounts.urls')),
     path('dashboard/', include('dashboard.urls')),
@@ -33,7 +40,8 @@ urlpatterns = [
     path('purchases/', include('purchases.urls')),
     path('expenses/', include('expenses.urls')),
     path('reports/', include('reports.urls')),
-]
+    prefix_default_language=False,
+)
 
 # Serve media files during development
 if settings.DEBUG:

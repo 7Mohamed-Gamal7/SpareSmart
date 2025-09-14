@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Quick Sale | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .quick-sale-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #28a745;
+    }
+    .calculation-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        position: sticky;
+        top: 2rem;
+    }
+    .amount-display {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .breakdown-item:last-child {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        font-weight: bold;
+        margin-top: 1rem;
+        font-size: 1.1rem;
+    }
+    .product-info {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    .stock-warning {
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .profit-indicator {
+        background: #e8f5e8;
+        border: 1px solid #c8e6c9;
+        color: #2e7d32;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .btn-quick-sale {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+    .btn-quick-sale:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+    .quick-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .quick-actions .btn {
+        flex: 1;
+        padding: 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-bolt me-3"></i>Quick Sale
+                </h1>
+                <p class="mb-0 opacity-75">Fast cash transactions for immediate sales</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'sales:sale_list' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'sales:sale_create' %}" class="btn btn-outline-primary">
+            <i class="fas fa-plus me-2"></i>Detailed Sale
+        </a>
+        <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-info">
+            <i class="fas fa-box me-2"></i>Browse Products
+        </a>
+        <a href="{% url 'inventory:customer_list' %}" class="btn btn-outline-success">
+            <i class="fas fa-users me-2"></i>Customer List
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Quick Sale Form -->
+        <div class="col-lg-8">
+            <div class="quick-sale-card">
+                <h4 class="mb-4">
+                    <i class="fas fa-shopping-cart me-2"></i>Sale Details
+                </h4>
+
+                <form method="post" id="quickSaleForm">
+                    {% csrf_token %}
+                    
+                    <!-- Customer Selection -->
+                    <div class="form-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user me-2"></i>Customer Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label class="form-label">Customer *</label>
+                                {{ form.customer|add_class:"form-select" }}
+                                {% if form.customer.errors %}
+                                    <div class="text-danger mt-1">{{ form.customer.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <a href="{% url 'inventory:customer_create' %}" class="btn btn-outline-success" target="_blank">
+                                        <i class="fas fa-plus me-1"></i>New Customer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div class="form-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-box me-2"></i>Product Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Product *</label>
+                                {{ form.product|add_class:"form-select" }}
+                                {% if form.product.errors %}
+                                    <div class="text-danger mt-1">{{ form.product.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Quantity *</label>
+                                {{ form.quantity|add_class:"form-control" }}
+                                {% if form.quantity.errors %}
+                                    <div class="text-danger mt-1">{{ form.quantity.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Unit Price *</label>
+                                {{ form.unit_price|add_class:"form-control" }}
+                                {% if form.unit_price.errors %}
+                                    <div class="text-danger mt-1">{{ form.unit_price.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Product Information Display -->
+                        <div id="productInfo" style="display: none;"></div>
+                    </div>
+
+                    <!-- Pricing & Discount -->
+                    <div class="form-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-percent me-2"></i>Pricing & Discount
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Discount %</label>
+                                {{ form.discount_percentage|add_class:"form-control" }}
+                                {% if form.discount_percentage.errors %}
+                                    <div class="text-danger mt-1">{{ form.discount_percentage.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Payment Method *</label>
+                                {{ form.payment_method|add_class:"form-select" }}
+                                {% if form.payment_method.errors %}
+                                    <div class="text-danger mt-1">{{ form.payment_method.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-quick-sale" id="completeSaleBtn">
+                                        <i class="fas fa-check me-2"></i>Complete Sale
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profit Information Display -->
+                        <div id="profitInfo" style="display: none;"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Calculation Display -->
+        <div class="col-lg-4">
+            <div class="calculation-display">
+                <div class="amount-display" id="totalAmount">$0.00</div>
+                
+                <div class="breakdown-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotalAmount">$0.00</span>
+                </div>
+                
+                <div class="breakdown-item">
+                    <span>Discount:</span>
+                    <span id="discountAmount">$0.00</span>
+                </div>
+                
+                <div class="breakdown-item">
+                    <span>Total:</span>
+                    <span id="finalAmount">$0.00</span>
+                </div>
+
+                <div class="mt-4">
+                    <h6>Quick Stats</h6>
+                    <div class="breakdown-item">
+                        <span>Quantity:</span>
+                        <span id="displayQuantity">0</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Unit Price:</span>
+                        <span id="displayUnitPrice">$0.00</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span>Profit:</span>
+                        <span id="displayProfit">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <small class="opacity-75">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Calculation updates automatically
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productSelect = document.querySelector('select[name="product"]');
+    const quantityInput = document.querySelector('input[name="quantity"]');
+    const unitPriceInput = document.querySelector('input[name="unit_price"]');
+    const discountInput = document.querySelector('input[name="discount_percentage"]');
+    const productInfoDiv = document.getElementById('productInfo');
+    const profitInfoDiv = document.getElementById('profitInfo');
+    
+    // Event listeners
+    productSelect.addEventListener('change', handleProductChange);
+    quantityInput.addEventListener('input', calculateTotals);
+    unitPriceInput.addEventListener('input', calculateTotals);
+    discountInput.addEventListener('input', calculateTotals);
+    
+    // Form validation
+    document.getElementById('quickSaleForm').addEventListener('submit', validateForm);
+    
+    function handleProductChange() {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        
+        if (selectedOption.value) {
+            // Get product data from the option
+            const productText = selectedOption.text;
+            const stockMatch = productText.match(/Stock: (\d+)/);
+            const stock = stockMatch ? parseInt(stockMatch[1]) : 0;
+            
+            // Fetch product price via AJAX
+            fetch(`{% url 'sales:get_product_price' %}?product_id=${selectedOption.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        unitPriceInput.value = data.price;
+                        
+                        // Display product information
+                        let infoHtml = `
+                            <div class="product-info">
+                                <h6><i class="fas fa-info-circle me-2"></i>Product Information</h6>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <strong>Available Stock:</strong><br>
+                                        <span class="${data.stock > 0 ? 'text-success' : 'text-danger'}">${data.stock} units</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>Selling Price:</strong><br>
+                                        $${data.price}
+                                    </div>
+                                    <div class="col-4">
+                                        <strong>Cost Price:</strong><br>
+                                        $${data.cost_price}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        if (data.stock === 0) {
+                            infoHtml += `
+                                <div class="stock-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Warning:</strong> This product is out of stock!
+                                </div>
+                            `;
+                        } else if (data.stock < 5) {
+                            infoHtml += `
+                                <div class="stock-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Low Stock:</strong> Only ${data.stock} units remaining!
+                                </div>
+                            `;
+                        }
+                        
+                        productInfoDiv.innerHTML = infoHtml;
+                        productInfoDiv.style.display = 'block';
+                        
+                        // Store cost price for profit calculation
+                        productSelect.dataset.costPrice = data.cost_price;
+                        
+                        calculateTotals();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product price:', error);
+                });
+        } else {
+            productInfoDiv.style.display = 'none';
+            profitInfoDiv.style.display = 'none';
+            unitPriceInput.value = '';
+            calculateTotals();
+        }
+    }
+    
+    function calculateTotals() {
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const discountPercentage = parseFloat(discountInput.value) || 0;
+        const costPrice = parseFloat(productSelect.dataset.costPrice) || 0;
+        
+        // Calculate amounts
+        const subtotal = quantity * unitPrice;
+        const discountAmount = (subtotal * discountPercentage) / 100;
+        const total = subtotal - discountAmount;
+        const profit = (unitPrice - costPrice) * quantity;
+        const profitMargin = costPrice > 0 ? ((unitPrice - costPrice) / costPrice * 100) : 0;
+        
+        // Update display
+        document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('discountAmount').textContent = `$${discountAmount.toFixed(2)}`;
+        document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('finalAmount').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('displayQuantity').textContent = quantity;
+        document.getElementById('displayUnitPrice').textContent = `$${unitPrice.toFixed(2)}`;
+        document.getElementById('displayProfit').textContent = `$${profit.toFixed(2)}`;
+        
+        // Update profit information
+        if (quantity > 0 && unitPrice > 0 && costPrice > 0) {
+            let profitClass = 'profit-indicator';
+            let profitIcon = 'fa-arrow-up';
+            
+            if (profit < 0) {
+                profitClass = 'stock-warning';
+                profitIcon = 'fa-arrow-down';
+            }
+            
+            const profitHtml = `
+                <div class="${profitClass}">
+                    <i class="fas ${profitIcon} me-2"></i>
+                    <strong>Profit Analysis:</strong> $${profit.toFixed(2)} 
+                    (${profitMargin.toFixed(1)}% margin)
+                </div>
+            `;
+            
+            profitInfoDiv.innerHTML = profitHtml;
+            profitInfoDiv.style.display = 'block';
+        } else {
+            profitInfoDiv.style.display = 'none';
+        }
+        
+        // Update button state
+        const submitBtn = document.getElementById('completeSaleBtn');
+        if (total > 0 && quantity > 0) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Sale - $${total.toFixed(2)}`;
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Sale`;
+        }
+    }
+    
+    function validateForm(e) {
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const productValue = productSelect.value;
+        const customerValue = document.querySelector('select[name="customer"]').value;
+        
+        if (!customerValue) {
+            e.preventDefault();
+            alert('Please select a customer.');
+            return false;
+        }
+        
+        if (!productValue) {
+            e.preventDefault();
+            alert('Please select a product.');
+            return false;
+        }
+        
+        if (quantity <= 0) {
+            e.preventDefault();
+            alert('Please enter a valid quantity.');
+            return false;
+        }
+        
+        if (unitPrice <= 0) {
+            e.preventDefault();
+            alert('Please enter a valid unit price.');
+            return false;
+        }
+        
+        // Check stock availability
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const productText = selectedOption.text;
+        const stockMatch = productText.match(/Stock: (\d+)/);
+        const stock = stockMatch ? parseInt(stockMatch[1]) : 0;
+        
+        if (quantity > stock) {
+            e.preventDefault();
+            alert(`Insufficient stock. Available: ${stock}, Requested: ${quantity}`);
+            return false;
+        }
+        
+        // Confirm sale
+        const total = (quantity * unitPrice) * (1 - (parseFloat(discountInput.value) || 0) / 100);
+        if (!confirm(`Confirm sale of $${total.toFixed(2)}?`)) {
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Initialize
+    calculateTotals();
+});
+</script>
+{% endblock %}

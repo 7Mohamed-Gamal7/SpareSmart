@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Suppliers | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .filter-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .supplier-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .supplier-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .supplier-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .supplier-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .supplier-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 0.875rem;
+    }
+    .rating-stars {
+        color: #ffc107;
+    }
+    .balance-positive { color: #28a745; }
+    .balance-negative { color: #dc3545; }
+    .balance-zero { color: #6c757d; }
+    .stats-row {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-truck me-3"></i>Suppliers
+                </h1>
+                <p class="mb-0 opacity-75">Manage supplier relationships and procurement</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'inventory:supplier_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add Supplier
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="stats-row">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_suppliers }}</div>
+                    <div class="stat-label">Total Suppliers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ active_suppliers }}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-success">${{ total_payable }}</div>
+                    <div class="stat-label">Total Payable</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">${{ total_purchases_this_month }}</div>
+                    <div class="stat-label">This Month Purchases</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Search Suppliers</label>
+                <input type="text" class="form-control" name="search" 
+                       value="{{ request.GET.search }}" placeholder="Name, company, phone...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Rating</label>
+                <select class="form-select" name="rating">
+                    <option value="">All Ratings</option>
+                    <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
+                    <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
+                    <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+ Stars</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Balance</label>
+                <select class="form-select" name="balance_filter">
+                    <option value="">All Balances</option>
+                    <option value="positive" {% if request.GET.balance_filter == 'positive' %}selected{% endif %}>We Owe</option>
+                    <option value="negative" {% if request.GET.balance_filter == 'negative' %}selected{% endif %}>They Owe</option>
+                    <option value="zero" {% if request.GET.balance_filter == 'zero' %}selected{% endif %}>Settled</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" name="sort">
+                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Date Added</option>
+                    <option value="balance" {% if request.GET.sort == 'balance' %}selected{% endif %}>Balance</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Rating</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Suppliers Table -->
+    {% if suppliers %}
+    <div class="supplier-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selectAll" class="form-check-input">
+                    </th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Rating</th>
+                    <th>Balance</th>
+                    <th>Last Purchase</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supplier in suppliers %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input supplier-checkbox" value="{{ supplier.id }}">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="supplier-avatar me-3" style="background-color: {{ supplier.name|slice:':1'|lower|default:'#667eea' }};">
+                                {{ supplier.name|slice:':2'|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ supplier.name }}</div>
+                                {% if supplier.company_name %}
+                                <small class="text-muted">{{ supplier.company_name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <i class="fas fa-phone me-1"></i>{{ supplier.phone }}
+                        </div>
+                        {% if supplier.email %}
+                        <div>
+                            <i class="fas fa-envelope me-1"></i>{{ supplier.email }}
+                        </div>
+                        {% endif %}
+                        {% if supplier.website %}
+                        <div>
+                            <i class="fas fa-globe me-1"></i>
+                            <a href="{{ supplier.website }}" target="_blank" class="text-decoration-none">Website</a>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            {{ supplier.address|default:"Not specified"|truncatewords:5 }}
+                        </small>
+                    </td>
+                    <td>
+                        {% if supplier.rating %}
+                        <div class="rating-stars">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= supplier.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">{{ supplier.rating }}/5</small>
+                        {% else %}
+                        <small class="text-muted">Not rated</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if supplier.balance > 0 %}
+                            <span class="balance-positive fw-bold">${{ supplier.balance }}</span>
+                            <br><small class="text-muted">We owe</small>
+                        {% elif supplier.balance < 0 %}
+                            <span class="balance-negative fw-bold">${{ supplier.balance|floatformat:2 }}</span>
+                            <br><small class="text-muted">They owe</small>
+                        {% else %}
+                            <span class="balance-zero">$0.00</span>
+                            <br><small class="text-muted">Settled</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if supplier.last_purchase_date %}
+                            <div>{{ supplier.last_purchase_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">${{ supplier.last_purchase_amount|default:0 }}</small>
+                        {% else %}
+                            <small class="text-muted">No purchases yet</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if supplier.is_active %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {% if supplier.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'inventory:supplier_detail' supplier.id %}">
+                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-shopping-cart me-2"></i>View Purchases</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-credit-card me-2"></i>Payment History</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-star me-2"></i>Rate Supplier</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-file-export me-2"></i>Export Data</a></li>
+                                {% if supplier.is_active %}
+                                <li><a class="dropdown-item text-warning" href="#">
+                                    <i class="fas fa-pause me-2"></i>Deactivate</a></li>
+                                {% else %}
+                                <li><a class="dropdown-item text-success" href="#">
+                                    <i class="fas fa-play me-2"></i>Activate</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="bulk-actions" style="display: none;">
+                <span class="me-3">
+                    <span id="selectedCount">0</span> suppliers selected
+                </span>
+                <button type="button" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="fas fa-envelope me-1"></i>Send Email
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm me-2">
+                    <i class="fas fa-file-export me-1"></i>Export
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-edit me-1"></i>Bulk Edit
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <small class="text-muted">
+                Showing {{ suppliers|length }} of {{ total_suppliers }} suppliers
+            </small>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Suppliers pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.rating %}&rating={{ request.GET.rating }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-truck fa-5x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">No Suppliers Found</h3>
+        <p class="text-muted mb-4">Start building your supplier network by adding your first supplier.</p>
+        <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Add First Supplier
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form on filter change
+    const filterSelects = document.querySelectorAll('select[name="status"], select[name="rating"], select[name="balance_filter"], select[name="sort"]');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+
+    // Bulk selection functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const supplierCheckboxes = document.querySelectorAll('.supplier-checkbox');
+    const bulkActions = document.querySelector('.bulk-actions');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.supplier-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        if (count > 0) {
+            bulkActions.style.display = 'block';
+            selectedCount.textContent = count;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+        
+        selectAllCheckbox.indeterminate = count > 0 && count < supplierCheckboxes.length;
+        selectAllCheckbox.checked = count === supplierCheckboxes.length;
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        supplierCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+
+    supplierCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    // Generate avatar colors based on name
+    document.querySelectorAll('.supplier-avatar').forEach(avatar => {
+        const name = avatar.textContent.trim();
+        const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+        const colorIndex = name.charCodeAt(0) % colors.length;
+        avatar.style.backgroundColor = colors[colorIndex];
+    });
+});
+</script>
+{% endblock %}

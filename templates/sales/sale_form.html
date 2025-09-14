@@ -1,0 +1,576 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    .form-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        border-radius: 10px 10px 0 0;
+    }
+    .items-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .items-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .items-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .summary-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .summary-row:last-child {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .item-row {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+    }
+    .delete-row {
+        background: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    .btn-add-item {
+        border: 2px dashed #dee2e6;
+        color: #6c757d;
+        background: transparent;
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+    .btn-add-item:hover {
+        border-color: #667eea;
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    .profit-indicator {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .stock-warning {
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-shopping-cart me-3"></i>{{ title }}
+                </h1>
+                <p class="mb-0 opacity-75">
+                    {% if sale %}
+                        Editing sale #{{ sale.sale_number }}
+                    {% else %}
+                        Create a new sales transaction
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'sales:sale_list' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="saleForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <!-- Sale Information -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sale Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Customer *</label>
+                                    {{ form.customer|add_class:"form-select" }}
+                                    {% if form.customer.errors %}
+                                        <div class="text-danger">{{ form.customer.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sale Type *</label>
+                                    {{ form.sale_type|add_class:"form-select" }}
+                                    {% if form.sale_type.errors %}
+                                        <div class="text-danger">{{ form.sale_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Sale Date *</label>
+                                    {{ form.sale_date|add_class:"form-control" }}
+                                    {% if form.sale_date.errors %}
+                                        <div class="text-danger">{{ form.sale_date.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Due Date</label>
+                                    {{ form.due_date|add_class:"form-control" }}
+                                    {% if form.due_date.errors %}
+                                        <div class="text-danger">{{ form.due_date.errors.0 }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Required for credit and installment sales</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Amount</label>
+                                    {{ form.discount_amount|add_class:"form-control" }}
+                                    {% if form.discount_amount.errors %}
+                                        <div class="text-danger">{{ form.discount_amount.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Customer Notes</label>
+                                    {{ form.notes|add_class:"form-control" }}
+                                    {% if form.notes.errors %}
+                                        <div class="text-danger">{{ form.notes.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Internal Notes</label>
+                                    {{ form.internal_notes|add_class:"form-control" }}
+                                    {% if form.internal_notes.errors %}
+                                        <div class="text-danger">{{ form.internal_notes.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sale Items -->
+                <div class="form-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Sale Items</h5>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="addItemBtn">
+                            <i class="fas fa-plus me-1"></i>Add Item
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Formset Management Form -->
+                        {{ formset.management_form }}
+                        
+                        <!-- Formset Errors -->
+                        {% if formset.non_form_errors %}
+                            <div class="alert alert-danger">
+                                {{ formset.non_form_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Items Container -->
+                        <div id="itemsContainer">
+                            {% for item_form in formset %}
+                                <div class="item-row" data-form-index="{{ forloop.counter0 }}">
+                                    {% if item_form.non_field_errors %}
+                                        <div class="alert alert-danger">
+                                            {{ item_form.non_field_errors }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Hidden fields -->
+                                    {% for hidden in item_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Product *</label>
+                                            {{ item_form.product|add_class:"form-select product-select" }}
+                                            {% if item_form.product.errors %}
+                                                <div class="text-danger">{{ item_form.product.errors.0 }}</div>
+                                            {% endif %}
+                                            <div class="stock-info mt-1"></div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Quantity *</label>
+                                            {{ item_form.quantity|add_class:"form-control quantity-input" }}
+                                            {% if item_form.quantity.errors %}
+                                                <div class="text-danger">{{ item_form.quantity.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Unit Price *</label>
+                                            {{ item_form.unit_price|add_class:"form-control price-input" }}
+                                            {% if item_form.unit_price.errors %}
+                                                <div class="text-danger">{{ item_form.unit_price.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Discount %</label>
+                                            {{ item_form.discount_percentage|add_class:"form-control discount-input" }}
+                                            {% if item_form.discount_percentage.errors %}
+                                                <div class="text-danger">{{ item_form.discount_percentage.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Total</label>
+                                            <div class="form-control-plaintext fw-bold item-total">$0.00</div>
+                                            <div class="profit-info mt-1"></div>
+                                            {% if item_form.DELETE %}
+                                                <div class="form-check mt-2">
+                                                    {{ item_form.DELETE }}
+                                                    <label class="form-check-label text-danger">Delete</label>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Add Item Button -->
+                        <button type="button" class="btn btn-add-item w-100" id="addMoreItems">
+                            <i class="fas fa-plus me-2"></i>Add Another Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="summary-card">
+                    <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>Sale Summary</h5>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotalAmount">$0.00</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Discount:</span>
+                        <span id="discountAmount">$0.00</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Total Amount:</span>
+                        <span id="totalAmount">$0.00</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Sale Details</h6>
+                        <div class="summary-row">
+                            <span>Total Items:</span>
+                            <span id="totalItems">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Total Quantity:</span>
+                            <span id="totalQuantity">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Estimated Profit:</span>
+                            <span id="totalProfit">$0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save me-2"></i>{{ action }} Sale
+                        </button>
+                        <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-light">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Item Template (Hidden) -->
+<div id="itemTemplate" style="display: none;">
+    <div class="item-row" data-form-index="__prefix__">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">Product *</label>
+                <select name="items-__prefix__-product" class="form-select product-select">
+                    <option value="">Select a product</option>
+                    {% for product in form.fields.items.form.fields.product.queryset %}
+                        <option value="{{ product.id }}" data-price="{{ product.selling_price }}" data-stock="{{ product.current_stock }}" data-cost="{{ product.cost_price }}">
+                            {{ product.name }} (Stock: {{ product.current_stock }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="stock-info mt-1"></div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Quantity *</label>
+                <input type="number" name="items-__prefix__-quantity" class="form-control quantity-input" min="1" value="1">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Unit Price *</label>
+                <input type="number" name="items-__prefix__-unit_price" class="form-control price-input" step="0.01" min="0">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Discount %</label>
+                <input type="number" name="items-__prefix__-discount_percentage" class="form-control discount-input" step="0.01" min="0" max="100" value="0">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Total</label>
+                <div class="form-control-plaintext fw-bold item-total">$0.00</div>
+                <div class="profit-info mt-1"></div>
+                <button type="button" class="btn btn-danger btn-sm mt-2 remove-item">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        <input type="hidden" name="items-__prefix__-id">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let formIndex = {{ formset.total_form_count }};
+    const maxForms = parseInt(document.getElementById('id_items-MAX_NUM_FORMS').value);
+    
+    // Initialize existing forms
+    document.querySelectorAll('.item-row').forEach(initializeItemRow);
+    
+    // Add new item
+    document.getElementById('addMoreItems').addEventListener('click', addNewItem);
+    document.getElementById('addItemBtn').addEventListener('click', addNewItem);
+    
+    // Form submission
+    document.getElementById('saleForm').addEventListener('submit', function(e) {
+        updateFormCount();
+        return validateForm();
+    });
+    
+    // Sale type change handler
+    document.querySelector('select[name="sale_type"]').addEventListener('change', function() {
+        const dueDateField = document.querySelector('input[name="due_date"]');
+        const dueDateGroup = dueDateField.closest('.mb-3');
+        
+        if (this.value === 'credit' || this.value === 'installment') {
+            dueDateGroup.style.display = 'block';
+            dueDateField.required = true;
+        } else {
+            dueDateGroup.style.display = 'none';
+            dueDateField.required = false;
+        }
+    });
+    
+    // Discount amount change handler
+    document.querySelector('input[name="discount_amount"]').addEventListener('input', calculateTotals);
+    
+    function addNewItem() {
+        if (formIndex >= maxForms) {
+            alert('Maximum number of items reached.');
+            return;
+        }
+        
+        const template = document.getElementById('itemTemplate').innerHTML;
+        const newForm = template.replace(/__prefix__/g, formIndex);
+        
+        const container = document.getElementById('itemsContainer');
+        const div = document.createElement('div');
+        div.innerHTML = newForm;
+        container.appendChild(div.firstElementChild);
+        
+        initializeItemRow(container.lastElementChild);
+        formIndex++;
+        updateFormCount();
+    }
+    
+    function initializeItemRow(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const priceInput = row.querySelector('.price-input');
+        const discountInput = row.querySelector('.discount-input');
+        const removeBtn = row.querySelector('.remove-item');
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        
+        // Product selection
+        productSelect.addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            if (option.value) {
+                const price = option.dataset.price;
+                const stock = option.dataset.stock;
+                const cost = option.dataset.cost;
+                
+                priceInput.value = price;
+                
+                // Show stock info
+                const stockInfo = row.querySelector('.stock-info');
+                if (parseInt(stock) > 0) {
+                    stockInfo.innerHTML = `<small class="text-success">Stock: ${stock}</small>`;
+                } else {
+                    stockInfo.innerHTML = `<small class="text-danger">Out of stock</small>`;
+                }
+                
+                calculateItemTotal(row);
+            }
+        });
+        
+        // Quantity, price, discount changes
+        [quantityInput, priceInput, discountInput].forEach(input => {
+            input.addEventListener('input', () => calculateItemTotal(row));
+        });
+        
+        // Remove item
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                row.remove();
+                calculateTotals();
+            });
+        }
+        
+        // Delete checkbox
+        if (deleteCheckbox) {
+            deleteCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    row.classList.add('delete-row');
+                } else {
+                    row.classList.remove('delete-row');
+                }
+                calculateTotals();
+            });
+        }
+        
+        // Initial calculation
+        calculateItemTotal(row);
+    }
+    
+    function calculateItemTotal(row) {
+        const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const discount = parseFloat(row.querySelector('.discount-input').value) || 0;
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        
+        if (deleteCheckbox && deleteCheckbox.checked) {
+            row.querySelector('.item-total').textContent = '$0.00';
+            row.querySelector('.profit-info').innerHTML = '';
+            calculateTotals();
+            return;
+        }
+        
+        const subtotal = quantity * price;
+        const discountAmount = (subtotal * discount) / 100;
+        const total = subtotal - discountAmount;
+        
+        row.querySelector('.item-total').textContent = `$${total.toFixed(2)}`;
+        
+        // Calculate profit
+        const productSelect = row.querySelector('.product-select');
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.cost) {
+            const costPrice = parseFloat(selectedOption.dataset.cost);
+            const profit = (price - costPrice) * quantity;
+            const profitMargin = costPrice > 0 ? ((price - costPrice) / costPrice * 100).toFixed(1) : 0;
+            
+            let profitClass = 'success';
+            if (profit < 0) profitClass = 'danger';
+            else if (profitMargin < 15) profitClass = 'warning';
+            
+            row.querySelector('.profit-info').innerHTML = 
+                `<span class="profit-indicator bg-${profitClass} text-white">Profit: $${profit.toFixed(2)} (${profitMargin}%)</span>`;
+        }
+        
+        calculateTotals();
+    }
+    
+    function calculateTotals() {
+        let subtotal = 0;
+        let totalItems = 0;
+        let totalQuantity = 0;
+        let totalProfit = 0;
+        
+        document.querySelectorAll('.item-row').forEach(row => {
+            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteCheckbox && deleteCheckbox.checked) return;
+            
+            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            const price = parseFloat(row.querySelector('.price-input').value) || 0;
+            const discount = parseFloat(row.querySelector('.discount-input').value) || 0;
+            
+            if (quantity > 0 && price > 0) {
+                const itemSubtotal = quantity * price;
+                const itemDiscount = (itemSubtotal * discount) / 100;
+                const itemTotal = itemSubtotal - itemDiscount;
+                
+                subtotal += itemTotal;
+                totalItems++;
+                totalQuantity += quantity;
+                
+                // Calculate profit
+                const productSelect = row.querySelector('.product-select');
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                if (selectedOption && selectedOption.dataset.cost) {
+                    const costPrice = parseFloat(selectedOption.dataset.cost);
+                    totalProfit += (price - costPrice) * quantity;
+                }
+            }
+        });
+        
+        const discountAmount = parseFloat(document.querySelector('input[name="discount_amount"]').value) || 0;
+        const totalAmount = subtotal - discountAmount;
+        
+        document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;\n        document.getElementById('discountAmount').textContent = `$${discountAmount.toFixed(2)}`;\n        document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`;\n        document.getElementById('totalItems').textContent = totalItems;\n        document.getElementById('totalQuantity').textContent = totalQuantity;\n        document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(2)}`;\n    }\n    \n    function updateFormCount() {\n        const totalForms = document.querySelectorAll('.item-row').length;\n        document.getElementById('id_items-TOTAL_FORMS').value = totalForms;\n    }\n    \n    function validateForm() {\n        const items = document.querySelectorAll('.item-row');\n        let hasValidItem = false;\n        \n        items.forEach(row => {\n            const deleteCheckbox = row.querySelector('input[type=\"checkbox\"][name$=\"-DELETE\"]');\n            if (deleteCheckbox && deleteCheckbox.checked) return;\n            \n            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;\n            const price = parseFloat(row.querySelector('.price-input').value) || 0;\n            \n            if (quantity > 0 && price > 0) {\n                hasValidItem = true;\n            }\n        });\n        \n        if (!hasValidItem) {\n            alert('Please add at least one item to the sale.');\n            return false;\n        }\n        \n        return true;\n    }\n    \n    // Initial calculations\n    calculateTotals();\n});\n</script>\n{% endblock %}"

@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .payment-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    .payment-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        border-radius: 15px 15px 0 0;
+    }
+    .sale-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    .amount-display {
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .summary-row:last-child {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        font-weight: bold;
+        margin-top: 1rem;
+        font-size: 1.1rem;
+    }
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+    .payment-method-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .payment-method-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    .payment-method-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+    .payment-method-card.selected {
+        border-color: #667eea;
+        background: #667eea;
+        color: white;
+    }
+    .payment-method-card i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .btn-record-payment {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+    .btn-record-payment:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        color: white;
+    }
+    .sale-info {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .payment-amount-input {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        border: 3px solid #667eea;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    .quick-amount-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .quick-amount-btn {
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        background: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .quick-amount-btn:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-credit-card me-3"></i>{{ title }}
+                </h1>
+                <p class="mb-0 opacity-75">Record payment for Sale #{{ sale.sale_number }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Sale
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Payment Form -->
+        <div class="col-lg-8">
+            <!-- Sale Information -->
+            <div class="sale-info">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle me-2"></i>Sale Information</h6>
+                        <p class="mb-1"><strong>Sale Number:</strong> {{ sale.sale_number }}</p>
+                        <p class="mb-1"><strong>Customer:</strong> {{ sale.customer.name }}</p>
+                        <p class="mb-0"><strong>Sale Date:</strong> {{ sale.sale_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-dollar-sign me-2"></i>Financial Summary</h6>
+                        <p class="mb-1"><strong>Total Amount:</strong> ${{ sale.total_amount|floatformat:2 }}</p>
+                        <p class="mb-1"><strong>Paid Amount:</strong> ${{ sale.paid_amount|floatformat:2 }}</p>
+                        <p class="mb-0"><strong>Balance Due:</strong> <span class="text-danger fw-bold">${{ sale.balance_amount|floatformat:2 }}</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" id="paymentForm">
+                {% csrf_token %}
+                
+                <!-- Payment Amount Section -->
+                <div class="payment-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payment Amount</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label class="form-label">Payment Amount *</label>
+                                {{ form.amount|add_class:"form-control payment-amount-input" }}
+                                {% if form.amount.errors %}
+                                    <div class="text-danger mt-1">{{ form.amount.errors.0 }}</div>
+                                {% endif %}
+                                
+                                <!-- Quick Amount Buttons -->
+                                <div class="quick-amount-buttons">
+                                    <button type="button" class="quick-amount-btn" data-amount="{{ sale.balance_amount }}">
+                                        Full Amount<br>${{ sale.balance_amount|floatformat:2 }}
+                                    </button>
+                                    <button type="button" class="quick-amount-btn" data-amount="{% widthratio sale.balance_amount 2 1 %}">
+                                        Half Amount<br>${{ sale.balance_amount|floatformat:2|floatformat:0|add:"0"|mul:"0.5" }}
+                                    </button>
+                                    <button type="button" class="quick-amount-btn" data-amount="100">
+                                        $100
+                                    </button>
+                                    <button type="button" class="quick-amount-btn" data-amount="50">
+                                        $50
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Remaining Balance</label>
+                                <div class="amount-display" id="remainingBalance">${{ sale.balance_amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Section -->
+                <div class="payment-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Hidden select field -->
+                        <div style="display: none;">
+                            {{ form.payment_method }}
+                        </div>
+                        
+                        <!-- Payment method cards -->
+                        <div class="payment-method-cards">
+                            <div class="payment-method-card" data-method="cash">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <div>Cash</div>
+                            </div>
+                            <div class="payment-method-card" data-method="card">
+                                <i class="fas fa-credit-card"></i>
+                                <div>Card</div>
+                            </div>
+                            <div class="payment-method-card" data-method="bank_transfer">
+                                <i class="fas fa-university"></i>
+                                <div>Bank Transfer</div>
+                            </div>
+                            <div class="payment-method-card" data-method="check">
+                                <i class="fas fa-money-check"></i>
+                                <div>Check</div>
+                            </div>
+                            <div class="payment-method-card" data-method="mobile_payment">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>Mobile Payment</div>
+                            </div>
+                            <div class="payment-method-card" data-method="credit">
+                                <i class="fas fa-gift"></i>
+                                <div>Store Credit</div>
+                            </div>
+                        </div>
+                        
+                        {% if form.payment_method.errors %}
+                            <div class="text-danger mt-2">{{ form.payment_method.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Payment Details Section -->
+                <div class="payment-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Payment Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Reference Number</label>
+                                    {{ form.reference_number|add_class:"form-control" }}
+                                    {% if form.reference_number.errors %}
+                                        <div class="text-danger">{{ form.reference_number.errors.0 }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Transaction ID, check number, etc.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3" id="bankNameField" style="display: none;">
+                                    <label class="form-label">Bank Name</label>
+                                    {{ form.bank_name|add_class:"form-control" }}
+                                    {% if form.bank_name.errors %}
+                                        <div class="text-danger">{{ form.bank_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3" id="checkNumberField" style="display: none;">
+                                    <label class="form-label">Check Number</label>
+                                    {{ form.check_number|add_class:"form-control" }}
+                                    {% if form.check_number.errors %}
+                                        <div class="text-danger">{{ form.check_number.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    {{ form.notes|add_class:"form-control" }}
+                                    {% if form.notes.errors %}
+                                        <div class="text-danger">{{ form.notes.errors.0 }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Optional notes about this payment</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-record-payment" id="submitBtn">
+                        <i class="fas fa-check me-2"></i>Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Payment Summary -->
+        <div class="col-lg-4">
+            <div class="sale-summary">
+                <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>Payment Summary</h5>
+                
+                <div class="amount-display" id="paymentAmount">$0.00</div>
+                
+                <div class="summary-row">
+                    <span>Current Balance:</span>
+                    <span>${{ sale.balance_amount|floatformat:2 }}</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Payment Amount:</span>
+                    <span id="displayPaymentAmount">$0.00</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>New Balance:</span>
+                    <span id="newBalance">${{ sale.balance_amount|floatformat:2 }}</span>
+                </div>
+
+                <div class="mt-4">
+                    <h6>Sale Information</h6>
+                    <div class="summary-row">
+                        <span>Total Amount:</span>
+                        <span>${{ sale.total_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Previously Paid:</span>
+                        <span>${{ sale.paid_amount|floatformat:2 }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Payment Method:</span>
+                        <span id="selectedMethod">Not selected</span>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <small class="opacity-75">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Payment will be recorded immediately
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.querySelector('input[name="amount"]');
+    const paymentMethodSelect = document.querySelector('select[name="payment_method"]');
+    const paymentMethodCards = document.querySelectorAll('.payment-method-card');
+    const quickAmountButtons = document.querySelectorAll('.quick-amount-btn');
+    const bankNameField = document.getElementById('bankNameField');
+    const checkNumberField = document.getElementById('checkNumberField');
+    
+    const currentBalance = {{ sale.balance_amount }};
+    
+    // Quick amount buttons
+    quickAmountButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const amount = this.dataset.amount;
+            amountInput.value = parseFloat(amount).toFixed(2);
+            updateCalculations();
+        });
+    });
+    
+    // Payment method selection
+    paymentMethodCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selection from all cards
+            paymentMethodCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selection to clicked card
+            this.classList.add('selected');
+            
+            // Update hidden select
+            const method = this.dataset.method;
+            paymentMethodSelect.value = method;
+            
+            // Update display
+            document.getElementById('selectedMethod').textContent = this.textContent.trim();
+            
+            // Show/hide additional fields
+            hideAllAdditionalFields();
+            if (method === 'bank_transfer') {
+                bankNameField.style.display = 'block';
+            } else if (method === 'check') {
+                checkNumberField.style.display = 'block';
+            }
+        });
+    });
+    
+    // Amount input changes
+    amountInput.addEventListener('input', updateCalculations);
+    
+    // Form validation
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+        }
+    });
+    
+    function updateCalculations() {
+        const paymentAmount = parseFloat(amountInput.value) || 0;
+        const newBalance = Math.max(0, currentBalance - paymentAmount);
+        
+        // Update displays
+        document.getElementById('paymentAmount').textContent = `$${paymentAmount.toFixed(2)}`;
+        document.getElementById('displayPaymentAmount').textContent = `$${paymentAmount.toFixed(2)}`;
+        document.getElementById('newBalance').textContent = `$${newBalance.toFixed(2)}`;
+        document.getElementById('remainingBalance').textContent = `$${newBalance.toFixed(2)}`;
+        
+        // Update submit button
+        const submitBtn = document.getElementById('submitBtn');
+        if (paymentAmount > 0 && paymentAmount <= currentBalance) {
+            submitBtn.disabled = false;
+            if (newBalance === 0) {
+                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Payment - $${paymentAmount.toFixed(2)}`;
+                submitBtn.classList.remove('btn-record-payment');
+                submitBtn.classList.add('btn', 'btn-success');
+            } else {
+                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Record Payment - $${paymentAmount.toFixed(2)}`;
+                submitBtn.classList.remove('btn-success');
+                submitBtn.classList.add('btn-record-payment');
+            }
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Record Payment`;
+        }
+    }
+    
+    function hideAllAdditionalFields() {
+        bankNameField.style.display = 'none';
+        checkNumberField.style.display = 'none';
+    }
+    
+    function validateForm() {
+        const paymentAmount = parseFloat(amountInput.value) || 0;
+        const selectedMethod = paymentMethodSelect.value;
+        
+        if (paymentAmount <= 0) {
+            alert('Please enter a valid payment amount.');
+            return false;
+        }
+        
+        if (paymentAmount > currentBalance) {
+            alert(`Payment amount cannot exceed balance of $${currentBalance.toFixed(2)}.`);
+            return false;
+        }
+        
+        if (!selectedMethod) {
+            alert('Please select a payment method.');
+            return false;
+        }
+        
+        return confirm(`Record payment of $${paymentAmount.toFixed(2)} via ${selectedMethod.replace('_', ' ')}?`);
+    }
+    
+    // Initialize
+    updateCalculations();
+    
+    // Set default payment method to cash
+    if (paymentMethodCards.length > 0) {
+        paymentMethodCards[0].click();
+    }
+});
+</script>
+{% endblock %}

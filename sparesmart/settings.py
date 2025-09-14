@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Added for language support
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -134,13 +135,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ar'  # Arabic as default language
 
-TIME_ZONE = 'UTC'
+# Available languages
+LANGUAGES = [
+    ('ar', 'العربية'),
+    ('en', 'English'),
+]
+
+TIME_ZONE = 'Africa/Cairo'  # Cairo timezone for Arabic region
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
+
+# Locale paths for translation files
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -171,7 +183,17 @@ AUTH_USER_MODEL = 'accounts.User'
 # Date and Time Format
 DATE_FORMAT = 'Y-m-d'
 DATETIME_FORMAT = 'Y-m-d H:i:s'
-USE_L10N = False
+USE_L10N = True  # Enable localization for Arabic formatting
+
+# Arabic Language Settings
+LANGUAGE_BIDI = True  # Right-to-left text direction
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ','
+DECIMAL_SEPARATOR = '.'
+
+# Arabic Number Format
+NUMBER_GROUPING = 3
+FIRST_DAY_OF_WEEK = 6  # Saturday (Arabic week starts on Saturday)
 
 # Pagination
 PAGINATE_BY = 20

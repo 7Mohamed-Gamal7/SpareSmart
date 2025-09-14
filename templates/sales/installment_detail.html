@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Installment Plan Details - {{ installment.sale.sale_number }} | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .installment-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .info-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+    .info-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+    }
+    .status-badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        text-align: center;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .action-buttons .btn {
+        margin: 0.25rem;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+    .payments-table {
+        font-size: 0.9rem;
+    }
+    .payment-status-paid { background-color: #d4edda !important; }
+    .payment-status-overdue { background-color: #f8d7da !important; }
+    .payment-status-upcoming { background-color: #fff3cd !important; }
+    .payment-status-partial { background-color: #cce7ff !important; }
+    .progress-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(#28a745 var(--progress), #e9ecef var(--progress));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin: 0 auto;
+    }
+    .progress-circle::before {
+        content: '';
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: white;
+        position: absolute;
+    }
+    .progress-text {
+        position: relative;
+        z-index: 1;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-left: 2rem;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 8px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px #dee2e6;
+    }
+    .timeline-item.paid::before {
+        background: #28a745;
+        box-shadow: 0 0 0 3px #28a745;
+    }
+    .timeline-item.overdue::before {
+        background: #dc3545;
+        box-shadow: 0 0 0 3px #dc3545;
+    }
+    .timeline-item.upcoming::before {
+        background: #ffc107;
+        box-shadow: 0 0 0 3px #ffc107;
+    }
+    .timeline-item.partial::before {
+        background: #17a2b8;
+        box-shadow: 0 0 0 3px #17a2b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Installment Header -->
+    <div class="installment-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">Installment Plan - Sale #{{ installment.sale.sale_number }}</h1>
+                <p class="mb-0 opacity-75">
+                    Customer: {{ installment.sale.customer.name }} | 
+                    Started: {{ installment.start_date|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="badge status-badge 
+                    {% if installment.status == 'active' %}bg-success
+                    {% elif installment.status == 'completed' %}bg-primary
+                    {% elif installment.status == 'defaulted' %}bg-danger
+                    {% elif installment.status == 'cancelled' %}bg-secondary
+                    {% else %}bg-warning{% endif %}">
+                    {{ installment.get_status_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Installment Information -->
+        <div class="col-lg-8">
+            <!-- Plan Information -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Plan Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Sale Number</label>
+                                <p class="fw-bold">
+                                    <a href="{% url 'sales:sale_detail' installment.sale.id %}" class="text-decoration-none">
+                                        {{ installment.sale.sale_number }}
+                                    </a>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Customer</label>
+                                <p>
+                                    <a href="{% url 'inventory:customer_detail' installment.sale.customer.id %}" class="text-decoration-none">
+                                        {{ installment.sale.customer.name }}
+                                    </a>
+                                    <br><small class="text-muted">{{ installment.sale.customer.phone }}</small>
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Total Amount</label>
+                                <p class="fw-bold">${{ installment.total_amount|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Down Payment</label>
+                                <p class="fw-bold text-success">${{ installment.down_payment|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Start Date</label>
+                                <p>{{ installment.start_date|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Number of Installments</label>
+                                <p class="fw-bold">{{ installment.number_of_installments }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Installment Amount</label>
+                                <p class="fw-bold">${{ installment.installment_amount|floatformat:2 }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Interest Rate</label>
+                                <p>{{ installment.interest_rate }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Schedule -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Payment Schedule</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover payments-table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Due Date</th>
+                                    <th>Amount Due</th>
+                                    <th>Paid Amount</th>
+                                    <th>Balance</th>
+                                    <th>Paid Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr class="
+                                    {% if payment.status == 'paid' %}payment-status-paid
+                                    {% elif payment.status == 'overdue' %}payment-status-overdue
+                                    {% elif payment.status == 'partial' %}payment-status-partial
+                                    {% elif payment.due_date <= today and payment.status == 'pending' %}payment-status-upcoming{% endif %}">
+                                    <td class="fw-bold">{{ payment.installment_number }}</td>
+                                    <td>
+                                        {{ payment.due_date|date:"M d, Y" }}
+                                        {% if payment.status == 'overdue' %}
+                                            <br><small class="text-danger">{{ payment.days_overdue }} days overdue</small>
+                                        {% elif payment.due_date > today and payment.due_date <= today|add_days:7 %}
+                                            <br><small class="text-warning">Due soon</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-bold">${{ payment.amount|floatformat:2 }}</td>
+                                    <td class="text-success fw-bold">${{ payment.paid_amount|floatformat:2 }}</td>
+                                    <td>
+                                        {% with balance=payment.amount|floatformat:2|add:payment.paid_amount|floatformat:2|sub %}
+                                        {% if balance > 0 %}
+                                            <span class="text-danger fw-bold">${{ balance|floatformat:2 }}</span>
+                                        {% else %}
+                                            <span class="text-muted">$0.00</span>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td>
+                                        {% if payment.paid_date %}
+                                            {{ payment.paid_date|date:"M d, Y" }}
+                                        {% else %}
+                                            <span class="text-muted">Not paid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if payment.status == 'paid' %}bg-success
+                                            {% elif payment.status == 'overdue' %}bg-danger
+                                            {% elif payment.status == 'partial' %}bg-info
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ payment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if payment.status != 'paid' %}
+                                            <a href="{% url 'sales:installment_payment' payment.id %}" class="btn btn-success btn-sm">
+                                                <i class="fas fa-credit-card me-1"></i>Pay
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Paid</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No payment schedule available.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Timeline -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Payment Timeline</h5>
+                </div>
+                <div class="card-body">
+                    {% if payments %}
+                    <div class="timeline">
+                        {% for payment in payments %}
+                        <div class="timeline-item 
+                            {% if payment.status == 'paid' %}paid
+                            {% elif payment.status == 'overdue' %}overdue
+                            {% elif payment.status == 'partial' %}partial
+                            {% elif payment.due_date <= today %}upcoming{% endif %}">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h6 class="mb-1">Installment #{{ payment.installment_number }}</h6>
+                                    <small class="text-muted">{{ payment.due_date|date:"M d, Y" }}</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mb-1"><strong>Amount:</strong> ${{ payment.amount|floatformat:2 }}</p>
+                                    <p class="mb-1"><strong>Paid:</strong> ${{ payment.paid_amount|floatformat:2 }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    {% if payment.paid_date %}
+                                    <p class="mb-1"><strong>Paid on:</strong> {{ payment.paid_date|date:"M d, Y" }}</p>
+                                    {% endif %}
+                                    {% if payment.notes %}
+                                    <p class="mb-1"><strong>Notes:</strong> {{ payment.notes }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge 
+                                        {% if payment.status == 'paid' %}bg-success
+                                        {% elif payment.status == 'overdue' %}bg-danger
+                                        {% elif payment.status == 'partial' %}bg-info
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Stats -->
+        <div class="col-lg-4">
+            <!-- Payment Progress -->
+            <div class="stat-card">
+                <div class="progress-circle" style="--progress: {{ installment.payment_progress }}%;">
+                    <div class="progress-text">{{ installment.payment_progress }}%</div>
+                </div>
+                <div class="mt-3">Payment Progress</div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Financial Summary</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Total Amount</label>
+                        <p class="fw-bold">${{ installment.total_amount|floatformat:2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Total Paid</label>
+                        <p class="fw-bold text-success">${{ installment.total_paid|floatformat:2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Remaining Balance</label>
+                        <p class="fw-bold text-danger">${{ installment.remaining_balance|floatformat:2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Installments Paid</label>
+                        <p class="fw-bold">{{ installment.paid_installments }}/{{ installment.number_of_installments }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Payment -->
+            {% with next_payment=installment.next_due_payment %}
+            {% if next_payment %}
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Next Payment</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Due Date</label>
+                        <p class="fw-bold">{{ next_payment.due_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Amount</label>
+                        <p class="fw-bold">${{ next_payment.amount|floatformat:2 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Status</label>
+                        <p>
+                            <span class="badge 
+                                {% if next_payment.status == 'overdue' %}bg-danger
+                                {% elif next_payment.due_date <= today|add_days:7 %}bg-warning
+                                {% else %}bg-secondary{% endif %}">
+                                {% if next_payment.status == 'overdue' %}
+                                    Overdue ({{ next_payment.days_overdue }} days)
+                                {% elif next_payment.due_date <= today|add_days:7 %}
+                                    Due Soon
+                                {% else %}
+                                    Upcoming
+                                {% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    {% if next_payment.status != 'paid' %}
+                    <div class="d-grid">
+                        <a href="{% url 'sales:installment_payment' next_payment.id %}" class="btn btn-success">
+                            <i class="fas fa-credit-card me-2"></i>Record Payment
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- Action Buttons -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Actions</h6>
+                </div>
+                <div class="card-body action-buttons">
+                    <a href="{% url 'sales:sale_detail' installment.sale.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-file-invoice me-1"></i>View Sale
+                    </a>
+                    <a href="{% url 'sales:sale_invoice' installment.sale.id %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-print me-1"></i>View Invoice
+                    </a>
+                    <a href="{% url 'sales:installment_list' %}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+            </div>
+
+            <!-- Timestamps -->
+            <div class="card info-card">
+                <div class="card-body">
+                    <small class="text-muted">
+                        <div class="mb-1">
+                            <strong>Created:</strong> {{ installment.created_at|date:"M d, Y H:i" }}
+                        </div>
+                        <div>
+                            <strong>Updated:</strong> {{ installment.updated_at|date:"M d, Y H:i" }}
+                        </div>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set CSS custom property for progress circle
+    const progressCircle = document.querySelector('.progress-circle');
+    if (progressCircle) {
+        const progress = progressCircle.style.getPropertyValue('--progress');
+        progressCircle.style.setProperty('--progress', progress);
+    }
+});
+</script>
+{% endblock %}

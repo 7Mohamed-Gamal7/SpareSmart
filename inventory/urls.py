@@ -9,6 +9,7 @@ urlpatterns = [
     path('products/create/', views.product_create, name='product_create'),
     path('products/<int:product_id>/', views.product_detail, name='product_detail'),
     path('products/<int:product_id>/edit/', views.product_update, name='product_update'),
+    path('products/bulk-action/', views.bulk_action, name='bulk_action'),
     
     # Categories
     path('categories/', views.category_list, name='category_list'),
@@ -28,4 +29,13 @@ urlpatterns = [
     path('stock-movements/', views.stock_movements, name='stock_movements'),
     path('alerts/', views.inventory_alerts, name='alerts'),
     path('low-stock/', views.low_stock_report, name='low_stock_report'),
+    
+    # Enhanced Alerts Management
+    path('alerts/dashboard/', views.alerts_dashboard, name='alerts_dashboard'),
+    path('alerts/list/', views.alerts_list, name='alerts_list'),
+    path('alerts/<int:alert_id>/acknowledge/', views.acknowledge_alert, name='acknowledge_alert'),
+    path('alerts/<int:alert_id>/resolve/', views.resolve_alert, name='resolve_alert'),
+    path('alerts/bulk-acknowledge/', views.bulk_acknowledge_alerts, name='bulk_acknowledge_alerts'),
+    path('alerts/refresh/', views.refresh_alerts, name='refresh_alerts'),
+    path('purchase-requirements/', views.purchase_requirements, name='purchase_requirements'),
 ]

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Create User" %} - {% trans "SpareSmart" %}{% endblock %}
+{% block page_title %}{% trans "Create User" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #6c5ce7 0%, #5a3ca7 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-user-plus me-3"></i>{% trans "Create User" %}
+                </h1>
+                <p class="mb-0 opacity-75">{% trans "Add a new user to the system" %}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'accounts:user_list' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Users" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">{% trans "Personal Information" %}</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "First Name" %} *</label>
+                        {{ form.first_name|add_class:"form-control" }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Last Name" %} *</label>
+                        {{ form.last_name|add_class:"form-control" }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Email" %}</label>
+                        {{ form.email|add_class:"form-control" }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Phone" %}</label>
+                        {{ form.phone|add_class:"form-control" }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger">{{ form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="mb-3">{% trans "Account Information" %}</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Username" %} *</label>
+                        {{ form.username|add_class:"form-control" }}
+                        {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Password" %} *</label>
+                        {{ form.password1|add_class:"form-control" }}
+                        {% if form.password1.errors %}
+                            <div class="text-danger">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Confirm Password" %} *</label>
+                        {{ form.password2|add_class:"form-control" }}
+                        {% if form.password2.errors %}
+                            <div class="text-danger">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Role" %} *</label>
+                        {{ form.role|add_class:"form-select" }}
+                        {% if form.role.errors %}
+                            <div class="text-danger">{{ form.role.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_active|add_class:"form-check-input" }}
+                            <label class="form-check-label">{% trans "Active" %}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary me-2">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>{% trans "Create User" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

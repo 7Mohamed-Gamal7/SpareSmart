@@ -1,0 +1,1260 @@
+# SpareSmart Arabic Translation
+# SPDX-FileCopyrightText: SpareSmart Team
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SpareSmart 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-14 12:00+0200\n"
+"PO-Revision-Date: 2025-01-14 12:00+0200\n"
+"Last-Translator: SpareSmart Team\n"
+"Language: ar\n"
+"Language-Team: Arabic\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+msgid "SpareSmart - Spare Parts Management"
+msgstr "سبير سمارت - إدارة قطع الغيار"
+
+msgid "SpareSmart"
+msgstr "سبير سمارت"
+
+msgid "Notifications"
+msgstr "الإشعارات"
+
+msgid "Here you can view all system notifications and alerts."
+msgstr "يمكنك هنا عرض جميع إشعارات وتنبيهات النظام."
+
+msgid "No notifications at this time"
+msgstr "لا توجد إشعارات في هذا الوقت"
+
+msgid "We'll notify you when there are important updates."
+msgstr "سنقوم بإشعارك عند وجود تحديثات مهمة."
+
+msgid "System Settings"
+msgstr "إعدادات النظام"
+
+msgid "Language Preferences"
+msgstr "تفضيلات اللغة"
+
+msgid "Select Language"
+msgstr "اختر اللغة"
+
+msgid "User Preferences"
+msgstr "تفضيلات المستخدم"
+
+msgid "Theme"
+msgstr "المظهر"
+
+msgid "Light"
+msgstr "فاتح"
+
+msgid "Dark"
+msgstr "داكن"
+
+msgid "Date Format"
+msgstr "تنسيق التاريخ"
+
+msgid "System Information"
+msgstr "معلومات النظام"
+
+msgid "Current Language"
+msgstr "اللغة الحالية"
+
+msgid "Text Direction"
+msgstr "اتجاه النص"
+
+msgid "Right to Left"
+msgstr "من اليمين إلى اليسار"
+
+msgid "Left to Right"
+msgstr "من اليسار إلى اليمين"
+
+msgid "User Role"
+msgstr "دور المستخدم"
+
+msgid "Last Login"
+msgstr "آخر تسجيل دخول"
+
+# Dashboard specific translations
+msgid "Welcome back"
+msgstr "مرحباً بعودتك"
+
+msgid "Here's what's happening in your spare parts business today."
+msgstr "إليك ما يحدث في تجارة قطع الغيار اليوم."
+
+msgid "Today's Sales"
+msgstr "مبيعات اليوم"
+
+msgid "transactions"
+msgstr "معاملة"
+
+msgid "Monthly Revenue"
+msgstr "إيرادات الشهر"
+
+msgid "sales this month"
+msgstr "مبيعة هذا الشهر"
+
+msgid "Inventory Value"
+msgstr "قيمة المخزون"
+
+msgid "products"
+msgstr "منتج"
+
+msgid "Monthly Expenses"
+msgstr "مصروفات الشهر"
+
+msgid "expenses"
+msgstr "مصروف"
+
+msgid "Alerts & Pending Items"
+msgstr "التنبيهات والعناصر المعلقة"
+
+msgid "Pending Approvals"
+msgstr "موافقات معلقة"
+
+msgid "expense(s) waiting for approval"
+msgstr "مصروف(ات) في انتظار الموافقة"
+
+msgid "Review"
+msgstr "مراجعة"
+
+msgid "Low Stock Alert"
+msgstr "تنبيه مخزون منخفض"
+
+msgid "product(s) running low"
+msgstr "منتج(ات) ينفد المخزون"
+
+msgid "View"
+msgstr "عرض"
+
+msgid "Overdue Payments"
+msgstr "مدفوعات متأخرة"
+
+msgid "payment(s) overdue"
+msgstr "دفعة(ات) متأخرة"
+
+msgid "Follow Up"
+msgstr "متابعة"
+
+msgid "Sales Trend (Last 7 Days)"
+msgstr "اتجاه المبيعات (آخر 7 أيام)"
+
+msgid "Quick Actions"
+msgstr "إجراءات سريعة"
+
+msgid "New Sale"
+msgstr "مبيعة جديدة"
+
+msgid "New Purchase"
+msgstr "مشترى جديد"
+
+msgid "Add Product"
+msgstr "إضافة منتج"
+
+msgid "Record Expense"
+msgstr "تسجيل مصروف"
+
+msgid "View Reports"
+msgstr "عرض التقارير"
+
+msgid "Recent Activities"
+msgstr "الأنشطة الحديثة"
+
+msgid "ago"
+msgstr "مضى"
+
+msgid "View All Activities"
+msgstr "عرض كل الأنشطة"
+
+msgid "No recent activities"
+msgstr "لا توجد أنشطة حديثة"
+
+msgid "Top Selling Products"
+msgstr "المنتجات الأكثر مبيعاً"
+
+msgid "sold"
+msgstr "مبيع"
+
+msgid "View All Products"
+msgstr "عرض كل المنتجات"
+
+msgid "No sales data available"
+msgstr "لا توجد بيانات مبيعات متاحة"
+
+msgid "Sales Amount"
+msgstr "مبلغ المبيعات"
+
+# Main Navigation
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Inventory"
+msgstr "المخزون"
+
+msgid "Sales"
+msgstr "المبيعات"
+
+msgid "Purchases"
+msgstr "المشتريات"
+
+msgid "Customers"
+msgstr "العملاء"
+
+msgid "Suppliers"
+msgstr "الموردين"
+
+msgid "Expenses"
+msgstr "المصروفات"
+
+msgid "Reports"
+msgstr "التقارير"
+
+msgid "Users"
+msgstr "المستخدمين"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+# Common Actions
+msgid "Add"
+msgstr "إضافة"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "View"
+msgstr "عرض"
+
+msgid "Search"
+msgstr "بحث"
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Export"
+msgstr "تصدير"
+
+msgid "Print"
+msgstr "طباعة"
+
+msgid "Submit"
+msgstr "إرسال"
+
+msgid "Update"
+msgstr "تحديث"
+
+msgid "Create"
+msgstr "إنشاء"
+
+msgid "Back"
+msgstr "رجوع"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Continue"
+msgstr "متابعة"
+
+msgid "Refresh"
+msgstr "تحديث"
+
+# Dashboard
+msgid "Welcome to SpareSmart"
+msgstr "مرحباً بك في سبير سمارت"
+
+msgid "Total Sales"
+msgstr "إجمالي المبيعات"
+
+msgid "Total Purchases"
+msgstr "إجمالي المشتريات"
+
+msgid "Total Products"
+msgstr "إجمالي المنتجات"
+
+msgid "Low Stock Items"
+msgstr "المنتجات منخفضة المخزون"
+
+msgid "Recent Activities"
+msgstr "الأنشطة الحديثة"
+
+msgid "Quick Actions"
+msgstr "إجراءات سريعة"
+
+msgid "Statistics"
+msgstr "الإحصائيات"
+
+msgid "Overview"
+msgstr "نظرة عامة"
+
+msgid "Today"
+msgstr "اليوم"
+
+msgid "This Week"
+msgstr "هذا الأسبوع"
+
+msgid "This Month"
+msgstr "هذا الشهر"
+
+msgid "This Year"
+msgstr "هذا العام"
+
+# Inventory
+msgid "Product Management"
+msgstr "إدارة المنتجات"
+
+msgid "Product Name"
+msgstr "اسم المنتج"
+
+msgid "Product Code"
+msgstr "كود المنتج"
+
+msgid "SKU"
+msgstr "رقم المنتج"
+
+msgid "Category"
+msgstr "الفئة"
+
+msgid "Brand"
+msgstr "الماركة"
+
+msgid "Price"
+msgstr "السعر"
+
+msgid "Cost Price"
+msgstr "سعر التكلفة"
+
+msgid "Selling Price"
+msgstr "سعر البيع"
+
+msgid "Current Stock"
+msgstr "المخزون الحالي"
+
+msgid "Minimum Stock"
+msgstr "الحد الأدنى للمخزون"
+
+msgid "Maximum Stock"
+msgstr "الحد الأقصى للمخزون"
+
+msgid "Reorder Level"
+msgstr "مستوى إعادة الطلب"
+
+msgid "Unit"
+msgstr "الوحدة"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Vehicle Type"
+msgstr "نوع المركبة"
+
+msgid "Motorcycle"
+msgstr "دراجة نارية"
+
+msgid "Car"
+msgstr "سيارة"
+
+msgid "Tuk Tuk"
+msgstr "توك توك"
+
+msgid "Universal"
+msgstr "عام"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Active"
+msgstr "نشط"
+
+msgid "Inactive"
+msgstr "غير نشط"
+
+# Stock Alerts
+msgid "Inventory Alerts"
+msgstr "تنبيهات المخزون"
+
+msgid "Out of Stock"
+msgstr "نفاد المخزون"
+
+msgid "Low Stock"
+msgstr "مخزون منخفض"
+
+msgid "Reorder Required"
+msgstr "إعادة طلب مطلوبة"
+
+msgid "Overstock"
+msgstr "مخزون زائد"
+
+msgid "Alert Type"
+msgstr "نوع التنبيه"
+
+msgid "Alert Message"
+msgstr "رسالة التنبيه"
+
+msgid "Recommended Action"
+msgstr "الإجراء الموصى به"
+
+msgid "Created At"
+msgstr "تاريخ الإنشاء"
+
+msgid "Acknowledge"
+msgstr "إقرار"
+
+msgid "Resolve"
+msgstr "حل"
+
+msgid "Purchase Requirements"
+msgstr "متطلبات الشراء"
+
+# Sales
+msgid "Sales Management"
+msgstr "إدارة المبيعات"
+
+msgid "New Sale"
+msgstr "مبيعة جديدة"
+
+msgid "Sale Invoice"
+msgstr "فاتورة مبيعات"
+
+msgid "Customer"
+msgstr "العميل"
+
+msgid "Sale Date"
+msgstr "تاريخ البيع"
+
+msgid "Due Date"
+msgstr "تاريخ الاستحقاق"
+
+msgid "Payment Status"
+msgstr "حالة الدفع"
+
+msgid "Paid"
+msgstr "مدفوع"
+
+msgid "Partially Paid"
+msgstr "مدفوع جزئياً"
+
+msgid "Unpaid"
+msgstr "غير مدفوع"
+
+msgid "Overdue"
+msgstr "متأخر"
+
+msgid "Total Amount"
+msgstr "المبلغ الإجمالي"
+
+msgid "Paid Amount"
+msgstr "المبلغ المدفوع"
+
+msgid "Remaining Amount"
+msgstr "المبلغ المتبقي"
+
+msgid "Discount"
+msgstr "الخصم"
+
+msgid "Tax"
+msgstr "الضريبة"
+
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+msgid "Quantity"
+msgstr "الكمية"
+
+msgid "Unit Price"
+msgstr "سعر الوحدة"
+
+msgid "Line Total"
+msgstr "إجمالي السطر"
+
+# Purchases
+msgid "Purchase Management"
+msgstr "إدارة المشتريات"
+
+msgid "New Purchase"
+msgstr "مشترى جديد"
+
+msgid "Purchase Order"
+msgstr "أمر شراء"
+
+msgid "Supplier"
+msgstr "المورد"
+
+msgid "Purchase Date"
+msgstr "تاريخ الشراء"
+
+msgid "Delivery Date"
+msgstr "تاريخ التسليم"
+
+msgid "Purchase Status"
+msgstr "حالة الشراء"
+
+msgid "Pending"
+msgstr "معلق"
+
+msgid "Confirmed"
+msgstr "مؤكد"
+
+msgid "Delivered"
+msgstr "مُسلم"
+
+msgid "Cancelled"
+msgstr "ملغي"
+
+msgid "Purchase Invoice"
+msgstr "فاتورة مشتريات"
+
+msgid "Reference Number"
+msgstr "رقم المرجع"
+
+# Customers & Suppliers
+msgid "Customer Management"
+msgstr "إدارة العملاء"
+
+msgid "Supplier Management"
+msgstr "إدارة الموردين"
+
+msgid "Customer Name"
+msgstr "اسم العميل"
+
+msgid "Supplier Name"
+msgstr "اسم المورد"
+
+msgid "Contact Person"
+msgstr "الشخص المسؤول"
+
+msgid "Phone"
+msgstr "الهاتف"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Address"
+msgstr "العنوان"
+
+msgid "City"
+msgstr "المدينة"
+
+msgid "Country"
+msgstr "البلد"
+
+msgid "Credit Limit"
+msgstr "حد الائتمان"
+
+msgid "Current Balance"
+msgstr "الرصيد الحالي"
+
+msgid "Registration Date"
+msgstr "تاريخ التسجيل"
+
+msgid "Notes"
+msgstr "ملاحظات"
+
+# Expenses
+msgid "Expense Management"
+msgstr "إدارة المصروفات"
+
+msgid "New Expense"
+msgstr "مصروف جديد"
+
+msgid "Expense Type"
+msgstr "نوع المصروف"
+
+msgid "Expense Amount"
+msgstr "مبلغ المصروف"
+
+msgid "Expense Date"
+msgstr "تاريخ المصروف"
+
+msgid "Paid By"
+msgstr "دفع بواسطة"
+
+msgid "Receipt"
+msgstr "الإيصال"
+
+msgid "Expense Description"
+msgstr "وصف المصروف"
+
+# Reports
+msgid "Reports Management"
+msgstr "إدارة التقارير"
+
+msgid "Sales Report"
+msgstr "تقرير المبيعات"
+
+msgid "Purchase Report"
+msgstr "تقرير المشتريات"
+
+msgid "Inventory Report"
+msgstr "تقرير المخزون"
+
+msgid "Customer Report"
+msgstr "تقرير العملاء"
+
+msgid "Supplier Report"
+msgstr "تقرير الموردين"
+
+msgid "Expense Report"
+msgstr "تقرير المصروفات"
+
+msgid "Profit Report"
+msgstr "تقرير الأرباح"
+
+msgid "From Date"
+msgstr "من تاريخ"
+
+msgid "To Date"
+msgstr "إلى تاريخ"
+
+msgid "Report Period"
+msgstr "فترة التقرير"
+
+msgid "Generate Report"
+msgstr "إنشاء التقرير"
+
+# User Management
+msgid "User Management"
+msgstr "إدارة المستخدمين"
+
+msgid "New User"
+msgstr "مستخدم جديد"
+
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Confirm Password"
+msgstr "تأكيد كلمة المرور"
+
+msgid "First Name"
+msgstr "الاسم الأول"
+
+msgid "Last Name"
+msgstr "الاسم الأخير"
+
+msgid "Role"
+msgstr "الدور"
+
+msgid "Admin"
+msgstr "مدير"
+
+msgid "Manager"
+msgstr "مدير عام"
+
+msgid "Sales Staff"
+msgstr "موظف مبيعات"
+
+msgid "Inventory Staff"
+msgstr "موظف مخازن"
+
+msgid "Cashier"
+msgstr "أمين صندوق"
+
+msgid "Last Login"
+msgstr "آخر تسجيل دخول"
+
+msgid "Date Joined"
+msgstr "تاريخ الانضمام"
+
+# Authentication
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Remember Me"
+msgstr "تذكرني"
+
+msgid "Forgot Password"
+msgstr "نسيت كلمة المرور"
+
+msgid "Welcome"
+msgstr "مرحباً"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Change Password"
+msgstr "تغيير كلمة المرور"
+
+# Common Messages
+msgid "Are you sure?"
+msgstr "هل أنت متأكد؟"
+
+msgid "Confirm Delete"
+msgstr "تأكيد الحذف"
+
+msgid "This action cannot be undone"
+msgstr "لا يمكن التراجع عن هذا الإجراء"
+
+msgid "Success"
+msgstr "نجح"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Warning"
+msgstr "تحذير"
+
+msgid "Information"
+msgstr "معلومات"
+
+msgid "No data found"
+msgstr "لا توجد بيانات"
+
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+msgid "Please wait..."
+msgstr "يرجى الانتظار..."
+
+# Validation Messages
+msgid "This field is required"
+msgstr "هذا الحقل مطلوب"
+
+msgid "Invalid format"
+msgstr "تنسيق غير صحيح"
+
+msgid "Minimum length required"
+msgstr "الحد الأدنى للطول مطلوب"
+
+msgid "Maximum length exceeded"
+msgstr "تم تجاوز الحد الأقصى للطول"
+
+msgid "Invalid email address"
+msgstr "عنوان بريد إلكتروني غير صحيح"
+
+msgid "Passwords do not match"
+msgstr "كلمات المرور غير متطابقة"
+
+# Pagination
+msgid "Previous Page"
+msgstr "الصفحة السابقة"
+
+msgid "Next Page"
+msgstr "الصفحة التالية"
+
+msgid "First Page"
+msgstr "الصفحة الأولى"
+
+msgid "Last Page"
+msgstr "الصفحة الأخيرة"
+
+msgid "Page"
+msgstr "صفحة"
+
+msgid "of"
+msgstr "من"
+
+msgid "records"
+msgstr "سجل"
+
+msgid "showing"
+msgstr "عرض"
+
+msgid "to"
+msgstr "إلى"
+
+# Forms
+msgid "Required field"
+msgstr "حقل مطلوب"
+
+msgid "Optional field"
+msgstr "حقل اختياري"
+
+msgid "Select option"
+msgstr "اختر خياراً"
+
+msgid "Choose file"
+msgstr "اختر ملف"
+
+msgid "Upload"
+msgstr "رفع"
+
+msgid "Browse"
+msgstr "تصفح"
+
+# Dates and Times
+msgid "January"
+msgstr "يناير"
+
+msgid "February"
+msgstr "فبراير"
+
+msgid "March"
+msgstr "مارس"
+
+msgid "April"
+msgstr "أبريل"
+
+msgid "May"
+msgstr "مايو"
+
+msgid "June"
+msgstr "يونيو"
+
+msgid "July"
+msgstr "يوليو"
+
+msgid "August"
+msgstr "أغسطس"
+
+msgid "September"
+msgstr "سبتمبر"
+
+msgid "October"
+msgstr "أكتوبر"
+
+msgid "November"
+msgstr "نوفمبر"
+
+msgid "December"
+msgstr "ديسمبر"
+
+msgid "Monday"
+msgstr "الاثنين"
+
+msgid "Tuesday"
+msgstr "الثلاثاء"
+
+msgid "Wednesday"
+msgstr "الأربعاء"
+
+msgid "Thursday"
+msgstr "الخميس"
+
+msgid "Friday"
+msgstr "الجمعة"
+
+msgid "Saturday"
+msgstr "السبت"
+
+msgid "Sunday"
+msgstr "الأحد"
+
+# Business specific terms
+msgid "Spare Parts"
+msgstr "قطع الغيار"
+
+msgid "Auto Parts"
+msgstr "قطع غيار السيارات"
+
+msgid "Motorcycle Parts"
+msgstr "قطع غيار الدراجات النارية"
+
+msgid "Engine Parts"
+msgstr "قطع غيار المحرك"
+
+msgid "Body Parts"
+msgstr "قطع غيار الهيكل"
+
+msgid "Electrical Parts"
+msgstr "قطع غيار كهربائية"
+
+msgid "Brake Parts"
+msgstr "قطع غيار الفرامل"
+
+msgid "Suspension Parts"
+msgstr "قطع غيار التعليق"
+
+msgid "Transmission Parts"
+msgstr "قطع غيار ناقل الحركة"
+
+msgid "Exhaust Parts"
+msgstr "قطع غيار العادم"
+
+msgid "Original Parts"
+msgstr "قطع أصلية"
+
+msgid "Aftermarket Parts"
+msgstr "قطع غير أصلية"
+
+msgid "Used Parts"
+msgstr "قطع غيار مستعملة"
+
+msgid "New Parts"
+msgstr "قطع غيار جديدة"
+
+msgid "Warranty"
+msgstr "الضمان"
+
+msgid "Installation"
+msgstr "التركيب"
+
+msgid "Part Number"
+msgstr "رقم القطعة"
+
+msgid "OEM Number"
+msgstr "رقم الشركة المصنعة"
+
+msgid "Compatible Models"
+msgstr "الموديلات المتوافقة"
+
+msgid "Model Year"
+msgstr "سنة الموديل"
+
+msgid "Manufacturer"
+msgstr "الشركة المصنعة"
+
+# Purchase Requirements specific
+msgid "Purchase Requirements"
+msgstr "متطلبات الشراء"
+
+msgid "Items that need to be reordered based on current stock levels"
+msgstr "العناصر التي تحتاج إعادة طلب بناءً على مستويات المخزون الحالية"
+
+msgid "Back to Alerts"
+msgstr "العودة إلى التنبيهات"
+
+msgid "Print"
+msgstr "طباعة"
+
+msgid "Items to Order"
+msgstr "عناصر للطلب"
+
+msgid "High Priority"
+msgstr "أولوية عالية"
+
+msgid "Medium Priority"
+msgstr "أولوية متوسطة"
+
+msgid "Total Cost"
+msgstr "التكلفة الإجمالية"
+
+msgid "Create PO"
+msgstr "إنشاء أمر شراء"
+
+msgid "Quick Purchase"
+msgstr "شراء سريع"
+
+msgid "Export CSV"
+msgstr "تصدير CSV"
+
+msgid "View Alerts"
+msgstr "عرض التنبيهات"
+
+msgid "Priority"
+msgstr "الأولوية"
+
+msgid "Product"
+msgstr "المنتج"
+
+msgid "Current Stock"
+msgstr "المخزون الحالي"
+
+msgid "Recommended Qty"
+msgstr "الكمية الموصى بها"
+
+msgid "Unit Cost"
+msgstr "تكلفة الوحدة"
+
+msgid "Alert Type"
+msgstr "نوع التنبيه"
+
+msgid "Create Purchase Order"
+msgstr "إنشاء أمر شراء"
+
+msgid "View All Purchase Orders"
+msgstr "عرض كل أوامر الشراء"
+
+msgid "Export to CSV"
+msgstr "تصدير إلى CSV"
+
+msgid "No Purchase Requirements"
+msgstr "لا توجد متطلبات شراء"
+
+msgid "Excellent! All your products have adequate stock levels. No purchases are required at this time."
+msgstr "ممتاز! جميع منتجاتك لديها مستويات مخزون كافية. لا توجد مشتريات مطلوبة في هذا الوقت."
+
+msgid "View Alerts Dashboard"
+msgstr "عرض لوحة التنبيهات"
+
+msgid "View Products"
+msgstr "عرض المنتجات"
+
+# Purchase Orders specific
+msgid "Purchase Orders"
+msgstr "أوامر الشراء"
+
+msgid "Manage purchase orders, receiving, and supplier payments"
+msgstr "إدارة أوامر الشراء والاستلام ومدفوعات الموردين"
+
+msgid "New Purchase"
+msgstr "شراء جديد"
+
+msgid "Total Orders"
+msgstr "إجمالي الأوامر"
+
+msgid "Today's Orders"
+msgstr "أوامر اليوم"
+
+msgid "Pending Orders"
+msgstr "أوامر معلقة"
+
+msgid "Today's Amount"
+msgstr "مبلغ اليوم"
+
+msgid "Receiving"
+msgstr "الاستلام"
+
+msgid "Payments"
+msgstr "المدفوعات"
+
+msgid "Search Orders"
+msgstr "البحث في الأوامر"
+
+msgid "Date Range"
+msgstr "نطاق التاريخ"
+
+msgid "Purchase #"
+msgstr "رقم الشراء"
+
+msgid "Order Date"
+msgstr "تاريخ الطلب"
+
+msgid "Items"
+msgstr "العناصر"
+
+msgid "Amount"
+msgstr "المبلغ"
+
+msgid "Paid"
+msgstr "مدفوع"
+
+msgid "Balance"
+msgstr "الرصيد"
+
+msgid "Payment"
+msgstr "الدفع"
+
+msgid "No Purchase Orders Found"
+msgstr "لم يتم العثور على أوامر شراء"
+
+msgid "Start managing your inventory by creating your first purchase order."
+msgstr "ابدأ في إدارة مخزونك عن طريق إنشاء أول أمر شراء."
+
+msgid "Create First Purchase"
+msgstr "إنشاء أول شراء"
+
+# User Management specific
+msgid "User Management"
+msgstr "إدارة المستخدمين"
+
+msgid "Manage system users, roles, and permissions"
+msgstr "إدارة مستخدمي النظام والأدوار والصلاحيات"
+
+msgid "New User"
+msgstr "مستخدم جديد"
+
+msgid "Add User"
+msgstr "إضافة مستخدم"
+
+msgid "Permissions"
+msgstr "الصلاحيات"
+
+msgid "User"
+msgstr "المستخدم"
+
+msgid "Date Joined"
+msgstr "تاريخ الانضمام"
+
+msgid "Actions"
+msgstr "الإجراءات"
+
+msgid "Never"
+msgstr "أبداً"
+
+msgid "View Details"
+msgstr "عرض التفاصيل"
+
+msgid "Deactivate"
+msgstr "إلغاء التفعيل"
+
+msgid "Activate"
+msgstr "تفعيل"
+
+msgid "No Users Found"
+msgstr "لم يتم العثور على مستخدمين"
+
+msgid "Start by creating your first user account."
+msgstr "ابدأ بإنشاء حساب المستخدم الأول."
+
+msgid "Create First User"
+msgstr "إنشاء أول مستخدم"
+
+# Profile specific
+msgid "Personal Information"
+msgstr "المعلومات الشخصية"
+
+msgid "Account Information"
+msgstr "معلومات الحساب"
+
+msgid "Recent Activity"
+msgstr "النشاط الحديث"
+
+msgid "No recent activity"
+msgstr "لا يوجد نشاط حديث"
+
+msgid "Your activity will appear here when you use the system."
+msgstr "سيظهر نشاطك هنا عندما تستخدم النظام."
+
+# Expense Management specific
+msgid "Expense Management"
+msgstr "إدارة المصروفات"
+
+msgid "Track and manage business expenses and approvals"
+msgstr "تتبع وإدارة مصروفات الأعمال والموافقات"
+
+msgid "Total Expenses"
+msgstr "إجمالي المصروفات"
+
+msgid "This Month"
+msgstr "هذا الشهر"
+
+msgid "Pending Approvals"
+msgstr "موافقات معلقة"
+
+msgid "Today's Expenses"
+msgstr "مصروفات اليوم"
+
+msgid "Categories"
+msgstr "الفئات"
+
+msgid "Recurring"
+msgstr "متكررة"
+
+msgid "Petty Cash"
+msgstr "النقدية الصغيرة"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Category"
+msgstr "الفئة"
+
+msgid "Paid By"
+msgstr "دفع بواسطة"
+
+msgid "No Expenses Found"
+msgstr "لم يتم العثور على مصروفات"
+
+msgid "Start tracking your business expenses by creating your first expense record."
+msgstr "ابدأ في تتبع مصروفات عملك عن طريق إنشاء أول سجل مصروف."
+
+msgid "Create First Expense"
+msgstr "إنشاء أول مصروف"
+
+# Reports Management specific
+msgid "Reports Management"
+msgstr "إدارة التقارير"
+
+msgid "Generate comprehensive business reports and analytics"
+msgstr "إنشاء تقارير وتحليلات أعمال شاملة"
+
+msgid "Generate Report"
+msgstr "إنشاء تقرير"
+
+msgid "Total Reports"
+msgstr "إجمالي التقارير"
+
+msgid "Templates"
+msgstr "القوالب"
+
+msgid "Scheduled"
+msgstr "مجدولة"
+
+msgid "Quick Reports"
+msgstr "تقارير سريعة"
+
+msgid "Revenue, transactions, and customer analytics"
+msgstr "الإيرادات والمعاملات وتحليلات العملاء"
+
+msgid "Purchase orders, supplier payments, and costs"
+msgstr "أوامر الشراء ومدفوعات الموردين والتكاليف"
+
+msgid "Stock levels, movements, and valuations"
+msgstr "مستويات المخزون والحركات والتقييمات"
+
+msgid "Business expenses and cost analysis"
+msgstr "مصروفات الأعمال وتحليل التكاليف"
+
+msgid "Profit & Loss"
+msgstr "الأرباح والخسائر"
+
+msgid "Financial performance and profitability"
+msgstr "الأداء المالي والربحية"
+
+msgid "Installments Report"
+msgstr "تقرير الأقساط"
+
+msgid "Payment schedules and collections"
+msgstr "جداول الدفع والتحصيلات"
+
+msgid "Report Templates"
+msgstr "قوالب التقارير"
+
+msgid "Create and manage reusable report templates"
+msgstr "إنشاء وإدارة قوالب التقارير القابلة لإعادة الاستخدام"
+
+msgid "Available Templates"
+msgstr "القوالب المتاحة"
+
+msgid "View Templates"
+msgstr "عرض القوالب"
+
+msgid "Generated Reports"
+msgstr "التقارير المُنشأة"
+
+msgid "Access previously generated reports"
+msgstr "الوصول إلى التقارير المُنشأة سابقاً"
+
+msgid "Recent Reports"
+msgstr "التقارير الحديثة"
+
+msgid "View Reports"
+msgstr "عرض التقارير"
+
+msgid "Report Name"
+msgstr "اسم التقرير"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Generated"
+msgstr "مُنشأ"
+
+msgid "Ready"
+msgstr "جاهز"
+
+msgid "Download"
+msgstr "تحميل"
+
+msgid "View All Reports"
+msgstr "عرض كل التقارير"
+
+msgid "No Reports Generated Yet"
+msgstr "لم يتم إنشاء تقارير بعد"
+
+msgid "Start generating reports to track your business performance and analytics."
+msgstr "ابدأ في إنشاء التقارير لتتبع أداء عملك والتحليلات."
+
+msgid "Generate First Report"
+msgstr "إنشاء أول تقرير"

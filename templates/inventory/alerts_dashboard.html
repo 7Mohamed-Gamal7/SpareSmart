@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Inventory Alerts Dashboard | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .alert-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    .alert-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .alert-count {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .alert-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .critical-alert {
+        border-left: 5px solid #dc3545;
+        background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, transparent 100%);
+    }
+    .warning-alert {
+        border-left: 5px solid #ffc107;
+        background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%);
+    }
+    .info-alert {
+        border-left: 5px solid #17a2b8;
+        background: linear-gradient(90deg, rgba(23, 162, 184, 0.1) 0%, transparent 100%);
+    }
+    .success-alert {
+        border-left: 5px solid #28a745;
+        background: linear-gradient(90deg, rgba(40, 167, 69, 0.1) 0%, transparent 100%);
+    }
+    .alert-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .alert-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .alert-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+        vertical-align: middle;
+    }
+    .alert-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    .alert-icon.critical {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    .alert-icon.warning {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    .alert-icon.info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+    .product-info {
+        display: flex;
+        align-items: center;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class=\"container-fluid\">
+    <!-- Page Header -->
+    <div class=\"page-header\">
+        <div class=\"row align-items-center\">
+            <div class=\"col-md-8\">
+                <h1 class=\"mb-1\">
+                    <i class=\"fas fa-exclamation-triangle me-3\"></i>Inventory Alerts Dashboard
+                </h1>
+                <p class=\"mb-0 opacity-75\">Monitor stock levels and take immediate action on critical alerts</p>
+            </div>
+            <div class=\"col-md-4 text-md-end\">
+                <a href=\"{% url 'inventory:refresh_alerts' %}\" class=\"btn btn-light btn-lg me-2\">
+                    <i class=\"fas fa-sync me-2\"></i>Refresh Alerts
+                </a>
+                <a href=\"{% url 'inventory:purchase_requirements' %}\" class=\"btn btn-warning btn-lg\">
+                    <i class=\"fas fa-shopping-cart me-2\"></i>Purchase Req.
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class=\"quick-actions\">
+        <div class=\"row g-2\">
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:alerts_list' %}\" class=\"btn btn-primary w-100\">
+                    <i class=\"fas fa-list me-1\"></i>All Alerts
+                </a>
+            </div>
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:alerts_list' %}?alert_type=out_of_stock\" class=\"btn btn-danger w-100\">
+                    <i class=\"fas fa-times-circle me-1\"></i>Out of Stock
+                </a>
+            </div>
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:alerts_list' %}?alert_type=low_stock\" class=\"btn btn-warning w-100\">
+                    <i class=\"fas fa-exclamation-triangle me-1\"></i>Low Stock
+                </a>
+            </div>
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:purchase_requirements' %}\" class=\"btn btn-info w-100\">
+                    <i class=\"fas fa-shopping-cart me-1\"></i>Purchase Req.
+                </a>
+            </div>
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:low_stock_report' %}\" class=\"btn btn-secondary w-100\">
+                    <i class=\"fas fa-chart-bar me-1\"></i>Reports
+                </a>
+            </div>
+            <div class=\"col-md-2\">
+                <a href=\"{% url 'inventory:product_list' %}\" class=\"btn btn-outline-primary w-100\">
+                    <i class=\"fas fa-boxes me-1\"></i>Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Summary Cards -->
+    <div class=\"row mb-4\">
+        <div class=\"col-md-3\">
+            <div class=\"alert-card critical-alert\">
+                <div class=\"alert-count text-danger\">{{ alert_counts.out_of_stock }}</div>
+                <div class=\"alert-label\">Out of Stock</div>
+                <div class=\"mt-2\">
+                    <small class=\"text-muted\">Requires immediate attention</small>
+                </div>
+            </div>
+        </div>
+        <div class=\"col-md-3\">
+            <div class=\"alert-card warning-alert\">
+                <div class=\"alert-count text-warning\">{{ alert_counts.low_stock }}</div>
+                <div class=\"alert-label\">Low Stock</div>
+                <div class=\"mt-2\">
+                    <small class=\"text-muted\">Below minimum levels</small>
+                </div>
+            </div>
+        </div>
+        <div class=\"col-md-3\">
+            <div class=\"alert-card info-alert\">
+                <div class=\"alert-count text-info\">{{ alert_counts.reorder }}</div>
+                <div class=\"alert-label\">Reorder Required</div>
+                <div class=\"mt-2\">
+                    <small class=\"text-muted\">At reorder point</small>
+                </div>
+            </div>
+        </div>
+        <div class=\"col-md-3\">
+            <div class=\"alert-card success-alert\">
+                <div class=\"alert-count text-success\">{{ alert_counts.overstock }}</div>
+                <div class=\"alert-label\">Overstock</div>
+                <div class=\"mt-2\">
+                    <small class=\"text-muted\">Above maximum levels</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Information -->
+    <div class=\"row mb-4\">
+        <div class=\"col-md-6\">
+            <div class=\"alert-card\">
+                <h5><i class=\"fas fa-chart-pie me-2\"></i>Alert Summary</h5>
+                <div class=\"row\">
+                    <div class=\"col-6\">
+                        <div class=\"text-center\">
+                            <div class=\"h3 text-primary\">{{ total_alerts }}</div>
+                            <small class=\"text-muted\">Total Active Alerts</small>
+                        </div>
+                    </div>
+                    <div class=\"col-6\">
+                        <div class=\"text-center\">
+                            <div class=\"h3 text-success\">${{ affected_value|floatformat:2 }}</div>
+                            <small class=\"text-muted\">Affected Inventory Value</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class=\"col-md-6\">
+            <div class=\"alert-card\">
+                <h5><i class=\"fas fa-bolt me-2\"></i>Quick Stats</h5>
+                <div class=\"row\">
+                    <div class=\"col-6\">
+                        <div class=\"text-center\">
+                            <div class=\"h3 text-danger\">{{ critical_alerts.count }}</div>
+                            <small class=\"text-muted\">Critical Alerts</small>
+                        </div>
+                    </div>
+                    <div class=\"col-6\">
+                        <div class=\"text-center\">
+                            <div class=\"h3 text-info\">{{ recent_alerts.count }}</div>
+                            <small class=\"text-muted\">Recent Alerts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Alerts -->
+    {% if critical_alerts %}
+    <div class=\"alert-card\">
+        <div class=\"d-flex justify-content-between align-items-center mb-3\">
+            <h5 class=\"mb-0\"><i class=\"fas fa-exclamation-triangle text-danger me-2\"></i>Critical Alerts</h5>
+            <a href=\"{% url 'inventory:alerts_list' %}?alert_type=out_of_stock,low_stock\" class=\"btn btn-outline-primary btn-sm\">
+                View All Critical
+            </a>
+        </div>
+        
+        <div class=\"alert-table\">
+            <table class=\"table table-hover mb-0\">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Alert Type</th>
+                        <th>Current Stock</th>
+                        <th>Required Action</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alert in critical_alerts|slice:\":10\" %}
+                    <tr>
+                        <td>
+                            <div class=\"product-info\">
+                                <div class=\"alert-icon {% if alert.alert_type == 'out_of_stock' %}critical{% else %}warning{% endif %}\">
+                                    <i class=\"fas {% if alert.alert_type == 'out_of_stock' %}fa-times{% else %}fa-exclamation{% endif %}\"></i>
+                                </div>
+                                <div>
+                                    <div class=\"fw-bold\">{{ alert.product.name }}</div>
+                                    <small class=\"text-muted\">{{ alert.product.sku }} | {{ alert.product.category.name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class=\"badge {% if alert.alert_type == 'out_of_stock' %}bg-danger{% else %}bg-warning{% endif %}\">
+                                {{ alert.get_alert_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class=\"fw-bold {% if alert.current_stock == 0 %}text-danger{% else %}text-warning{% endif %}\">
+                                {{ alert.current_stock }} {{ alert.product.unit }}
+                            </div>
+                            <small class=\"text-muted\">Min: {{ alert.product.minimum_stock }}</small>
+                        </td>
+                        <td>
+                            <small class=\"text-muted\">{{ alert.recommended_action|truncatewords:8 }}</small>
+                        </td>
+                        <td>
+                            <div>{{ alert.created_at|date:\"M d, Y\" }}</div>
+                            <small class=\"text-muted\">{{ alert.created_at|time:\"H:i\" }}</small>
+                        </td>
+                        <td>
+                            <div class=\"btn-group btn-group-sm\">
+                                <button class=\"btn btn-outline-success\" onclick=\"acknowledgeAlert({{ alert.id }})\">
+                                    <i class=\"fas fa-check\"></i>
+                                </button>
+                                <a href=\"{% url 'inventory:product_detail' alert.product.id %}\" class=\"btn btn-outline-primary\">
+                                    <i class=\"fas fa-eye\"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Alerts -->
+    {% if recent_alerts %}
+    <div class=\"alert-card mt-4\">
+        <div class=\"d-flex justify-content-between align-items-center mb-3\">
+            <h5 class=\"mb-0\"><i class=\"fas fa-clock text-info me-2\"></i>Recent Alerts</h5>
+            <a href=\"{% url 'inventory:alerts_list' %}\" class=\"btn btn-outline-primary btn-sm\">
+                View All Alerts
+            </a>
+        </div>
+        
+        <div class=\"row\">
+            {% for alert in recent_alerts|slice:\":8\" %}
+            <div class=\"col-md-6 mb-3\">
+                <div class=\"card h-100\">
+                    <div class=\"card-body\">
+                        <div class=\"d-flex align-items-center mb-2\">
+                            <div class=\"alert-icon 
+                                {% if alert.alert_type == 'out_of_stock' %}critical
+                                {% elif alert.alert_type == 'low_stock' %}warning
+                                {% else %}info{% endif %} me-3\">
+                                <i class=\"fas 
+                                    {% if alert.alert_type == 'out_of_stock' %}fa-times
+                                    {% elif alert.alert_type == 'low_stock' %}fa-exclamation
+                                    {% elif alert.alert_type == 'reorder' %}fa-shopping-cart
+                                    {% else %}fa-info{% endif %}\"></i>
+                            </div>
+                            <div class=\"flex-grow-1\">
+                                <h6 class=\"mb-1\">{{ alert.product.name }}</h6>
+                                <small class=\"text-muted\">{{ alert.product.sku }}</small>
+                            </div>
+                        </div>
+                        <p class=\"card-text small\">{{ alert.message }}</p>
+                        <div class=\"d-flex justify-content-between align-items-center\">
+                            <span class=\"badge 
+                                {% if alert.alert_type == 'out_of_stock' %}bg-danger
+                                {% elif alert.alert_type == 'low_stock' %}bg-warning
+                                {% elif alert.alert_type == 'reorder' %}bg-info
+                                {% else %}bg-success{% endif %}\">
+                                {{ alert.get_alert_type_display }}
+                            </span>
+                            <small class=\"text-muted\">{{ alert.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- No Alerts State -->
+    {% if total_alerts == 0 %}
+    <div class=\"alert-card text-center py-5\">
+        <i class=\"fas fa-check-circle fa-5x text-success mb-4\"></i>
+        <h3 class=\"text-success mb-3\">All Good!</h3>
+        <p class=\"text-muted mb-4\">No active inventory alerts at this time. Your inventory levels are within acceptable ranges.</p>
+        <a href=\"{% url 'inventory:product_list' %}\" class=\"btn btn-primary me-3\">
+            <i class=\"fas fa-boxes me-2\"></i>View Products
+        </a>
+        <a href=\"{% url 'inventory:low_stock_report' %}\" class=\"btn btn-outline-secondary\">
+            <i class=\"fas fa-chart-bar me-2\"></i>View Reports
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function acknowledgeAlert(alertId) {
+    if (confirm('Are you sure you want to acknowledge this alert?')) {
+        fetch(`/inventory/alerts/${alertId}/acknowledge/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error acknowledging alert');
+        });
+    }
+}
+
+// Auto-refresh alerts every 5 minutes
+setInterval(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

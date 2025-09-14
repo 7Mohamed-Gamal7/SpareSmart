@@ -7,6 +7,7 @@ urlpatterns = [
     # Purchases
     path('', views.purchase_list, name='purchase_list'),
     path('create/', views.purchase_create, name='purchase_create'),
+    path('quick-purchase/', views.quick_purchase, name='quick_purchase'),
     path('<int:purchase_id>/', views.purchase_detail, name='purchase_detail'),
     path('<int:purchase_id>/edit/', views.purchase_update, name='purchase_update'),
     path('<int:purchase_id>/receive/', views.purchase_receive, name='purchase_receive'),

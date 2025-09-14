@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Expense Management" %} - {% trans "SpareSmart" %}{% endblock %}
+{% block page_title %}{% trans "Expense Management" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .expenses-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .expenses-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .expenses-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .expenses-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .stats-row {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #e17055;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-receipt me-3"></i>{% trans "Expense Management" %}
+                </h1>
+                <p class="mb-0 opacity-75">{% trans "Track and manage business expenses and approvals" %}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'expenses:expense_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>{% trans "New Expense" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="stats-row">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_expenses|default:0 }}</div>
+                    <div class="stat-label">{% trans "Total Expenses" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">${{ monthly_total|default:0|floatformat:2 }}</div>
+                    <div class="stat-label">{% trans "This Month" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-warning">{{ pending_approvals|default:0 }}</div>
+                    <div class="stat-label">{% trans "Pending Approvals" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-success">${{ today_expenses|default:0|floatformat:2 }}</div>
+                    <div class="stat-label">{% trans "Today's Expenses" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <a href="{% url 'expenses:expense_create' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-1"></i>{% trans "New Expense" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'expenses:expense_category_list' %}" class="btn btn-secondary w-100">
+                    <i class="fas fa-tags me-1"></i>{% trans "Categories" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'expenses:recurring_expense_list' %}" class="btn btn-info w-100">
+                    <i class="fas fa-repeat me-1"></i>{% trans "Recurring" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'expenses:petty_cash_list' %}" class="btn btn-warning w-100">
+                    <i class="fas fa-money-bill me-1"></i>{% trans "Petty Cash" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="#" class="btn btn-success w-100">
+                    <i class="fas fa-chart-bar me-1"></i>{% trans "Reports" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <button onclick="exportExpenses()" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-download me-1"></i>{% trans "Export" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expenses Table -->
+    {% if expenses %}
+    <div class="expenses-table">
+        <table class="table table-hover mb-0 data-table">
+            <thead>
+                <tr>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th>{% trans "Category" %}</th>
+                    <th>{% trans "Amount" %}</th>
+                    <th>{% trans "Paid By" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>
+                        <div>{{ expense.date|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ expense.date|time:"H:i" }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ expense.description }}</div>
+                        {% if expense.notes %}
+                        <small class="text-muted">{{ expense.notes|truncatechars:50 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ expense.category }}</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold">${{ expense.amount|floatformat:2 }}</div>
+                    </td>
+                    <td>
+                        <div>{{ expense.created_by.first_name }} {{ expense.created_by.last_name }}</div>
+                        <small class="text-muted">{{ expense.created_by.get_role_display }}</small>
+                    </td>
+                    <td>
+                        <span class="badge status-badge 
+                            {% if expense.status == 'approved' %}bg-success
+                            {% elif expense.status == 'pending' %}bg-warning
+                            {% elif expense.status == 'rejected' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ expense.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'expenses:expense_detail' expense.id %}">
+                                    <i class="fas fa-eye me-2"></i>{% trans "View Details" %}</a></li>
+                                {% if expense.status == 'pending' %}
+                                <li><a class="dropdown-item" href="{% url 'expenses:expense_update' expense.id %}">
+                                    <i class="fas fa-edit me-2"></i>{% trans "Edit" %}</a></li>
+                                {% if user.role in 'admin,manager' %}
+                                <li><a class="dropdown-item" href="{% url 'expenses:expense_approve' expense.id %}">
+                                    <i class="fas fa-check me-2"></i>{% trans "Approve" %}</a></li>
+                                {% endif %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-receipt fa-5x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">{% trans "No Expenses Found" %}</h3>
+        <p class="text-muted mb-4">{% trans "Start tracking your business expenses by creating your first expense record." %}</p>
+        <a href="{% url 'expenses:expense_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>{% trans "Create First Expense" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportExpenses() {
+    window.location.href = '{% url "expenses:expense_list" %}?export=csv';
+}
+</script>
+{% endblock %}

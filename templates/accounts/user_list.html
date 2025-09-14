@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "User Management" %} - {% trans "SpareSmart" %}{% endblock %}
+{% block page_title %}{% trans "User Management" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #6c5ce7 0%, #5a3ca7 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .users-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .users-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .users-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .users-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .role-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-users me-3"></i>{% trans "User Management" %}
+                </h1>
+                <p class="mb-0 opacity-75">{% trans "Manage system users, roles, and permissions" %}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'accounts:user_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>{% trans "New User" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <a href="{% url 'accounts:user_create' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-1"></i>{% trans "Add User" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'accounts:role_permissions' %}" class="btn btn-secondary w-100">
+                    <i class="fas fa-key me-1"></i>{% trans "Permissions" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <button onclick="exportUsers()" class="btn btn-info w-100">
+                    <i class="fas fa-download me-1"></i>{% trans "Export" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    {% if users %}
+    <div class="users-table">
+        <table class="table table-hover mb-0" id="usersTable">
+            <thead>
+                <tr>
+                    <th>{% trans "User" %}</th>
+                    <th>{% trans "Role" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Last Login" %}</th>
+                    <th>{% trans "Date Joined" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
+                                 alt="Profile" class="rounded-circle me-3" width="40" height="40">
+                            <div>
+                                <div class="fw-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                                <small class="text-muted">{{ user.username }} • {{ user.email }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="role-badge bg-primary text-white">
+                            {{ user.get_role_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %} text-white">
+                            {% if user.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if user.last_login %}
+                            {{ user.last_login|date:"Y-m-d H:i" }}
+                        {% else %}
+                            <span class="text-muted">{% trans "Never" %}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'accounts:user_detail' user.id %}">
+                                    <i class="fas fa-eye me-2"></i>{% trans "View Details" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:user_update' user.id %}">
+                                    <i class="fas fa-edit me-2"></i>{% trans "Edit" %}</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:admin_change_password' user.id %}">
+                                    <i class="fas fa-key me-2"></i>{% trans "Change Password" %}</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:toggle_user_status' user.id %}">
+                                    <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %} me-2"></i>
+                                    {% if user.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-users fa-5x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">{% trans "No Users Found" %}</h3>
+        <p class="text-muted mb-4">{% trans "Start by creating your first user account." %}</p>
+        <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>{% trans "Create First User" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#usersTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        order: [[4, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: [5] }
+        ]
+    });
+});
+
+function exportUsers() {
+    window.location.href = '{% url "accounts:user_list" %}?export=csv';
+}
+</script>
+{% endblock %}

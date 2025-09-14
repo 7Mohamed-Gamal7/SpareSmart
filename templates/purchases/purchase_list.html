@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Purchase Orders" %} | {% trans "SpareSmart" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #ff7043 0%, #d32f2f 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .filter-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .purchases-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .purchases-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .purchases-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .purchases-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .stats-row {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ff7043;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    .purchase-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-shopping-cart me-3"></i>{% trans "Purchase Orders" %}
+                </h1>
+                <p class="mb-0 opacity-75">{% trans "Manage purchase orders, receiving, and supplier payments" %}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'purchases:purchase_create' %}" class="btn btn-light btn-lg me-2">
+                    <i class="fas fa-plus me-2"></i>{% trans "New Purchase" %}
+                </a>
+                <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-bolt me-2"></i>{% trans "Quick Purchase" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="stats-row">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_purchases }}</div>
+                    <div class="stat-label">{% trans "Total Orders" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ today_purchases }}</div>
+                    <div class="stat-label">{% trans "Today's Orders" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-warning">{{ pending_orders }}</div>
+                    <div class="stat-label">{% trans "Pending Orders" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-success">${{ today_amount|floatformat:2 }}</div>
+                    <div class="stat-label">{% trans "Today's Amount" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-1"></i>{% trans "New Purchase" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success w-100">
+                    <i class="fas fa-bolt me-1"></i>{% trans "Quick Purchase" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="#" class="btn btn-info w-100">
+                    <i class="fas fa-truck me-1"></i>{% trans "Receiving" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="#" class="btn btn-warning w-100">
+                    <i class="fas fa-credit-card me-1"></i>{% trans "Payments" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="#" class="btn btn-secondary w-100">
+                    <i class="fas fa-chart-bar me-1"></i>{% trans "Reports" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="#" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-download me-1"></i>{% trans "Export" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">{% trans "Search Orders" %}</label>
+                {{ filter_form.search }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{% trans "Supplier" %}</label>
+                {{ filter_form.supplier }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{% trans "Status" %}</label>
+                {{ filter_form.status }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{% trans "Payment Status" %}</label>
+                {{ filter_form.payment_status }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">{% trans "Date Range" %}</label>
+                {{ filter_form.date_range }}
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="row g-3 mt-2">
+            <div class="col-md-3">
+                <label class="form-label">{% trans "From Date" %}</label>
+                {{ filter_form.date_from }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">{% trans "To Date" %}</label>
+                {{ filter_form.date_to }}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>{% trans "Filter" %}
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>{% trans "Clear" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchases Table -->
+    {% if purchases %}
+    <div class="purchases-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>{% trans "Purchase #" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Order Date" %}</th>
+                    <th>{% trans "Items" %}</th>
+                    <th>{% trans "Amount" %}</th>
+                    <th>{% trans "Paid" %}</th>
+                    <th>{% trans "Balance" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Payment" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase in purchases %}
+                <tr>
+                    <td>
+                        <a href="{% url 'purchases:purchase_detail' purchase.id %}" class="fw-bold text-decoration-none">
+                            {{ purchase.purchase_number }}
+                        </a>
+                        {% if purchase.supplier_reference %}
+                        <br><small class="text-muted">Ref: {{ purchase.supplier_reference }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-bold">{{ purchase.supplier.name }}</div>
+                            <small class="text-muted">{{ purchase.supplier.phone }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>{{ purchase.order_date|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ purchase.order_date|time:"H:i" }}</small>
+                        {% if purchase.expected_delivery_date %}
+                        <br><small class="text-info">Due: {{ purchase.expected_delivery_date|date:"M d" }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ purchase.items.count }} items</span>
+                        {% with total_qty=purchase.items.all|length %}
+                        {% if total_qty > 0 %}
+                        <br><small class="text-muted">{{ total_qty }} products</small>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <div class="fw-bold">${{ purchase.total_amount|floatformat:2 }}</div>
+                        {% if purchase.discount_amount > 0 %}
+                        <small class="text-success">-${{ purchase.discount_amount|floatformat:2 }} discount</small>
+                        {% endif %}
+                        {% if purchase.shipping_cost > 0 %}
+                        <br><small class="text-info">+${{ purchase.shipping_cost|floatformat:2 }} shipping</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="text-success fw-bold">${{ purchase.paid_amount|floatformat:2 }}</div>
+                    </td>
+                    <td>
+                        {% if purchase.balance_amount > 0 %}
+                            <div class="text-danger fw-bold">${{ purchase.balance_amount|floatformat:2 }}</div>
+                        {% else %}
+                            <div class="text-muted">$0.00</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge status-badge 
+                            {% if purchase.status == 'pending' %}bg-warning
+                            {% elif purchase.status == 'ordered' %}bg-info
+                            {% elif purchase.status == 'partial_received' %}bg-primary
+                            {% elif purchase.status == 'received' %}bg-success
+                            {% elif purchase.status == 'cancelled' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ purchase.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge status-badge 
+                            {% if purchase.payment_status == 'paid' %}bg-success
+                            {% elif purchase.payment_status == 'partial' %}bg-warning
+                            {% elif purchase.payment_status == 'overdue' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ purchase.get_payment_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_detail' purchase.id %}">
+                                    <i class="fas fa-eye me-2"></i>{% trans "View Details" %}</a></li>
+                                {% if purchase.status not in 'received,cancelled' %}
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_update' purchase.id %}">
+                                    <i class="fas fa-edit me-2"></i>{% trans "Edit" %}</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_invoice' purchase.id %}">
+                                    <i class="fas fa-file-invoice me-2"></i>{% trans "View Invoice" %}</a></li>
+                                {% if purchase.status in 'ordered,partial_received' %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_receive' purchase.id %}">
+                                    <i class="fas fa-truck me-2"></i>{% trans "Receive Goods" %}</a></li>
+                                {% endif %}
+                                {% if purchase.balance_amount > 0 %}
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_payment_create' purchase.id %}">
+                                    <i class="fas fa-credit-card me-2"></i>{% trans "Record Payment" %}</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">{% trans "No Purchase Orders Found" %}</h3>
+        <p class="text-muted mb-4">{% trans "Start managing your inventory by creating your first purchase order." %}</p>
+        <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-plus me-2"></i>{% trans "Create First Purchase" %}
+        </a>
+        <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
+            <i class="fas fa-bolt me-2"></i>{% trans "Quick Purchase" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form on filter change
+    const filterSelects = document.querySelectorAll('select[name="supplier"], select[name="status"], select[name="payment_status"], select[name="date_range"]');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+
+    // Date range change handler
+    const dateRangeSelect = document.querySelector('select[name="date_range"]');
+    const dateFromInput = document.querySelector('input[name="date_from"]');
+    const dateToInput = document.querySelector('input[name="date_to"]');
+    
+    if (dateRangeSelect) {
+        dateRangeSelect.addEventListener('change', function() {
+            if (this.value) {
+                dateFromInput.value = '';
+                dateToInput.value = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

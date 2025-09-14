@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Invoice #{{ sale.sale_number }} | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        margin: 2rem 0;
+    }
+    .invoice-header {
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+    }
+    .company-info {
+        text-align: right;
+    }
+    .company-logo {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    .invoice-title {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+    .invoice-number {
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+    .customer-info, .invoice-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    .items-table {
+        margin: 2rem 0;
+    }
+    .items-table th {
+        background: #667eea;
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+    }
+    .items-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .total-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 2rem;
+        border-left: 5px solid #667eea;
+    }
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+    }
+    .total-row.final {
+        border-top: 2px solid #667eea;
+        padding-top: 1rem;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+    }
+    .invoice-footer {
+        border-top: 2px solid #e9ecef;
+        padding-top: 2rem;
+        margin-top: 3rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    .action-buttons {
+        margin: 2rem 0;
+        text-align: center;
+    }
+    .action-buttons .btn {
+        margin: 0.25rem;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+    }
+    @media print {
+        .action-buttons, .navbar, .sidebar {
+            display: none !important;
+        }
+        .invoice-container {
+            box-shadow: none;
+            margin: 0;
+            padding: 1rem;
+        }
+        body {
+            font-size: 12px;
+        }
+    }
+    .payment-info {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Action Buttons -->
+    <div class="action-buttons no-print">
+        <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Sale
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-2"></i>Print Invoice
+        </button>
+        <a href="{% url 'sales:sale_print' sale.id %}" target="_blank" class="btn btn-success">
+            <i class="fas fa-file-pdf me-2"></i>Download PDF
+        </a>
+        {% if sale.balance_amount > 0 %}
+        <a href="{% url 'sales:payment_create' sale.id %}" class="btn btn-warning">
+            <i class="fas fa-credit-card me-2"></i>Record Payment
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Invoice Container -->
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="company-logo">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h2 class="mb-1">SpareSmart</h2>
+                    <p class="text-muted mb-1">Motorcycle, Car & Tuk-Tuk Spare Parts</p>
+                    <p class="text-muted mb-1">123 Main Street, Business District</p>
+                    <p class="text-muted mb-1">Phone: +1 (555) 123-4567</p>
+                    <p class="text-muted">Email: info@sparesmart.com</p>
+                </div>
+                <div class="col-md-6 company-info">
+                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-number">#{{ sale.sale_number }}</div>
+                    <div class="mt-3">
+                        <span class="badge status-badge 
+                            {% if sale.payment_status == 'paid' %}bg-success
+                            {% elif sale.payment_status == 'partial' %}bg-warning
+                            {% elif sale.payment_status == 'overdue' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ sale.get_payment_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer and Invoice Details -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="customer-info">
+                    <h5 class="mb-3"><i class="fas fa-user me-2"></i>Bill To:</h5>
+                    <h6 class="mb-2">{{ sale.customer.name }}</h6>
+                    {% if sale.customer.company_name %}
+                    <p class="mb-1">{{ sale.customer.company_name }}</p>
+                    {% endif %}
+                    <p class="mb-1">{{ sale.customer.address|default:"Address not provided" }}</p>
+                    <p class="mb-1">Phone: {{ sale.customer.phone }}</p>
+                    {% if sale.customer.email %}
+                    <p class="mb-1">Email: {{ sale.customer.email }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="invoice-details">
+                    <h5 class="mb-3"><i class="fas fa-calendar me-2"></i>Invoice Details:</h5>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>Invoice Date:</strong></div>
+                        <div class="col-6">{{ sale.sale_date|date:"M d, Y" }}</div>
+                    </div>
+                    {% if sale.due_date %}
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>Due Date:</strong></div>
+                        <div class="col-6">{{ sale.due_date|date:"M d, Y" }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>Sale Type:</strong></div>
+                        <div class="col-6">{{ sale.get_sale_type_display }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>Salesperson:</strong></div>
+                        <div class="col-6">{{ sale.created_by.get_full_name }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-table">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 40%">Product Description</th>
+                        <th style="width: 10%">Qty</th>
+                        <th style="width: 15%">Unit Price</th>
+                        <th style="width: 10%">Discount</th>
+                        <th style="width: 20%">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sale.items.all %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="fw-bold">{{ item.product.name }}</div>
+                            <small class="text-muted">SKU: {{ item.product.sku }}</small>
+                            {% if item.product.brand %}
+                            <br><small class="text-muted">Brand: {{ item.product.brand.name }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-end">${{ item.unit_price|floatformat:2 }}</td>
+                        <td class="text-center">
+                            {% if item.discount_percentage > 0 %}
+                                {{ item.discount_percentage }}%
+                                <br><small class="text-success">-${{ item.discount_amount|floatformat:2 }}</small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-bold">${{ item.total_price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <div class="row">
+            <div class="col-md-6">
+                {% if sale.notes %}
+                <div class="mb-3">
+                    <h6><i class="fas fa-sticky-note me-2"></i>Notes:</h6>
+                    <p>{{ sale.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="total-section">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span>${{ sale.subtotal|floatformat:2 }}</span>
+                    </div>
+                    {% if sale.discount_amount > 0 %}
+                    <div class="total-row">
+                        <span>Discount:</span>
+                        <span class="text-success">-${{ sale.discount_amount|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="total-row final">
+                        <span>Total Amount:</span>
+                        <span>${{ sale.total_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        {% if payments or sale.paid_amount > 0 %}
+        <div class="payment-info">
+            <h6><i class="fas fa-credit-card me-2"></i>Payment Information:</h6>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <strong>Total Amount:</strong> ${{ sale.total_amount|floatformat:2 }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <strong>Amount Paid:</strong> <span class="text-success">${{ sale.paid_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-2">
+                        <strong>Balance Due:</strong> 
+                        {% if sale.balance_amount > 0 %}
+                            <span class="text-danger">${{ sale.balance_amount|floatformat:2 }}</span>
+                        {% else %}
+                            <span class="text-success">$0.00</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if payments %}
+            <div class="mt-3">
+                <h6>Payment History:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                                <td class="text-success">${{ payment.amount|floatformat:2 }}</td>
+                                <td>{{ payment.get_payment_method_display }}</td>
+                                <td>{{ payment.reference_number|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Installment Information -->
+        {% if sale.sale_type == 'installment' and installment_plan %}
+        <div class="payment-info">
+            <h6><i class="fas fa-calendar-alt me-2"></i>Installment Plan:</h6>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <strong>Down Payment:</strong> ${{ installment_plan.down_payment|floatformat:2 }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <strong>Installment Amount:</strong> ${{ installment_plan.installment_amount|floatformat:2 }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <strong>Number of Installments:</strong> {{ installment_plan.number_of_installments }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-2">
+                        <strong>Interest Rate:</strong> {{ installment_plan.interest_rate }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Invoice Footer -->
+        <div class="invoice-footer">
+            <p class="mb-2"><strong>Thank you for your business!</strong></p>
+            <p class="mb-1">For any queries regarding this invoice, please contact us at info@sparesmart.com</p>
+            <p class="mb-0"><small>This is a computer-generated invoice and does not require a signature.</small></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-print if print parameter is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('print') === 'true') {
+        window.print();
+    }
+});
+</script>
+{% endblock %}

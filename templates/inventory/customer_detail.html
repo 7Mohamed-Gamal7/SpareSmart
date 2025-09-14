@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Customer Details - {{ customer.name }} | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .customer-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .info-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+    .info-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+    }
+    .customer-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 1.5rem;
+        margin-right: 1.5rem;
+    }
+    .balance-positive { color: #28a745; }
+    .balance-negative { color: #dc3545; }
+    .balance-zero { color: #6c757d; }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        text-align: center;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .action-buttons .btn {
+        margin: 0.25rem;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+    .transaction-table {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Customer Header -->
+    <div class="customer-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center">
+                    <div class="customer-avatar" style="background-color: #667eea;">
+                        {{ customer.name|slice:':2'|upper }}
+                    </div>
+                    <div>
+                        <h1 class="mb-1">{{ customer.name }}</h1>
+                        {% if customer.company_name %}
+                        <p class="mb-0 opacity-75">{{ customer.company_name }}</p>
+                        {% endif %}
+                        <span class="badge bg-light text-dark mt-2">
+                            {{ customer.get_customer_type_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="badge 
+                    {% if customer.is_active %}bg-success
+                    {% else %}bg-secondary{% endif %} p-2">
+                    {% if customer.is_active %}Active Customer{% else %}Inactive{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Customer Information -->
+        <div class="col-lg-8">
+            <!-- Contact Information -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-address-card me-2"></i>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Phone Number</label>
+                                <p class="fw-bold">
+                                    <i class="fas fa-phone me-2"></i>{{ customer.phone }}
+                                </p>
+                            </div>
+                            {% if customer.email %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Email Address</label>
+                                <p>
+                                    <i class="fas fa-envelope me-2"></i>{{ customer.email }}
+                                </p>
+                            </div>
+                            {% endif %}
+                            {% if customer.whatsapp %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">WhatsApp</label>
+                                <p>
+                                    <i class="fab fa-whatsapp me-2"></i>{{ customer.whatsapp }}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if customer.address %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Address</label>
+                                <p>
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ customer.address }}
+                                </p>
+                            </div>
+                            {% endif %}
+                            {% if customer.city %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">City</label>
+                                <p>{{ customer.city }}</p>
+                            </div>
+                            {% endif %}
+                            {% if customer.tax_number %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Tax Number</label>
+                                <p>{{ customer.tax_number }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Information -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Financial Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Current Balance</label>
+                                <p class="fw-bold 
+                                    {% if customer.balance > 0 %}balance-positive
+                                    {% elif customer.balance < 0 %}balance-negative
+                                    {% else %}balance-zero{% endif %}">
+                                    ${{ customer.balance|floatformat:2 }}
+                                </p>
+                                <small class="text-muted">
+                                    {% if customer.balance > 0 %}
+                                        Credit Balance (Customer overpaid)
+                                    {% elif customer.balance < 0 %}
+                                        Outstanding Amount (Customer owes)
+                                    {% else %}
+                                        No outstanding balance
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Credit Limit</label>
+                                <p class="fw-bold">${{ customer.credit_limit|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Payment Terms</label>
+                                <p>{{ customer.payment_terms }} days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales History -->
+            <div class="card info-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Sales History</h5>
+                    <small class="text-muted">Recent transactions</small>
+                </div>
+                <div class="card-body p-0">
+                    {% comment %}
+                    <!-- This will be implemented when sales module is ready -->
+                    {% if recent_sales %}
+                    <div class="table-responsive">
+                        <table class="table table-hover transaction-table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Invoice #</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in recent_sales %}
+                                <tr>
+                                    <td>{{ sale.sale_date }}</td>
+                                    <td>{{ sale.invoice_number }}</td>
+                                    <td>${{ sale.total_amount }}</td>
+                                    <td>${{ sale.paid_amount }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ sale.status }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    {% endcomment %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No sales transactions recorded yet.</p>
+                        <a href="#" class="btn btn-primary">Create First Sale</a>
+                    </div>
+                    {% comment %}
+                    {% endif %}
+                    {% endcomment %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Stats -->
+        <div class="col-lg-4">
+            <!-- Customer Statistics -->
+            <div class="stat-card">
+                <div class="stat-value">{{ customer.total_orders|default:0 }}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-value">${{ customer.total_purchases|default:0 }}</div>
+                <div class="stat-label">Total Purchases</div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Quick Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Customer Since</label>
+                        <p class="fw-bold">{{ customer.created_at|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Last Sale</label>
+                        <p>
+                            {% if customer.last_sale_date %}
+                                {{ customer.last_sale_date|date:"M d, Y" }}
+                            {% else %}
+                                No sales yet
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Average Order Value</label>
+                        <p>${{ customer.avg_order_value|default:0|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Actions</h6>
+                </div>
+                <div class="card-body action-buttons">
+                    <a href="#" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit Customer
+                    </a>
+                    <a href="#" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>New Sale
+                    </a>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                        <i class="fas fa-credit-card me-1"></i>Record Payment
+                    </button>
+                    <a href="#" class="btn btn-warning btn-sm">
+                        <i class="fas fa-file-invoice me-1"></i>View Invoices
+                    </a>
+                    <a href="{% url 'inventory:customer_list' %}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+            </div>
+
+            <!-- Customer Notes -->
+            {% if customer.notes %}
+            <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ customer.notes }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Timestamps -->
+            <div class="card info-card">
+                <div class="card-body">
+                    <small class="text-muted">
+                        <div class="mb-1">
+                            <strong>Created:</strong> {{ customer.created_at|date:"M d, Y H:i" }}
+                        </div>
+                        <div>
+                            <strong>Updated:</strong> {{ customer.updated_at|date:"M d, Y H:i" }}
+                        </div>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Record Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="#">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Payment Amount</label>
+                        <input type="number" class="form-control" name="amount" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-select" name="payment_method" required>
+                            <option value="">Select payment method</option>
+                            <option value="cash">Cash</option>
+                            <option value="card">Credit/Debit Card</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="check">Check</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reference</label>
+                        <input type="text" class="form-control" name="reference" placeholder="Transaction ID, check number, etc.">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-success">Record Payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate avatar color based on name
+    const avatar = document.querySelector('.customer-avatar');
+    if (avatar) {
+        const name = avatar.textContent.trim();
+        const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+        const colorIndex = name.charCodeAt(0) % colors.length;
+        avatar.style.backgroundColor = colors[colorIndex];
+    }
+});
+</script>
+{% endblock %}

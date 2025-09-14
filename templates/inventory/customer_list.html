@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Customers | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .filter-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .customer-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .customer-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .customer-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .customer-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .customer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 0.875rem;
+    }
+    .customer-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+    }
+    .balance-positive { color: #28a745; }
+    .balance-negative { color: #dc3545; }
+    .balance-zero { color: #6c757d; }
+    .stats-row {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-users me-3"></i>Customers
+                </h1>
+                <p class="mb-0 opacity-75">Manage customer information and relationships</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'inventory:customer_create' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Add Customer
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="stats-row">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_customers }}</div>
+                    <div class="stat-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value">{{ active_customers }}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-success">${{ total_credit_balance }}</div>
+                    <div class="stat-label">Total Credit</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value text-danger">${{ total_debit_balance }}</div>
+                    <div class="stat-label">Total Outstanding</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Search Customers</label>
+                <input type="text" class="form-control" name="search" 
+                       value="{{ request.GET.search }}" placeholder="Name, phone, email...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Customer Type</label>
+                <select class="form-select" name="customer_type">
+                    <option value="">All Types</option>
+                    <option value="individual" {% if request.GET.customer_type == 'individual' %}selected{% endif %}>Individual</option>
+                    <option value="business" {% if request.GET.customer_type == 'business' %}selected{% endif %}>Business</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Balance</label>
+                <select class="form-select" name="balance_filter">
+                    <option value="">All Balances</option>
+                    <option value="positive" {% if request.GET.balance_filter == 'positive' %}selected{% endif %}>Credit Balance</option>
+                    <option value="negative" {% if request.GET.balance_filter == 'negative' %}selected{% endif %}>Outstanding</option>
+                    <option value="zero" {% if request.GET.balance_filter == 'zero' %}selected{% endif %}>Zero Balance</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" name="sort">
+                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Date Added</option>
+                    <option value="balance" {% if request.GET.sort == 'balance' %}selected{% endif %}>Balance</option>
+                    <option value="last_sale" {% if request.GET.sort == 'last_sale' %}selected{% endif %}>Last Sale</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Customers Table -->
+    {% if customers %}
+    <div class="customer-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selectAll" class="form-check-input">
+                    </th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Balance</th>
+                    <th>Last Sale</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input customer-checkbox" value="{{ customer.id }}">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="customer-avatar me-3" style="background-color: {{ customer.name|slice:':1'|lower|default:'#667eea' }};">
+                                {{ customer.name|slice:':2'|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ customer.name }}</div>
+                                {% if customer.company_name %}
+                                <small class="text-muted">{{ customer.company_name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge customer-type-badge 
+                            {% if customer.customer_type == 'individual' %}bg-primary
+                            {% else %}bg-success{% endif %}">
+                            {{ customer.get_customer_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div>
+                            <i class="fas fa-phone me-1"></i>{{ customer.phone }}
+                        </div>
+                        {% if customer.email %}
+                        <div>
+                            <i class="fas fa-envelope me-1"></i>{{ customer.email }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            {{ customer.address|default:"Not specified"|truncatewords:5 }}
+                        </small>
+                    </td>
+                    <td>
+                        {% if customer.balance > 0 %}
+                            <span class="balance-positive fw-bold">${{ customer.balance }}</span>
+                            <br><small class="text-muted">Credit</small>
+                        {% elif customer.balance < 0 %}
+                            <span class="balance-negative fw-bold">${{ customer.balance|floatformat:2 }}</span>
+                            <br><small class="text-muted">Outstanding</small>
+                        {% else %}
+                            <span class="balance-zero">$0.00</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.last_sale_date %}
+                            <div>{{ customer.last_sale_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">${{ customer.last_sale_amount|default:0 }}</small>
+                        {% else %}
+                            <small class="text-muted">No sales yet</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if customer.is_active %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {% if customer.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'inventory:customer_detail' customer.id %}">
+                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-edit me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-file-invoice me-2"></i>View Sales</a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-credit-card me-2"></i>Payment History</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-file-export me-2"></i>Export Data</a></li>
+                                {% if customer.is_active %}
+                                <li><a class="dropdown-item text-warning" href="#">
+                                    <i class="fas fa-pause me-2"></i>Deactivate</a></li>
+                                {% else %}
+                                <li><a class="dropdown-item text-success" href="#">
+                                    <i class="fas fa-play me-2"></i>Activate</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="bulk-actions" style="display: none;">
+                <span class="me-3">
+                    <span id="selectedCount">0</span> customers selected
+                </span>
+                <button type="button" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="fas fa-envelope me-1"></i>Send Email
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm me-2">
+                    <i class="fas fa-file-export me-1"></i>Export
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-edit me-1"></i>Bulk Edit
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 text-end">
+            <small class="text-muted">
+                Showing {{ customers|length }} of {{ total_customers }} customers
+            </small>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Customers pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.customer_type %}&customer_type={{ request.GET.customer_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.customer_type %}&customer_type={{ request.GET.customer_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.customer_type %}&customer_type={{ request.GET.customer_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.customer_type %}&customer_type={{ request.GET.customer_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.customer_type %}&customer_type={{ request.GET.customer_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-users fa-5x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">No Customers Found</h3>
+        <p class="text-muted mb-4">Start building your customer base by adding your first customer.</p>
+        <a href="{% url 'inventory:customer_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus me-2"></i>Add First Customer
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form on filter change
+    const filterSelects = document.querySelectorAll('select[name="customer_type"], select[name="status"], select[name="balance_filter"], select[name="sort"]');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+
+    // Bulk selection functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const customerCheckboxes = document.querySelectorAll('.customer-checkbox');
+    const bulkActions = document.querySelector('.bulk-actions');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.customer-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        if (count > 0) {
+            bulkActions.style.display = 'block';
+            selectedCount.textContent = count;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+        
+        selectAllCheckbox.indeterminate = count > 0 && count < customerCheckboxes.length;
+        selectAllCheckbox.checked = count === customerCheckboxes.length;
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        customerCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+
+    customerCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    // Generate avatar colors based on name
+    document.querySelectorAll('.customer-avatar').forEach(avatar => {
+        const name = avatar.textContent.trim();
+        const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+        const colorIndex = name.charCodeAt(0) % colors.length;
+        avatar.style.backgroundColor = colors[colorIndex];
+    });
+});
+</script>
+{% endblock %}

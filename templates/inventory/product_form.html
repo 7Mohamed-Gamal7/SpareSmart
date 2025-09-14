@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-box"></i> {{ title }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-lg-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Basic Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.name.id_for_label }}" class="form-label">Product Name *</label>
+                                            {{ form.name|add_class:"form-control" }}
+                                            {% if form.name.errors %}
+                                                <div class="text-danger">{{ form.name.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.sku.id_for_label }}" class="form-label">SKU *</label>
+                                            {{ form.sku|add_class:"form-control" }}
+                                            {% if form.sku.errors %}
+                                                <div class="text-danger">{{ form.sku.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.barcode.id_for_label }}" class="form-label">Barcode</label>
+                                            {{ form.barcode|add_class:"form-control" }}
+                                            {% if form.barcode.errors %}
+                                                <div class="text-danger">{{ form.barcode.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                        {{ form.description|add_class:"form-control" }}
+                                        {% if form.description.errors %}
+                                            <div class="text-danger">{{ form.description.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
+                                            {{ form.category|add_class:"form-control" }}
+                                            {% if form.category.errors %}
+                                                <div class="text-danger">{{ form.category.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.brand.id_for_label }}" class="form-label">Brand</label>
+                                            {{ form.brand|add_class:"form-control" }}
+                                            {% if form.brand.errors %}
+                                                <div class="text-danger">{{ form.brand.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.unit.id_for_label }}" class="form-label">Unit *</label>
+                                            {{ form.unit|add_class:"form-control" }}
+                                            {% if form.unit.errors %}
+                                                <div class="text-danger">{{ form.unit.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Information -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Pricing Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.cost_price.id_for_label }}" class="form-label">Cost Price *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                {{ form.cost_price|add_class:"form-control" }}
+                                            </div>
+                                            {% if form.cost_price.errors %}
+                                                <div class="text-danger">{{ form.cost_price.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.selling_price.id_for_label }}" class="form-label">Selling Price *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                {{ form.selling_price|add_class:"form-control" }}
+                                            </div>
+                                            {% if form.selling_price.errors %}
+                                                <div class="text-danger">{{ form.selling_price.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.wholesale_price.id_for_label }}" class="form-label">Wholesale Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                {{ form.wholesale_price|add_class:"form-control" }}
+                                            </div>
+                                            {% if form.wholesale_price.errors %}
+                                                <div class="text-danger">{{ form.wholesale_price.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="profit-margin" class="alert alert-info">
+                                        <strong>Profit Margin:</strong> <span id="margin-value">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Information -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Stock Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.current_stock.id_for_label }}" class="form-label">Current Stock</label>
+                                            {{ form.current_stock|add_class:"form-control" }}
+                                            {% if form.current_stock.errors %}
+                                                <div class="text-danger">{{ form.current_stock.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.minimum_stock.id_for_label }}" class="form-label">Minimum Stock</label>
+                                            {{ form.minimum_stock|add_class:"form-control" }}
+                                            {% if form.minimum_stock.errors %}
+                                                <div class="text-danger">{{ form.minimum_stock.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.maximum_stock.id_for_label }}" class="form-label">Maximum Stock</label>
+                                            {{ form.maximum_stock|add_class:"form-control" }}
+                                            {% if form.maximum_stock.errors %}
+                                                <div class="text-danger">{{ form.maximum_stock.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="{{ form.reorder_level.id_for_label }}" class="form-label">Reorder Level</label>
+                                            {{ form.reorder_level|add_class:"form-control" }}
+                                            {% if form.reorder_level.errors %}
+                                                <div class="text-danger">{{ form.reorder_level.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Specifications -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Product Specifications</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.weight.id_for_label }}" class="form-label">Weight (kg)</label>
+                                            {{ form.weight|add_class:"form-control" }}
+                                            {% if form.weight.errors %}
+                                                <div class="text-danger">{{ form.weight.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.dimensions.id_for_label }}" class="form-label">Dimensions</label>
+                                            {{ form.dimensions|add_class:"form-control" }}
+                                            {% if form.dimensions.errors %}
+                                                <div class="text-danger">{{ form.dimensions.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="{{ form.color.id_for_label }}" class="form-label">Color</label>
+                                            {{ form.color|add_class:"form-control" }}
+                                            {% if form.color.errors %}
+                                                <div class="text-danger">{{ form.color.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.material.id_for_label }}" class="form-label">Material</label>
+                                            {{ form.material|add_class:"form-control" }}
+                                            {% if form.material.errors %}
+                                                <div class="text-danger">{{ form.material.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.compatible_vehicles.id_for_label }}" class="form-label">Compatible Vehicles</label>
+                                            {{ form.compatible_vehicles|add_class:"form-control" }}
+                                            {% if form.compatible_vehicles.errors %}
+                                                <div class="text-danger">{{ form.compatible_vehicles.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.part_number.id_for_label }}" class="form-label">Part Number</label>
+                                            {{ form.part_number|add_class:"form-control" }}
+                                            {% if form.part_number.errors %}
+                                                <div class="text-danger">{{ form.part_number.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="{{ form.oem_number.id_for_label }}" class="form-label">OEM Number</label>
+                                            {{ form.oem_number|add_class:"form-control" }}
+                                            {% if form.oem_number.errors %}
+                                                <div class="text-danger">{{ form.oem_number.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="col-lg-4">
+                            <!-- Images and Files -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Images & Files</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+                                        {{ form.image|add_class:"form-control" }}
+                                        {% if form.image.errors %}
+                                            <div class="text-danger">{{ form.image.errors.0 }}</div>
+                                        {% endif %}
+                                        {% if product.image %}
+                                            <div class="mt-2">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail" style="max-width: 200px;">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.datasheet.id_for_label }}" class="form-label">Datasheet/Manual</label>
+                                        {{ form.datasheet|add_class:"form-control" }}
+                                        {% if form.datasheet.errors %}
+                                            <div class="text-danger">{{ form.datasheet.errors.0 }}</div>
+                                        {% endif %}
+                                        {% if product.datasheet %}
+                                            <div class="mt-2">
+                                                <a href="{{ product.datasheet.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-file-pdf"></i> View Current File
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status & Settings -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Status & Settings</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-3">
+                                        {{ form.is_active|add_class:"form-check-input" }}
+                                        <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                                            Active Product
+                                        </label>
+                                        <div class="form-text">Inactive products won't appear in sales</div>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        {{ form.is_featured|add_class:"form-check-input" }}
+                                        <label for="{{ form.is_featured.id_for_label }}" class="form-check-label">
+                                            Featured Product
+                                        </label>
+                                        <div class="form-text">Featured products appear prominently</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> {{ action }} Product
+                                        </button>
+                                        <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                        {% if product %}
+                                        <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-outline-info">
+                                            <i class="fas fa-eye"></i> View Product
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Calculate profit margin
+    function calculateProfitMargin() {
+        const costPrice = parseFloat($('#id_cost_price').val()) || 0;
+        const sellingPrice = parseFloat($('#id_selling_price').val()) || 0;
+        
+        if (costPrice > 0 && sellingPrice > 0) {
+            const margin = ((sellingPrice - costPrice) / costPrice) * 100;
+            $('#margin-value').text(margin.toFixed(2) + '%');
+            
+            // Update alert class based on margin
+            const $alert = $('#profit-margin');
+            $alert.removeClass('alert-info alert-warning alert-danger alert-success');
+            
+            if (margin < 10) {
+                $alert.addClass('alert-danger');
+            } else if (margin < 20) {
+                $alert.addClass('alert-warning');
+            } else if (margin < 30) {
+                $alert.addClass('alert-info');
+            } else {
+                $alert.addClass('alert-success');
+            }
+        } else {
+            $('#margin-value').text('0%');
+            $('#profit-margin').removeClass('alert-warning alert-danger alert-success').addClass('alert-info');
+        }
+    }
+
+    // Bind events
+    $('#id_cost_price, #id_selling_price').on('input change', calculateProfitMargin);
+    
+    // Initial calculation
+    calculateProfitMargin();
+
+    // Form validation
+    $('form').submit(function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        $('.form-control[required]').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid');
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        // Validate prices
+        const costPrice = parseFloat($('#id_cost_price').val()) || 0;
+        const sellingPrice = parseFloat($('#id_selling_price').val()) || 0;
+        
+        if (sellingPrice <= costPrice) {
+            $('#id_selling_price').addClass('is-invalid');
+            alert('Selling price must be greater than cost price.');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            $('html, body').animate({
+                scrollTop: $('.is-invalid').first().offset().top - 100
+            }, 500);
+        }
+    });
+
+    // Auto-generate SKU (optional)
+    $('#generate-sku').click(function() {
+        const timestamp = Date.now().toString().slice(-6);
+        const random = Math.random().toString(36).substr(2, 3).toUpperCase();
+        $('#id_sku').val('SKU-' + timestamp + '-' + random);
+    });
+});
+</script>
+{% endblock %}

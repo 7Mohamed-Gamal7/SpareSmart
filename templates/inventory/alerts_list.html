@@ -1,0 +1,483 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Inventory Alerts | SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .filter-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .alerts-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .alerts-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .alerts-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+        vertical-align: middle;
+    }
+    .alerts-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .alert-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    .alert-icon.critical {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    .alert-icon.warning {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    .alert-icon.info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+    .alert-icon.success {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    .product-info {
+        display: flex;
+        align-items: center;
+    }
+    .bulk-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+    .bulk-actions.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class=\"container-fluid\">
+    <!-- Page Header -->
+    <div class=\"page-header\">
+        <div class=\"row align-items-center\">
+            <div class=\"col-md-8\">
+                <h1 class=\"mb-1\">
+                    <i class=\"fas fa-list me-3\"></i>Inventory Alerts
+                </h1>
+                <p class=\"mb-0 opacity-75\">Manage and track all inventory alerts</p>
+            </div>
+            <div class=\"col-md-4 text-md-end\">
+                <a href=\"{% url 'inventory:alerts_dashboard' %}\" class=\"btn btn-light btn-lg me-2\">
+                    <i class=\"fas fa-dashboard me-2\"></i>Dashboard
+                </a>
+                <a href=\"{% url 'inventory:refresh_alerts' %}\" class=\"btn btn-warning btn-lg\">
+                    <i class=\"fas fa-sync me-2\"></i>Refresh
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class=\"filter-card\">
+        <form method=\"get\" class=\"row g-3\">
+            <div class=\"col-md-3\">
+                <label class=\"form-label\">Search Alerts</label>
+                <input type=\"text\" name=\"search\" class=\"form-control\" placeholder=\"Product name, SKU, message...\" value=\"{{ filters.search }}\">
+            </div>
+            <div class=\"col-md-2\">
+                <label class=\"form-label\">Alert Type</label>
+                <select name=\"alert_type\" class=\"form-select\">
+                    <option value=\"\">All Types</option>
+                    {% for value, label in alert_types %}
+                    <option value=\"{{ value }}\" {% if filters.alert_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class=\"col-md-2\">
+                <label class=\"form-label\">Status</label>
+                <select name=\"status\" class=\"form-select\">
+                    {% for value, label in status_choices %}
+                    <option value=\"{{ value }}\" {% if filters.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class=\"col-md-2\">
+                <label class=\"form-label\">Vehicle Type</label>
+                <select name=\"vehicle_type\" class=\"form-select\">
+                    <option value=\"\">All Vehicles</option>
+                    {% for value, label in vehicle_types %}
+                    <option value=\"{{ value }}\" {% if filters.vehicle_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class=\"col-md-2\">
+                <label class=\"form-label\">&nbsp;</label>
+                <div class=\"d-grid\">
+                    <button type=\"submit\" class=\"btn btn-primary\">
+                        <i class=\"fas fa-search me-1\"></i>Filter
+                    </button>
+                </div>
+            </div>
+            <div class=\"col-md-1\">
+                <label class=\"form-label\">&nbsp;</label>
+                <div class=\"d-grid\">
+                    <a href=\"{% url 'inventory:alerts_list' %}\" class=\"btn btn-outline-secondary\">
+                        <i class=\"fas fa-times\"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class=\"bulk-actions\" id=\"bulkActions\">
+        <form method=\"post\" action=\"{% url 'inventory:bulk_acknowledge_alerts' %}\">
+            {% csrf_token %}
+            <div class=\"row align-items-center\">
+                <div class=\"col-md-8\">
+                    <span class=\"fw-bold\">Bulk Actions:</span>
+                    <span id=\"selectedCount\">0</span> alerts selected
+                </div>
+                <div class=\"col-md-4 text-end\">
+                    <button type=\"submit\" class=\"btn btn-success me-2\">
+                        <i class=\"fas fa-check me-1\"></i>Acknowledge Selected
+                    </button>
+                    <button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"clearSelection()\">
+                        <i class=\"fas fa-times me-1\"></i>Clear
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Alerts Table -->
+    {% if page_obj %}
+    <div class=\"alerts-table\">
+        <table class=\"table table-hover mb-0\">
+            <thead>
+                <tr>
+                    <th style=\"width: 50px;\">
+                        <input type=\"checkbox\" id=\"selectAll\" class=\"form-check-input\">
+                    </th>
+                    <th>Product</th>
+                    <th>Alert Type</th>
+                    <th>Message</th>
+                    <th>Current Stock</th>
+                    <th>Recommended Action</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alert in page_obj %}
+                <tr>
+                    <td>
+                        {% if alert.status == 'active' %}
+                        <input type=\"checkbox\" name=\"alert_ids\" value=\"{{ alert.id }}\" class=\"form-check-input alert-checkbox\">
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class=\"product-info\">
+                            <div class=\"alert-icon 
+                                {% if alert.alert_type == 'out_of_stock' %}critical
+                                {% elif alert.alert_type == 'low_stock' %}warning
+                                {% elif alert.alert_type == 'overstock' %}success
+                                {% else %}info{% endif %}\">
+                                <i class=\"fas 
+                                    {% if alert.alert_type == 'out_of_stock' %}fa-times
+                                    {% elif alert.alert_type == 'low_stock' %}fa-exclamation
+                                    {% elif alert.alert_type == 'reorder' %}fa-shopping-cart
+                                    {% elif alert.alert_type == 'overstock' %}fa-arrow-up
+                                    {% else %}fa-info{% endif %}\"></i>
+                            </div>
+                            <div>
+                                <div class=\"fw-bold\">
+                                    <a href=\"{% url 'inventory:product_detail' alert.product.id %}\" class=\"text-decoration-none\">
+                                        {{ alert.product.name }}
+                                    </a>
+                                </div>
+                                <small class=\"text-muted\">
+                                    {{ alert.product.sku }} | {{ alert.product.category.name }}
+                                    {% if alert.product.brand %} | {{ alert.product.brand.name }}{% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class=\"badge 
+                            {% if alert.alert_type == 'out_of_stock' %}bg-danger
+                            {% elif alert.alert_type == 'low_stock' %}bg-warning
+                            {% elif alert.alert_type == 'reorder' %}bg-info
+                            {% elif alert.alert_type == 'overstock' %}bg-success
+                            {% else %}bg-secondary{% endif %}\">
+                            {{ alert.get_alert_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class=\"fw-bold\">{{ alert.message }}</div>
+                    </td>
+                    <td>
+                        <div class=\"fw-bold 
+                            {% if alert.current_stock == 0 %}text-danger
+                            {% elif alert.current_stock <= alert.product.minimum_stock %}text-warning
+                            {% else %}text-success{% endif %}\">
+                            {{ alert.current_stock }} {{ alert.product.unit }}
+                        </div>
+                        <small class=\"text-muted\">
+                            Min: {{ alert.product.minimum_stock }} | 
+                            Reorder: {{ alert.product.reorder_level }}
+                        </small>
+                    </td>
+                    <td>
+                        <small class=\"text-muted\">{{ alert.recommended_action|truncatewords:10 }}</small>
+                    </td>
+                    <td>
+                        <span class=\"badge 
+                            {% if alert.status == 'active' %}bg-danger
+                            {% elif alert.status == 'acknowledged' %}bg-warning
+                            {% else %}bg-success{% endif %}\">
+                            {{ alert.get_status_display }}
+                        </span>
+                        {% if alert.acknowledged_by %}
+                        <br><small class=\"text-muted\">by {{ alert.acknowledged_by.get_full_name }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ alert.created_at|date:\"M d, Y\" }}</div>
+                        <small class=\"text-muted\">{{ alert.created_at|time:\"H:i\" }}</small>
+                    </td>
+                    <td>
+                        <div class=\"dropdown\">
+                            <button class=\"btn btn-link btn-sm\" data-bs-toggle=\"dropdown\">
+                                <i class=\"fas fa-ellipsis-v\"></i>
+                            </button>
+                            <ul class=\"dropdown-menu\">
+                                <li><a class=\"dropdown-item\" href=\"{% url 'inventory:product_detail' alert.product.id %}\">
+                                    <i class=\"fas fa-eye me-2\"></i>View Product</a></li>
+                                {% if alert.status == 'active' %}
+                                <li><hr class=\"dropdown-divider\"></li>
+                                <li><a class=\"dropdown-item\" href=\"#\" onclick=\"acknowledgeAlert({{ alert.id }})\">
+                                    <i class=\"fas fa-check me-2\"></i>Acknowledge</a></li>
+                                <li><a class=\"dropdown-item\" href=\"#\" onclick=\"resolveAlert({{ alert.id }})\">
+                                    <i class=\"fas fa-check-circle me-2\"></i>Resolve</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label=\"Alert pagination\" class=\"mt-4\">
+        <ul class=\"pagination justify-content-center\">
+            {% if page_obj.has_previous %}
+                <li class=\"page-item\">
+                    <a class=\"page-link\" href=\"?page=1{% for key, value in filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}\">
+                        <i class=\"fas fa-angle-double-left\"></i>
+                    </a>
+                </li>
+                <li class=\"page-item\">
+                    <a class=\"page-link\" href=\"?page={{ page_obj.previous_page_number }}{% for key, value in filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}\">
+                        <i class=\"fas fa-angle-left\"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class=\"page-item active\">
+                        <span class=\"page-link\">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class=\"page-item\">
+                        <a class=\"page-link\" href=\"?page={{ num }}{% for key, value in filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}\">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class=\"page-item\">
+                    <a class=\"page-link\" href=\"?page={{ page_obj.next_page_number }}{% for key, value in filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}\">
+                        <i class=\"fas fa-angle-right\"></i>
+                    </a>
+                </li>
+                <li class=\"page-item\">
+                    <a class=\"page-link\" href=\"?page={{ page_obj.paginator.num_pages }}{% for key, value in filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}\">
+                        <i class=\"fas fa-angle-double-right\"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class=\"text-center py-5\">
+        <i class=\"fas fa-check-circle fa-5x text-success mb-4\"></i>
+        <h3 class=\"text-success mb-3\">No Alerts Found</h3>
+        <p class=\"text-muted mb-4\">
+            {% if filters.status == 'active' %}
+                Great! No active alerts at this time. Your inventory levels are well managed.
+            {% else %}
+                No alerts match your current filters.
+            {% endif %}
+        </p>
+        <a href=\"{% url 'inventory:alerts_dashboard' %}\" class=\"btn btn-primary me-3\">
+            <i class=\"fas fa-dashboard me-2\"></i>View Dashboard
+        </a>
+        <a href=\"{% url 'inventory:product_list' %}\" class=\"btn btn-outline-secondary\">
+            <i class=\"fas fa-boxes me-2\"></i>View Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const alertCheckboxes = document.querySelectorAll('.alert-checkbox');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    // Handle select all
+    selectAllCheckbox.addEventListener('change', function() {
+        alertCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+    
+    // Handle individual checkboxes
+    alertCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+    
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.alert-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCount.textContent = count;
+        
+        if (count > 0) {
+            bulkActions.classList.add('show');
+        } else {
+            bulkActions.classList.remove('show');
+        }
+        
+        // Update select all checkbox state
+        if (count === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        } else if (count === alertCheckboxes.length) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+        } else {
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+    
+    // Auto-submit form on filter change
+    const filterSelects = document.querySelectorAll('select[name=\"alert_type\"], select[name=\"status\"], select[name=\"vehicle_type\"]');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+
+function acknowledgeAlert(alertId) {
+    if (confirm('Are you sure you want to acknowledge this alert?')) {
+        fetch(`/inventory/alerts/${alertId}/acknowledge/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error acknowledging alert');
+        });
+    }
+}
+
+function resolveAlert(alertId) {
+    if (confirm('Are you sure you want to resolve this alert?')) {
+        fetch(`/inventory/alerts/${alertId}/resolve/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error resolving alert');
+        });
+    }
+}
+
+function clearSelection() {
+    document.querySelectorAll('.alert-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    document.getElementById('selectAll').checked = false;
+    document.getElementById('bulkActions').classList.remove('show');
+}
+</script>
+{% endblock %}

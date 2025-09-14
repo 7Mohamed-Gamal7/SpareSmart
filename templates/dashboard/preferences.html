@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Settings" %} - {% trans "SpareSmart" %}{% endblock %}
+{% block page_title %}{% trans "Settings" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-cog me-3"></i>{% trans "System Settings" %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Language Preferences -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>{% trans "Language Preferences" %}</h5>
+                            <form method="post" action="{% url 'set_language' %}">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ request.get_full_path }}" />
+                                <div class="mb-3">
+                                    <label class="form-label">{% trans "Select Language" %}</label>
+                                    <select name="language" class="form-select" onchange="this.form.submit()">
+                                        <option value="ar" {% if request.LANGUAGE_CODE == 'ar' %}selected{% endif %}>العربية</option>
+                                        <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>{% trans "User Preferences" %}</h5>
+                            <div class="mb-3">
+                                <label class="form-label">{% trans "Theme" %}</label>
+                                <select class="form-select">
+                                    <option>{% trans "Light" %}</option>
+                                    <option>{% trans "Dark" %}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">{% trans "Date Format" %}</label>
+                                <select class="form-select">
+                                    <option>DD/MM/YYYY</option>
+                                    <option>MM/DD/YYYY</option>
+                                    <option>YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- System Information -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>{% trans "System Information" %}</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>{% trans "Current Language" %}:</strong></td>
+                                    <td>{% if request.LANGUAGE_CODE == 'ar' %}العربية{% else %}English{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>{% trans "Text Direction" %}:</strong></td>
+                                    <td>{% if request.LANGUAGE_BIDI %}{% trans "Right to Left" %} (RTL){% else %}{% trans "Left to Right" %} (LTR){% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>{% trans "User Role" %}:</strong></td>
+                                    <td>{{ user.get_role_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>{% trans "Last Login" %}:</strong></td>
+                                    <td>{{ user.last_login|date:"Y-m-d H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Purchase Requirements" %} | {% trans "SpareSmart" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .summary-cards {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .summary-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    .summary-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ff9800;
+    }
+    .summary-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    .requirements-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .requirements-table th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+    }
+    .requirements-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #f1f3f4;
+        vertical-align: middle;
+    }
+    .requirements-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .priority-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+        font-weight: bold;
+    }
+    .priority-high {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+    }
+    .priority-medium {
+        background: #fff3e0;
+        color: #ef6c00;
+        border: 1px solid #ffcc02;
+    }
+    .product-info {
+        display: flex;
+        align-items: center;
+    }
+    .product-image {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: #6c757d;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .action-buttons {
+        margin: 2rem 0;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-shopping-cart me-3"></i>{% trans "Purchase Requirements" %}
+                </h1>
+                <p class="mb-0 opacity-75">{% trans "Items that need to be reordered based on current stock levels" %}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'inventory:alerts_dashboard' %}" class="btn btn-light btn-lg me-2">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Alerts" %}
+                </a>
+                <button onclick="window.print()" class="btn btn-info btn-lg">
+                    <i class="fas fa-print me-2"></i>{% trans "Print" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="summary-item">
+                    <div class="summary-value">{{ total_items }}</div>
+                    <div class="summary-label">{% trans "Items to Order" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-item">
+                    <div class="summary-value text-danger">{{ high_priority_count }}</div>
+                    <div class="summary-label">{% trans "High Priority" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-item">
+                    <div class="summary-value text-warning">{{ total_items|add:high_priority_count|add:"-"|add:high_priority_count }}</div>
+                    <div class="summary-label">{% trans "Medium Priority" %}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-item">
+                    <div class="summary-value text-success">${{ total_cost|floatformat:2 }}</div>
+                    <div class="summary-label">{% trans "Total Cost" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="row g-2">
+            <div class="col-md-2">
+                <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-1"></i>{% trans "Create PO" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success w-100">
+                    <i class="fas fa-bolt me-1"></i>{% trans "Quick Purchase" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <button onclick="exportToCsv()" class="btn btn-info w-100">
+                    <i class="fas fa-download me-1"></i>{% trans "Export CSV" %}
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'inventory:alerts_list' %}?alert_type=out_of_stock,low_stock" class="btn btn-warning w-100">
+                    <i class="fas fa-exclamation-triangle me-1"></i>{% trans "View Alerts" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary w-100">
+                    <i class="fas fa-boxes me-1"></i>{% trans "Products" %}
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'inventory:refresh_alerts' %}" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-sync me-1"></i>{% trans "Refresh" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requirements Table -->
+    {% if purchase_requirements %}
+    <div class="requirements-table">
+        <table class="table table-hover mb-0" id="requirementsTable">
+            <thead>
+                <tr>
+                    <th>{% trans "Priority" %}</th>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Current Stock" %}</th>
+                    <th>{% trans "Recommended Qty" %}</th>
+                    <th>{% trans "Unit Cost" %}</th>
+                    <th>{% trans "Total Cost" %}</th>
+                    <th>{% trans "Alert Type" %}</th>
+                    <th>{% trans "Supplier" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in purchase_requirements %}
+                <tr>
+                    <td>
+                        <span class="priority-badge {% if req.priority == 'HIGH' %}priority-high{% else %}priority-medium{% endif %}\">
+                            {{ req.priority }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="product-info">
+                            <div class="product-image">
+                                {% if req.product.image %}
+                                    <img src="{{ req.product.image.url }}" alt="{{ req.product.name }}" class="img-fluid">
+                                {% else %}
+                                    <i class="fas fa-box"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="fw-bold">
+                                    <a href="{% url 'inventory:product_detail' req.product.id %}" class="text-decoration-none">
+                                        {{ req.product.name }}
+                                    </a>
+                                </div>
+                                <small class="text-muted">
+                                    SKU: {{ req.product.sku }}<br>
+                                    {{ req.product.category.name }}
+                                    {% if req.product.brand %} | {{ req.product.brand.name }}{% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold {% if req.product.current_stock == 0 %}text-danger{% else %}text-warning{% endif %}\">
+                            {{ req.product.current_stock }} {{ req.product.unit }}
+                        </div>
+                        <small class="text-muted">
+                            Min: {{ req.product.minimum_stock }}<br>
+                            Reorder: {{ req.product.reorder_level }}
+                        </small>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-primary">```
+{{ req.recommended_qty }} {{ req.product.unit }}
+```</div>
+                        <small class="text-muted">
+                            After order: {{ req.recommended_qty|add:req.product.current_stock }} {{ req.product.unit }}
+                        </small>
+                    </td>
+                    <td>
+                        <div class="fw-bold">```
+{{ req.product.cost_price|floatformat:2 }}
+```</div>
+                        <small class="text-muted">per {{ req.product.unit }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-success">```
+{{ req.total_cost|floatformat:2 }}
+```</div>
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if req.alert.alert_type == 'out_of_stock' %}bg-danger
+                            {% elif req.alert.alert_type == 'low_stock' %}bg-warning
+                            {% else %}bg-info{% endif %}\">
+                            {{ req.alert.get_alert_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="text-muted">
+                            <!-- This will be populated when supplier relationships are implemented -->
+                            <small>Multiple suppliers</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'inventory:product_detail' req.product.id %}\">
+                                    <i class="fas fa-eye me-2"></i>View Product</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'purchases:purchase_create' %}?product={{ req.product.id }}\">
+                                    <i class="fas fa-plus me-2"></i>Create Purchase Order</a></li>
+                                <li><a class="dropdown-item" href="{% url 'purchases:quick_purchase' %}?product={{ req.product.id }}\">
+                                    <i class="fas fa-bolt me-2"></i>Quick Purchase</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="table-info">
+                    <td colspan="5" class="text-end fw-bold">{% trans "Total Purchase Requirements:" %}</td>
+                    <td class="fw-bold text-success">```
+{{ total_cost|floatformat:2 }}
+```</td>
+                    <td colspan="3"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-plus me-2"></i>{% trans "Create Purchase Order" %}
+        </a>
+        <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-primary btn-lg me-3">
+            <i class="fas fa-list me-2"></i>{% trans "View All Purchase Orders" %}
+        </a>
+        <button onclick="exportToCsv()" class="btn btn-success btn-lg">
+            <i class="fas fa-download me-2"></i>{% trans "Export to CSV" %}
+        </button>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+        <h3 class="text-success mb-3">{% trans "No Purchase Requirements" %}</h3>
+        <p class="text-muted mb-4">
+            {% trans "Excellent! All your products have adequate stock levels. No purchases are required at this time." %}
+        </p>
+        <a href="{% url 'inventory:alerts_dashboard' %}" class="btn btn-primary me-3">
+            <i class="fas fa-dashboard me-2"></i>{% trans "View Alerts Dashboard" %}
+        </a>
+        <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-boxes me-2"></i>{% trans "View Products" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportToCsv() {
+    const table = document.getElementById('requirementsTable');
+    if (!table) {
+        alert('No data to export');
+        return;
+    }
+    
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    // Extract headers (excluding action column)
+    const headers = [];
+    const headerCells = rows[0].querySelectorAll('th');
+    for (let i = 0; i < headerCells.length - 1; i++) {
+        headers.push('\"' + headerCells[i].textContent.trim() + '\"');
+    }
+    csv.push(headers.join(','));
+    
+    // Extract data rows (excluding footer and action column)
+    for (let i = 1; i < rows.length - 1; i++) {
+        const row = [];
+        const cells = rows[i].querySelectorAll('td');
+        for (let j = 0; j < cells.length - 1; j++) {
+            const cellText = cells[j].textContent.replace(/\\s+/g, ' ').trim();
+            row.push('\"' + cellText + '\"');
+        }
+        csv.push(row.join(','));
+    }
+    
+    // Download CSV
+    const csvContent = csv.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'purchase_requirements_' + new Date().toISOString().split('T')[0] + '.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Print styles
+const printStyles = `
+    @media print {
+        .quick-actions, .action-buttons, .btn, .dropdown { display: none !important; }
+        .container-fluid { padding: 0 !important; }
+        .page-header { background: #333 !important; -webkit-print-color-adjust: exact; }
+        .summary-cards, .requirements-table { box-shadow: none !important; }
+        .table { font-size: 12px; }
+        body { font-size: 12px; }
+    }
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.type = 'text/css';
+styleSheet.innerText = printStyles;
+document.head.appendChild(styleSheet);
+</script>
+{% endblock %}
