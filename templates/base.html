@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SpareSmart - Spare Parts Management{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #34495e 100%);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .sidebar .logo h4 {
+            color: white;
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .sidebar .nav-item {
+            margin: 5px 15px;
+        }
+        
+        .sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .content-wrapper {
+            padding: 30px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-card .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stats-card .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h4><i class="fas fa-cogs"></i> SpareSmart</h4>
+        </div>
+        
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard:home' %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'inventory' %}active{% endif %}" href="{% url 'inventory:product_list' %}">
+                    <i class="fas fa-boxes"></i> Inventory
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'sales' %}active{% endif %}" href="{% url 'sales:sale_list' %}">
+                    <i class="fas fa-shopping-cart"></i> Sales
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'purchases' %}active{% endif %}" href="{% url 'purchases:purchase_list' %}">
+                    <i class="fas fa-truck"></i> Purchases
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'expenses' %}active{% endif %}" href="{% url 'expenses:expense_list' %}">
+                    <i class="fas fa-receipt"></i> Expenses
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}" href="{% url 'reports:reports_home' %}">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </a>
+            </li>
+            
+            {% if user.role in 'admin,manager' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'accounts' %}active{% endif %}" href="{% url 'accounts:user_list' %}">
+                    <i class="fas fa-users"></i> Users
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <div class="mt-auto p-3">
+            <div class="text-center">
+                <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://via.placeholder.com/50{% endif %}" 
+                     alt="Profile" class="rounded-circle" width="50" height="50">
+                <div class="text-white mt-2">
+                    <small>{{ user.first_name }} {{ user.last_name }}</small><br>
+                    <small class="text-muted">{{ user.get_role_display }}</small>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary d-md-none me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h5>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <!-- Notifications -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-secondary position-relative" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count %}
+                        <span class="notification-badge">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <!-- Add notifications here -->
+                        <li><a class="dropdown-item" href="{% url 'dashboard:notifications' %}">View All</a></li>
+                    </ul>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i> {{ user.username }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user-circle"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'dashboard:preferences' %}"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    {% else %}
+    <!-- Login page content -->
+    {% block login_content %}{% endblock %}
+    {% endif %}
+    
+    <!-- Loading Overlay -->
+    <div class="loading d-none" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        // Sidebar toggle for mobile
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+        
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('d-none');
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('d-none');
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+        
+        // Initialize DataTables
+        $(document).ready(function() {
+            $('.data-table').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

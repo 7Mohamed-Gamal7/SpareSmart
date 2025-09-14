@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SpareSmart{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">Welcome back, {{ user.first_name|default:user.username }}!</h4>
+                        <p class="text-muted mb-0">Here's what's happening in your spare parts business today.</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-0"><strong>{{ "now"|date:"l, F d, Y" }}</strong></p>
+                        <p class="text-muted mb-0">{{ "now"|date:"g:i A" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Metrics Cards -->
+<div class="row mb-4">
+    <!-- Today's Sales -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number">${{ sales_stats.today_amount|floatformat:0 }}</div>
+                    <div class="stats-label">Today's Sales</div>
+                    <small>{{ sales_stats.today_count }} transactions</small>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-shopping-cart fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Revenue -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number">${{ sales_stats.month_amount|floatformat:0 }}</div>
+                    <div class="stats-label">Monthly Revenue</div>
+                    <small>{{ sales_stats.month_count }} sales this month</small>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Inventory Value -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number">${{ inventory_stats.total_value|floatformat:0 }}</div>
+                    <div class="stats-label">Inventory Value</div>
+                    <small>{{ inventory_stats.total_products }} products</small>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-boxes fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Expenses -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-number">${{ expense_stats.month_amount|floatformat:0 }}</div>
+                    <div class="stats-label">Monthly Expenses</div>
+                    <small>{{ expense_stats.month_count }} expenses</small>
+                </div>
+                <div class="stats-icon">
+                    <i class="fas fa-receipt fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerts and Quick Actions -->
+{% if pending_items %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Alerts & Pending Items</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if pending_items.pending_expenses > 0 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-clock"></i> Pending Approvals</h6>
+                            <p class="mb-1">{{ pending_items.pending_expenses }} expense(s) waiting for approval</p>
+                            <a href="{% url 'expenses:expense_list' %}?status=pending" class="btn btn-sm btn-warning">Review</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if pending_items.low_stock_alerts > 0 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="alert alert-danger">
+                            <h6><i class="fas fa-box-open"></i> Low Stock Alert</h6>
+                            <p class="mb-1">{{ pending_items.low_stock_alerts }} product(s) running low</p>
+                            <a href="{% url 'inventory:alerts' %}" class="btn btn-sm btn-danger">View</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if pending_items.overdue_payments > 0 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-credit-card"></i> Overdue Payments</h6>
+                            <p class="mb-1">{{ pending_items.overdue_payments }} payment(s) overdue</p>
+                            <a href="{% url 'sales:sale_list' %}?payment_status=overdue" class="btn btn-sm btn-info">Follow Up</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Charts Section -->
+<div class="row mb-4">
+    <!-- Sales Trend Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Sales Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesTrendChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'sales:sale_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Sale
+                    </a>
+                    <a href="{% url 'purchases:purchase_create' %}" class="btn btn-success">
+                        <i class="fas fa-truck"></i> New Purchase
+                    </a>
+                    <a href="{% url 'inventory:product_create' %}" class="btn btn-info">
+                        <i class="fas fa-box"></i> Add Product
+                    </a>
+                    <a href="{% url 'expenses:expense_create' %}" class="btn btn-warning">
+                        <i class="fas fa-receipt"></i> Record Expense
+                    </a>
+                    <a href="{% url 'reports:reports_home' %}" class="btn btn-secondary">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities and Top Products -->
+<div class="row">
+    <!-- Recent Activities -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                <div class="activity-list">
+                    {% for activity in recent_activities %}
+                    <div class="activity-item d-flex align-items-center mb-3">
+                        <div class="activity-icon me-3">
+                            {% if activity.action == 'create' %}
+                                <i class="fas fa-plus text-success"></i>
+                            {% elif activity.action == 'update' %}
+                                <i class="fas fa-edit text-warning"></i>
+                            {% elif activity.action == 'delete' %}
+                                <i class="fas fa-trash text-danger"></i>
+                            {% elif activity.action == 'login' %}
+                                <i class="fas fa-sign-in-alt text-info"></i>
+                            {% else %}
+                                <i class="fas fa-circle text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="activity-content flex-grow-1">
+                            <div class="activity-description">{{ activity.description }}</div>
+                            <small class="text-muted">
+                                {{ activity.user.username }} • {{ activity.timestamp|timesince }} ago
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'dashboard:activity_log' %}" class="btn btn-sm btn-outline-primary">View All Activities</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No recent activities</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Products -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Top Selling Products</h5>
+            </div>
+            <div class="card-body">
+                {% if top_products %}
+                <div class="product-list">
+                    {% for product in top_products %}
+                    <div class="product-item d-flex align-items-center justify-content-between mb-3">
+                        <div class="product-info">
+                            <h6 class="mb-1">{{ product.name }}</h6>
+                            <small class="text-muted">{{ product.sku }}</small>
+                        </div>
+                        <div class="product-stats text-end">
+                            <span class="badge bg-primary">{{ product.total_sold|default:0 }} sold</span>
+                            <br>
+                            <small class="text-muted">${{ product.selling_price }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">View All Products</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No sales data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sales Trend Chart
+const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+const salesTrendChart = new Chart(salesTrendCtx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for data in sales_trend %}
+                '{{ data.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Sales Amount',
+            data: [
+                {% for data in sales_trend %}
+                    {{ data.amount }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        },
+        elements: {
+            point: {
+                radius: 6,
+                hoverRadius: 8,
+                backgroundColor: '#3498db',
+                borderColor: '#fff',
+                borderWidth: 2
+            }
+        }
+    }
+});
+
+// Auto-refresh dashboard data every 5 minutes
+setInterval(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}
