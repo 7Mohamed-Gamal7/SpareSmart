@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% load i18n %}
+
 {% load widget_tweaks %}
 
-{% block title %}{% trans "User Management" %} - {% trans "SpareSmart" %}{% endblock %}
-{% block page_title %}{% trans "User Management" %}{% endblock %}
+{% block title %}User Management - SpareSmart{% endblock %}
+{% block page_title %}User Management{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -62,13 +62,13 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-users me-3"></i>{% trans "User Management" %}
+                    <i class="fas fa-users me-3"></i>User Management
                 </h1>
-                <p class="mb-0 opacity-75">{% trans "Manage system users, roles, and permissions" %}</p>
+                <p class="mb-0 opacity-75">Manage system users, roles, and permissions</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'accounts:user_create' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>{% trans "New User" %}
+                    <i class="fas fa-plus me-2"></i>New User
                 </a>
             </div>
         </div>
@@ -79,17 +79,17 @@
         <div class="row g-2">
             <div class="col-md-2">
                 <a href="{% url 'accounts:user_create' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-plus me-1"></i>{% trans "Add User" %}
+                    <i class="fas fa-plus me-1"></i>Add User
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'accounts:role_permissions' %}" class="btn btn-secondary w-100">
-                    <i class="fas fa-key me-1"></i>{% trans "Permissions" %}
+                    <i class="fas fa-key me-1"></i>Permissions
                 </a>
             </div>
             <div class="col-md-2">
                 <button onclick="exportUsers()" class="btn btn-info w-100">
-                    <i class="fas fa-download me-1"></i>{% trans "Export" %}
+                    <i class="fas fa-download me-1"></i>Export
                 </button>
             </div>
         </div>
@@ -101,12 +101,12 @@
         <table class="table table-hover mb-0" id="usersTable">
             <thead>
                 <tr>
-                    <th>{% trans "User" %}</th>
-                    <th>{% trans "Role" %}</th>
-                    <th>{% trans "Status" %}</th>
-                    <th>{% trans "Last Login" %}</th>
-                    <th>{% trans "Date Joined" %}</th>
-                    <th>{% trans "Actions" %}</th>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>الحالة</th>
+                    <th>Last Login</th>
+                    <th>Date Joined</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -129,14 +129,14 @@
                     </td>
                     <td>
                         <span class="status-badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %} text-white">
-                            {% if user.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
+                            {% if user.is_active %}نشط{% else %}غير نشط{% endif %}
                         </span>
                     </td>
                     <td>
                         {% if user.last_login %}
                             {{ user.last_login|date:"Y-m-d H:i" }}
                         {% else %}
-                            <span class="text-muted">{% trans "Never" %}</span>
+                            <span class="text-muted">Never</span>
                         {% endif %}
                     </td>
                     <td>{{ user.date_joined|date:"Y-m-d" }}</td>
@@ -147,15 +147,15 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'accounts:user_detail' user.id %}">
-                                    <i class="fas fa-eye me-2"></i>{% trans "View Details" %}</a></li>
+                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:user_update' user.id %}">
-                                    <i class="fas fa-edit me-2"></i>{% trans "Edit" %}</a></li>
+                                    <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:admin_change_password' user.id %}">
-                                    <i class="fas fa-key me-2"></i>{% trans "Change Password" %}</a></li>
+                                    <i class="fas fa-key me-2"></i>Change Password</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:toggle_user_status' user.id %}">
                                     <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %} me-2"></i>
-                                    {% if user.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}
+                                    {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
                                 </a></li>
                             </ul>
                         </div>
@@ -169,10 +169,10 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-users fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">{% trans "No Users Found" %}</h3>
-        <p class="text-muted mb-4">{% trans "Start by creating your first user account." %}</p>
+        <h3 class="text-muted mb-3">No Users Found</h3>
+        <p class="text-muted mb-4">Start by creating your first user account.</p>
         <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>{% trans "Create First User" %}
+            <i class="fas fa-plus me-2"></i>Create First User
         </a>
     </div>
     {% endif %}

@@ -138,10 +138,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ar'  # Arabic as default language
 
-# Available languages
+# Available languages - العربية فقط
 LANGUAGES = [
     ('ar', 'العربية'),
-    ('en', 'English'),
 ]
 
 TIME_ZONE = 'Africa/Cairo'  # Cairo timezone for Arabic region
@@ -151,10 +150,10 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Translation settings - use fallback for broken files
-LOCALE_PATHS = [
-    BASE_DIR / 'locale',
-]
+# Translation settings - معطل مؤقتاً لحل مشكلة ملف .mo
+# LOCALE_PATHS = [
+#     BASE_DIR / 'locale',
+# ]
 
 # Format localization
 USE_THOUSAND_SEPARATOR = True
@@ -193,12 +192,22 @@ USE_L10N = True  # Enable localization for Arabic formatting
 # Arabic Language Settings
 LANGUAGE_BIDI = True  # Right-to-left text direction
 USE_THOUSAND_SEPARATOR = True
-THOUSAND_SEPARATOR = ','
+THOUSAND_SEPARATOR = '،'  # Arabic thousands separator
 DECIMAL_SEPARATOR = '.'
 
 # Arabic Number Format
 NUMBER_GROUPING = 3
 FIRST_DAY_OF_WEEK = 6  # Saturday (Arabic week starts on Saturday)
+
+# Arabic Date and Time Formats
+DATE_FORMAT = 'Y/m/d'  # Arabic date format
+DATETIME_FORMAT = 'Y/m/d H:i'
+SHORT_DATE_FORMAT = 'm/d/Y'
+SHORT_DATETIME_FORMAT = 'm/d/Y H:i'
+
+# Enable Arabic locale formatting
+USE_L10N = True
+USE_TZ = True
 
 # Pagination
 PAGINATE_BY = 20

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% load i18n %}
+
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Purchase Requirements" %} | {% trans "SpareSmart" %}{% endblock %}
+{% block title %}Purchase Requirements | SpareSmart{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -108,16 +108,16 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-shopping-cart me-3"></i>{% trans "Purchase Requirements" %}
+                    <i class="fas fa-shopping-cart me-3"></i>Purchase Requirements
                 </h1>
-                <p class="mb-0 opacity-75">{% trans "Items that need to be reordered based on current stock levels" %}</p>
+                <p class="mb-0 opacity-75">Items that need to be reordered based on current stock levels</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'inventory:alerts_dashboard' %}" class="btn btn-light btn-lg me-2">
-                    <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Alerts" %}
+                    <i class="fas fa-arrow-left me-2"></i>Back to Alerts
                 </a>
                 <button onclick="window.print()" class="btn btn-info btn-lg">
-                    <i class="fas fa-print me-2"></i>{% trans "Print" %}
+                    <i class="fas fa-print me-2"></i>Print
                 </button>
             </div>
         </div>
@@ -129,25 +129,25 @@
             <div class="col-md-3">
                 <div class="summary-item">
                     <div class="summary-value">{{ total_items }}</div>
-                    <div class="summary-label">{% trans "Items to Order" %}</div>
+                    <div class="summary-label">Items to Order</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-item">
                     <div class="summary-value text-danger">{{ high_priority_count }}</div>
-                    <div class="summary-label">{% trans "High Priority" %}</div>
+                    <div class="summary-label">High Priority</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-item">
                     <div class="summary-value text-warning">{{ total_items|add:high_priority_count|add:"-"|add:high_priority_count }}</div>
-                    <div class="summary-label">{% trans "Medium Priority" %}</div>
+                    <div class="summary-label">Medium Priority</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="summary-item">
                     <div class="summary-value text-success">${{ total_cost|floatformat:2 }}</div>
-                    <div class="summary-label">{% trans "Total Cost" %}</div>
+                    <div class="summary-label">Total Cost</div>
                 </div>
             </div>
         </div>
@@ -158,32 +158,32 @@
         <div class="row g-2">
             <div class="col-md-2">
                 <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-plus me-1"></i>{% trans "Create PO" %}
+                    <i class="fas fa-plus me-1"></i>Create PO
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success w-100">
-                    <i class="fas fa-bolt me-1"></i>{% trans "Quick Purchase" %}
+                    <i class="fas fa-bolt me-1"></i>Quick Purchase
                 </a>
             </div>
             <div class="col-md-2">
                 <button onclick="exportToCsv()" class="btn btn-info w-100">
-                    <i class="fas fa-download me-1"></i>{% trans "Export CSV" %}
+                    <i class="fas fa-download me-1"></i>Export CSV
                 </button>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'inventory:alerts_list' %}?alert_type=out_of_stock,low_stock" class="btn btn-warning w-100">
-                    <i class="fas fa-exclamation-triangle me-1"></i>{% trans "View Alerts" %}
+                    <i class="fas fa-exclamation-triangle me-1"></i>View Alerts
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary w-100">
-                    <i class="fas fa-boxes me-1"></i>{% trans "Products" %}
+                    <i class="fas fa-boxes me-1"></i>المنتجات
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'inventory:refresh_alerts' %}" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-sync me-1"></i>{% trans "Refresh" %}
+                    <i class="fas fa-sync me-1"></i>Refresh
                 </a>
             </div>
         </div>
@@ -195,15 +195,15 @@
         <table class="table table-hover mb-0" id="requirementsTable">
             <thead>
                 <tr>
-                    <th>{% trans "Priority" %}</th>
-                    <th>{% trans "Product" %}</th>
-                    <th>{% trans "Current Stock" %}</th>
-                    <th>{% trans "Recommended Qty" %}</th>
-                    <th>{% trans "Unit Cost" %}</th>
-                    <th>{% trans "Total Cost" %}</th>
-                    <th>{% trans "Alert Type" %}</th>
-                    <th>{% trans "Supplier" %}</th>
-                    <th>{% trans "Actions" %}</th>
+                    <th>Priority</th>
+                    <th>Product</th>
+                    <th>Current Stock</th>
+                    <th>Recommended Qty</th>
+                    <th>Unit Cost</th>
+                    <th>Total Cost</th>
+                    <th>Alert Type</th>
+                    <th>المورد</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -300,7 +300,7 @@
             </tbody>
             <tfoot>
                 <tr class="table-info">
-                    <td colspan="5" class="text-end fw-bold">{% trans "Total Purchase Requirements:" %}</td>
+                    <td colspan="5" class="text-end fw-bold">Total Purchase Requirements:</td>
                     <td class="fw-bold text-success">```
 {{ total_cost|floatformat:2 }}
 ```</td>
@@ -313,13 +313,13 @@
     <!-- Action Buttons -->
     <div class="action-buttons">
         <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-lg me-3">
-            <i class="fas fa-plus me-2"></i>{% trans "Create Purchase Order" %}
+            <i class="fas fa-plus me-2"></i>Create Purchase Order
         </a>
         <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-primary btn-lg me-3">
-            <i class="fas fa-list me-2"></i>{% trans "View All Purchase Orders" %}
+            <i class="fas fa-list me-2"></i>View All Purchase Orders
         </a>
         <button onclick="exportToCsv()" class="btn btn-success btn-lg">
-            <i class="fas fa-download me-2"></i>{% trans "Export to CSV" %}
+            <i class="fas fa-download me-2"></i>Export to CSV
         </button>
     </div>
 
@@ -327,15 +327,15 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
-        <h3 class="text-success mb-3">{% trans "No Purchase Requirements" %}</h3>
+        <h3 class="text-success mb-3">No Purchase Requirements</h3>
         <p class="text-muted mb-4">
-            {% trans "Excellent! All your products have adequate stock levels. No purchases are required at this time." %}
+            Excellent! All your products have adequate stock levels. No purchases are required at this time.
         </p>
         <a href="{% url 'inventory:alerts_dashboard' %}" class="btn btn-primary me-3">
-            <i class="fas fa-dashboard me-2"></i>{% trans "View Alerts Dashboard" %}
+            <i class="fas fa-dashboard me-2"></i>View Alerts Dashboard
         </a>
         <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-boxes me-2"></i>{% trans "View Products" %}
+            <i class="fas fa-boxes me-2"></i>View Products
         </a>
     </div>
     {% endif %}

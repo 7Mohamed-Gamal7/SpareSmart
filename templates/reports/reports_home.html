@@ -1,9 +1,9 @@
 
-{% load i18n %}
+
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Reports Management" %} - {% trans "SpareSmart" %}{% endblock %}
-{% block page_title %}{% trans "Reports Management" %}{% endblock %}
+{% block title %}Reports Management - SpareSmart{% endblock %}
+{% block page_title %}Reports Management{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -98,13 +98,13 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-chart-bar me-3"></i>{% trans "Reports Management" %}
+                    <i class="fas fa-chart-bar me-3"></i>Reports Management
                 </h1>
-                <p class="mb-0 opacity-75">{% trans "Generate comprehensive business reports and analytics" %}</p>
+                <p class="mb-0 opacity-75">Generate comprehensive business reports and analytics</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'reports:generate_report' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>{% trans "Generate Report" %}
+                    <i class="fas fa-plus me-2"></i>Generate Report
                 </a>
             </div>
         </div>
@@ -116,25 +116,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_reports|default:0 }}</div>
-                    <div class="stat-label">{% trans "Total Reports" %}</div>
+                    <div class="stat-label">Total Reports</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ monthly_reports|default:0 }}</div>
-                    <div class="stat-label">{% trans "This Month" %}</div>
+                    <div class="stat-label">هذا الشهر</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ report_templates|default:0 }}</div>
-                    <div class="stat-label">{% trans "Templates" %}</div>
+                    <div class="stat-label">Templates</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ scheduled_reports|default:0 }}</div>
-                    <div class="stat-label">{% trans "Scheduled" %}</div>
+                    <div class="stat-label">Scheduled</div>
                 </div>
             </div>
         </div>
@@ -143,49 +143,49 @@
     <!-- Quick Report Generation -->
     <div class="quick-reports">
         <h5 class="mb-4">
-            <i class="fas fa-bolt me-2"></i>{% trans "Quick Reports" %}
+            <i class="fas fa-bolt me-2"></i>Quick Reports
         </h5>
         <div class="row g-3">
             <div class="col-md-4">
                 <a href="{% url 'reports:sales_report' %}" class="report-btn text-center">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <h6 class="fw-bold">{% trans "Sales Report" %}</h6>
-                    <small>{% trans "Revenue, transactions, and customer analytics" %}</small>
+                    <h6 class="fw-bold">تقرير المبيعات</h6>
+                    <small>Revenue, transactions, and customer analytics</small>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="{% url 'reports:purchases_report' %}" class="report-btn text-center">
                     <i class="fas fa-truck text-success"></i>
-                    <h6 class="fw-bold">{% trans "Purchase Report" %}</h6>
-                    <small>{% trans "Purchase orders, supplier payments, and costs" %}</small>
+                    <h6 class="fw-bold">Purchase Report</h6>
+                    <small>Purchase orders, supplier payments, and costs</small>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="{% url 'reports:inventory_report' %}" class="report-btn text-center">
                     <i class="fas fa-boxes text-warning"></i>
-                    <h6 class="fw-bold">{% trans "Inventory Report" %}</h6>
-                    <small>{% trans "Stock levels, movements, and valuations" %}</small>
+                    <h6 class="fw-bold">تقرير المخزون</h6>
+                    <small>Stock levels, movements, and valuations</small>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="{% url 'reports:expenses_report' %}" class="report-btn text-center">
                     <i class="fas fa-receipt text-danger"></i>
-                    <h6 class="fw-bold">{% trans "Expense Report" %}</h6>
-                    <small>{% trans "Business expenses and cost analysis" %}</small>
+                    <h6 class="fw-bold">Expense Report</h6>
+                    <small>Business expenses and cost analysis</small>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="{% url 'reports:profit_loss_report' %}" class="report-btn text-center">
                     <i class="fas fa-chart-line text-info"></i>
-                    <h6 class="fw-bold">{% trans "Profit & Loss" %}</h6>
-                    <small>{% trans "Financial performance and profitability" %}</small>
+                    <h6 class="fw-bold">Profit & Loss</h6>
+                    <small>Financial performance and profitability</small>
                 </a>
             </div>
             <div class="col-md-4">
                 <a href="{% url 'reports:installments_report' %}" class="report-btn text-center">
                     <i class="fas fa-calendar-alt text-secondary"></i>
-                    <h6 class="fw-bold">{% trans "Installments Report" %}</h6>
-                    <small>{% trans "Payment schedules and collections" %}</small>
+                    <h6 class="fw-bold">Installments Report</h6>
+                    <small>Payment schedules and collections</small>
                 </a>
             </div>
         </div>
@@ -197,15 +197,15 @@
             <div class="report-card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-file-alt me-2"></i>{% trans "Report Templates" %}
+                        <i class="fas fa-file-alt me-2"></i>Report Templates
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">{% trans "Create and manage reusable report templates" %}</p>
+                    <p class="text-muted mb-3">Create and manage reusable report templates</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">{% trans "Available Templates" %}: <strong>{{ report_templates|default:0 }}</strong></span>
+                        <span class="text-muted">Available Templates: <strong>{{ report_templates|default:0 }}</strong></span>
                         <a href="{% url 'reports:report_template_list' %}" class="btn btn-primary">
-                            <i class="fas fa-eye me-1"></i>{% trans "View Templates" %}
+                            <i class="fas fa-eye me-1"></i>View Templates
                         </a>
                     </div>
                 </div>
@@ -217,15 +217,15 @@
             <div class="report-card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-file-download me-2"></i>{% trans "Generated Reports" %}
+                        <i class="fas fa-file-download me-2"></i>Generated Reports
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-3">{% trans "Access previously generated reports" %}</p>
+                    <p class="text-muted mb-3">Access previously generated reports</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">{% trans "Recent Reports" %}: <strong>{{ recent_reports|default:0 }}</strong></span>
+                        <span class="text-muted">Recent Reports: <strong>{{ recent_reports|default:0 }}</strong></span>
                         <a href="{% url 'reports:generated_report_list' %}" class="btn btn-success">
-                            <i class="fas fa-list me-1"></i>{% trans "View Reports" %}
+                            <i class="fas fa-list me-1"></i>عرض التقارير
                         </a>
                     </div>
                 </div>
@@ -238,7 +238,7 @@
     <div class="report-card">
         <div class="card-header">
             <h5 class="mb-0">
-                <i class="fas fa-history me-2"></i>{% trans "Recent Reports" %}
+                <i class="fas fa-history me-2"></i>Recent Reports
             </h5>
         </div>
         <div class="card-body">
@@ -246,11 +246,11 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>{% trans "Report Name" %}</th>
-                            <th>{% trans "Type" %}</th>
-                            <th>{% trans "Generated" %}</th>
-                            <th>{% trans "Status" %}</th>
-                            <th>{% trans "Actions" %}</th>
+                            <th>Report Name</th>
+                            <th>Type</th>
+                            <th>Generated</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -268,14 +268,14 @@
                                 <small class="text-muted">{{ report.created_at|time:"H:i" }}</small>
                             </td>
                             <td>
-                                <span class="badge bg-success">{% trans "Ready" %}</span>
+                                <span class="badge bg-success">Ready</span>
                             </td>
                             <td>
                                 <a href="{% url 'reports:generated_report_detail' report.id %}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye me-1"></i>{% trans "View" %}
+                                    <i class="fas fa-eye me-1"></i>عرض
                                 </a>
                                 <a href="{% url 'reports:download_report' report.id %}" class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-download me-1"></i>{% trans "Download" %}
+                                    <i class="fas fa-download me-1"></i>Download
                                 </a>
                             </td>
                         </tr>
@@ -285,7 +285,7 @@
             </div>
             <div class="text-center mt-3">
                 <a href="{% url 'reports:generated_report_list' %}" class="btn btn-outline-primary">
-                    <i class="fas fa-list me-1"></i>{% trans "View All Reports" %}
+                    <i class="fas fa-list me-1"></i>View All Reports
                 </a>
             </div>
         </div>
@@ -295,10 +295,10 @@
     <div class="report-card">
         <div class="card-body text-center py-5">
             <i class="fas fa-chart-bar fa-5x text-muted mb-4"></i>
-            <h3 class="text-muted mb-3">{% trans "No Reports Generated Yet" %}</h3>
-            <p class="text-muted mb-4">{% trans "Start generating reports to track your business performance and analytics." %}</p>
+            <h3 class="text-muted mb-3">No Reports Generated Yet</h3>
+            <p class="text-muted mb-4">Start generating reports to track your business performance and analytics.</p>
             <a href="{% url 'reports:generate_report' %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus me-2"></i>{% trans "Generate First Report" %}
+                <i class="fas fa-plus me-2"></i>Generate First Report
             </a>
         </div>
     </div>

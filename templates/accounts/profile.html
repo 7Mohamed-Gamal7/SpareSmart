@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% load i18n %}
+
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Profile" %} - {% trans "SpareSmart" %}{% endblock %}
-{% block page_title %}{% trans "Profile" %}{% endblock %}
+{% block title %}الملف الشخصي - SpareSmart{% endblock %}
+{% block page_title %}الملف الشخصي{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -67,7 +67,7 @@
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'accounts:change_password' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-key me-2"></i>{% trans "Change Password" %}
+                    <i class="fas fa-key me-2"></i>Change Password
                 </a>
             </div>
         </div>
@@ -79,28 +79,28 @@
             <div class="profile-card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-user me-2"></i>{% trans "Personal Information" %}
+                        <i class="fas fa-user me-2"></i>Personal Information
                     </h5>
                 </div>
                 <div class="profile-info">
                     <div class="info-item">
-                        <div class="info-label">{% trans "First Name" %}</div>
+                        <div class="info-label">First Name</div>
                         <div class="info-value">{{ user.first_name|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Last Name" %}</div>
+                        <div class="info-label">Last Name</div>
                         <div class="info-value">{{ user.last_name|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Email" %}</div>
+                        <div class="info-label">Email</div>
                         <div class="info-value">{{ user.email|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Phone" %}</div>
+                        <div class="info-label">Phone</div>
                         <div class="info-value">{{ user.phone|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Address" %}</div>
+                        <div class="info-label">Address</div>
                         <div class="info-value">{{ user.address|default:"-" }}</div>
                     </div>
                 </div>
@@ -112,39 +112,39 @@
             <div class="profile-card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-cog me-2"></i>{% trans "Account Information" %}
+                        <i class="fas fa-cog me-2"></i>Account Information
                     </h5>
                 </div>
                 <div class="profile-info">
                     <div class="info-item">
-                        <div class="info-label">{% trans "Username" %}</div>
+                        <div class="info-label">اسم المستخدم</div>
                         <div class="info-value">{{ user.username }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Role" %}</div>
+                        <div class="info-label">Role</div>
                         <div class="info-value">
                             <span class="badge bg-primary">{{ user.get_role_display }}</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Status" %}</div>
+                        <div class="info-label">الحالة</div>
                         <div class="info-value">
                             <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
-                                {% if user.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
+                                {% if user.is_active %}نشط{% else %}غير نشط{% endif %}
                             </span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Date Joined" %}</div>
+                        <div class="info-label">Date Joined</div>
                         <div class="info-value">{{ user.date_joined|date:"Y-m-d H:i" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">{% trans "Last Login" %}</div>
+                        <div class="info-label">Last Login</div>
                         <div class="info-value">
                             {% if user.last_login %}
                                 {{ user.last_login|date:"Y-m-d H:i" }}
                             {% else %}
-                                {% trans "Never" %}
+                                Never
                             {% endif %}
                         </div>
                     </div>
@@ -157,14 +157,14 @@
     <div class="profile-card">
         <div class="card-header bg-info text-white">
             <h5 class="mb-0">
-                <i class="fas fa-history me-2"></i>{% trans "Recent Activity" %}
+                <i class="fas fa-history me-2"></i>Recent Activity
             </h5>
         </div>
         <div class="profile-info">
             <div class="text-center py-4">
                 <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                <h6 class="text-muted">{% trans "No recent activity" %}</h6>
-                <p class="text-muted">{% trans "Your activity will appear here when you use the system." %}</p>
+                <h6 class="text-muted">No recent activity</h6>
+                <p class="text-muted">Your activity will appear here when you use the system.</p>
             </div>
         </div>
     </div>

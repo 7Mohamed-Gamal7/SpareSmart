@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% load i18n %}
+
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Purchase Orders" %} | {% trans "SpareSmart" %}{% endblock %}
+{% block title %}Purchase Orders | سبير سمارت{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -88,16 +88,16 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-shopping-cart me-3"></i>{% trans "Purchase Orders" %}
+                    <i class="fas fa-shopping-cart me-3"></i>Purchase Orders
                 </h1>
-                <p class="mb-0 opacity-75">{% trans "Manage purchase orders, receiving, and supplier payments" %}</p>
+                <p class="mb-0 opacity-75">Manage purchase orders, receiving, and supplier payments</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'purchases:purchase_create' %}" class="btn btn-light btn-lg me-2">
-                    <i class="fas fa-plus me-2"></i>{% trans "New Purchase" %}
+                    <i class="fas fa-plus me-2"></i>شراء جديد
                 </a>
                 <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
-                    <i class="fas fa-bolt me-2"></i>{% trans "Quick Purchase" %}
+                    <i class="fas fa-bolt me-2"></i>Quick Purchase
                 </a>
             </div>
         </div>
@@ -109,7 +109,7 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_purchases }}</div>
-                    <div class="stat-label">{% trans "Total Orders" %}</div>
+                    <div class="stat-label">Total Orders</div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -121,7 +121,7 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-warning">{{ pending_orders }}</div>
-                    <div class="stat-label">{% trans "Pending Orders" %}</div>
+                    <div class="stat-label">Pending Orders</div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -138,32 +138,32 @@
         <div class="row g-2">
             <div class="col-md-2">
                 <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-plus me-1"></i>{% trans "New Purchase" %}
+                    <i class="fas fa-plus me-1"></i>شراء جديد
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success w-100">
-                    <i class="fas fa-bolt me-1"></i>{% trans "Quick Purchase" %}
+                    <i class="fas fa-bolt me-1"></i>Quick Purchase
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-info w-100">
-                    <i class="fas fa-truck me-1"></i>{% trans "Receiving" %}
+                    <i class="fas fa-truck me-1"></i>Receiving
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-warning w-100">
-                    <i class="fas fa-credit-card me-1"></i>{% trans "Payments" %}
+                    <i class="fas fa-credit-card me-1"></i>Payments
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-secondary w-100">
-                    <i class="fas fa-chart-bar me-1"></i>{% trans "Reports" %}
+                    <i class="fas fa-chart-bar me-1"></i>التقارير
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-download me-1"></i>{% trans "Export" %}
+                    <i class="fas fa-download me-1"></i>Export
                 </a>
             </div>
         </div>
@@ -173,23 +173,23 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">{% trans "Search Orders" %}</label>
+                <label class="form-label">Search Orders</label>
                 {{ filter_form.search }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">{% trans "Supplier" %}</label>
+                <label class="form-label">المورد</label>
                 {{ filter_form.supplier }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">{% trans "Status" %}</label>
+                <label class="form-label">الحالة</label>
                 {{ filter_form.status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">{% trans "Payment Status" %}</label>
+                <label class="form-label">Payment Status</label>
                 {{ filter_form.payment_status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">{% trans "Date Range" %}</label>
+                <label class="form-label">Date Range</label>
                 {{ filter_form.date_range }}
             </div>
             <div class="col-md-1">
@@ -204,18 +204,18 @@
         
         <div class="row g-3 mt-2">
             <div class="col-md-3">
-                <label class="form-label">{% trans "From Date" %}</label>
+                <label class="form-label">From Date</label>
                 {{ filter_form.date_from }}
             </div>
             <div class="col-md-3">
-                <label class="form-label">{% trans "To Date" %}</label>
+                <label class="form-label">To Date</label>
                 {{ filter_form.date_to }}
             </div>
             <div class="col-md-2">
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>{% trans "Filter" %}
+                        <i class="fas fa-search me-1"></i>تصفية
                     </button>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>{% trans "Clear" %}
+                        <i class="fas fa-times me-1"></i>Clear
                     </a>
                 </div>
             </div>
@@ -236,16 +236,16 @@
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th>{% trans "Purchase #" %}</th>
-                    <th>{% trans "Supplier" %}</th>
-                    <th>{% trans "Order Date" %}</th>
-                    <th>{% trans "Items" %}</th>
-                    <th>{% trans "Amount" %}</th>
-                    <th>{% trans "Paid" %}</th>
-                    <th>{% trans "Balance" %}</th>
-                    <th>{% trans "Status" %}</th>
-                    <th>{% trans "Payment" %}</th>
-                    <th>{% trans "Actions" %}</th>
+                    <th>Purchase #</th>
+                    <th>المورد</th>
+                    <th>Order Date</th>
+                    <th>Items</th>
+                    <th>المبلغ</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>الحالة</th>
+                    <th>Payment</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -326,21 +326,21 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_detail' purchase.id %}">
-                                    <i class="fas fa-eye me-2"></i>{% trans "View Details" %}</a></li>
+                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
                                 {% if purchase.status not in 'received,cancelled' %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_update' purchase.id %}">
-                                    <i class="fas fa-edit me-2"></i>{% trans "Edit" %}</a></li>
+                                    <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_invoice' purchase.id %}">
-                                    <i class="fas fa-file-invoice me-2"></i>{% trans "View Invoice" %}</a></li>
+                                    <i class="fas fa-file-invoice me-2"></i>View Invoice</a></li>
                                 {% if purchase.status in 'ordered,partial_received' %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_receive' purchase.id %}">
-                                    <i class="fas fa-truck me-2"></i>{% trans "Receive Goods" %}</a></li>
+                                    <i class="fas fa-truck me-2"></i>Receive Goods</a></li>
                                 {% endif %}
                                 {% if purchase.balance_amount > 0 %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_payment_create' purchase.id %}">
-                                    <i class="fas fa-credit-card me-2"></i>{% trans "Record Payment" %}</a></li>
+                                    <i class="fas fa-credit-card me-2"></i>Record Payment</a></li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -355,13 +355,13 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">{% trans "No Purchase Orders Found" %}</h3>
-        <p class="text-muted mb-4">{% trans "Start managing your inventory by creating your first purchase order." %}</p>
+        <h3 class="text-muted mb-3">No Purchase Orders Found</h3>
+        <p class="text-muted mb-4">Start managing your inventory by creating your first purchase order.</p>
         <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-lg me-3">
-            <i class="fas fa-plus me-2"></i>{% trans "Create First Purchase" %}
+            <i class="fas fa-plus me-2"></i>Create First Purchase
         </a>
         <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
-            <i class="fas fa-bolt me-2"></i>{% trans "Quick Purchase" %}
+            <i class="fas fa-bolt me-2"></i>Quick Purchase
         </a>
     </div>
     {% endif %}

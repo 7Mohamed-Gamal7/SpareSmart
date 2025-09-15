@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Dashboard" %} - {% trans "SpareSmart" %}{% endblock %}
-{% block page_title %}{% trans "Dashboard" %}{% endblock %}
+
+{% block title %}لوحة التحكم - سبير سمارت{% endblock %}
+{% block page_title %}لوحة التحكم{% endblock %}
 
 {% block content %}
 <!-- Welcome Section -->
@@ -12,8 +12,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="mb-1">{% trans "Welcome back" %}, {{ user.first_name|default:user.username }}!</h4>
-                        <p class="text-muted mb-0">{% trans "Here's what's happening in your spare parts business today." %}</p>
+                        <h4 class="mb-1">مرحباً بعودتك، {{ user.first_name|default:user.username }}!</h4>
+                        <p class="text-muted mb-0">إليك ما يحدث في أعمال قطع الغيار اليوم.</p>
                     </div>
                     <div class="text-end">
                         <p class="mb-0"><strong>{{ "now"|date:"l, F d, Y" }}</strong></p>
@@ -33,8 +33,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-number">${{ sales_stats.today_amount|floatformat:0 }}</div>
-                    <div class="stats-label">{% trans "Today's Sales" %}</div>
-                    <small>{{ sales_stats.today_count }} {% trans "transactions" %}</small>
+                    <div class="stats-label">مبيعات اليوم</div>
+                    <small>{{ sales_stats.today_count }} معاملات</small>
                 </div>
                 <div class="stats-icon">
                     <i class="fas fa-shopping-cart fa-2x"></i>
@@ -49,8 +49,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-number">${{ sales_stats.month_amount|floatformat:0 }}</div>
-                    <div class="stats-label">{% trans "Monthly Revenue" %}</div>
-                    <small>{{ sales_stats.month_count }} {% trans "sales this month" %}</small>
+                    <div class="stats-label">الإيرادات الشهرية</div>
+                    <small>{{ sales_stats.month_count }} مبيعات هذا الشهر</small>
                 </div>
                 <div class="stats-icon">
                     <i class="fas fa-chart-line fa-2x"></i>
@@ -65,8 +65,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-number">${{ inventory_stats.total_value|floatformat:0 }}</div>
-                    <div class="stats-label">{% trans "Inventory Value" %}</div>
-                    <small>{{ inventory_stats.total_products }} {% trans "products" %}</small>
+                    <div class="stats-label">قيمة المخزون</div>
+                    <small>{{ inventory_stats.total_products }} منتجات</small>
                 </div>
                 <div class="stats-icon">
                     <i class="fas fa-boxes fa-2x"></i>
@@ -81,8 +81,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stats-number">${{ expense_stats.month_amount|floatformat:0 }}</div>
-                    <div class="stats-label">{% trans "Monthly Expenses" %}</div>
-                    <small>{{ expense_stats.month_count }} {% trans "expenses" %}</small>
+                    <div class="stats-label">المصروفات الشهرية</div>
+                    <small>{{ expense_stats.month_count }} مصروفات</small>
                 </div>
                 <div class="stats-icon">
                     <i class="fas fa-receipt fa-2x"></i>
@@ -98,16 +98,16 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> {% trans "Alerts & Pending Items" %}</h5>
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Alerts & Pending Items</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     {% if pending_items.pending_expenses > 0 %}
                     <div class="col-md-4 mb-3">
                         <div class="alert alert-warning">
-                            <h6><i class="fas fa-clock"></i> {% trans "Pending Approvals" %}</h6>
-                            <p class="mb-1">{{ pending_items.pending_expenses }} {% trans "expense(s) waiting for approval" %}</p>
-                            <a href="{% url 'expenses:expense_list' %}?status=pending" class="btn btn-sm btn-warning">{% trans "Review" %}</a>
+                            <h6><i class="fas fa-clock"></i> Pending Approvals</h6>
+                            <p class="mb-1">{{ pending_items.pending_expenses }} expense(s) waiting for approval</p>
+                            <a href="{% url 'expenses:expense_list' %}?status=pending" class="btn btn-sm btn-warning">Review</a>
                         </div>
                     </div>
                     {% endif %}
@@ -115,9 +115,9 @@
                     {% if pending_items.low_stock_alerts > 0 %}
                     <div class="col-md-4 mb-3">
                         <div class="alert alert-danger">
-                            <h6><i class="fas fa-box-open"></i> {% trans "Low Stock Alert" %}</h6>
-                            <p class="mb-1">{{ pending_items.low_stock_alerts }} {% trans "product(s) running low" %}</p>
-                            <a href="{% url 'inventory:alerts_list' %}" class="btn btn-sm btn-danger">{% trans "View" %}</a>
+                            <h6><i class="fas fa-box-open"></i> Low Stock Alert</h6>
+                            <p class="mb-1">{{ pending_items.low_stock_alerts }} product(s) running low</p>
+                            <a href="{% url 'inventory:alerts_list' %}" class="btn btn-sm btn-danger">عرض</a>
                         </div>
                     </div>
                     {% endif %}
@@ -125,9 +125,9 @@
                     {% if pending_items.overdue_payments > 0 %}
                     <div class="col-md-4 mb-3">
                         <div class="alert alert-info">
-                            <h6><i class="fas fa-credit-card"></i> {% trans "Overdue Payments" %}</h6>
-                            <p class="mb-1">{{ pending_items.overdue_payments }} {% trans "payment(s) overdue" %}</p>
-                            <a href="{% url 'sales:sale_list' %}?payment_status=overdue" class="btn btn-sm btn-info">{% trans "Follow Up" %}</a>
+                            <h6><i class="fas fa-credit-card"></i> Overdue Payments</h6>
+                            <p class="mb-1">{{ pending_items.overdue_payments }} payment(s) overdue</p>
+                            <a href="{% url 'sales:sale_list' %}?payment_status=overdue" class="btn btn-sm btn-info">Follow Up</a>
                         </div>
                     </div>
                     {% endif %}
@@ -144,7 +144,7 @@
     <div class="col-xl-8 col-lg-7">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-chart-line"></i> {% trans "Sales Trend (Last 7 Days)" %}</h5>
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> اتجاه المبيعات (آخر 7 أيام)</h5>
             </div>
             <div class="card-body">
                 <canvas id="salesTrendChart" height="300"></canvas>
@@ -156,24 +156,24 @@
     <div class="col-xl-4 col-lg-5">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-bolt"></i> {% trans "Quick Actions" %}</h5>
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> الإجراءات السريعة</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{% url 'sales:sale_create' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> {% trans "New Sale" %}
+                        <i class="fas fa-plus"></i> بيع جديد
                     </a>
                     <a href="{% url 'purchases:purchase_create' %}" class="btn btn-success">
-                        <i class="fas fa-truck"></i> {% trans "New Purchase" %}
+                        <i class="fas fa-truck"></i> شراء جديد
                     </a>
                     <a href="{% url 'inventory:product_create' %}" class="btn btn-info">
-                        <i class="fas fa-box"></i> {% trans "Add Product" %}
+                        <i class="fas fa-box"></i> إضافة منتج
                     </a>
                     <a href="{% url 'expenses:expense_create' %}" class="btn btn-warning">
-                        <i class="fas fa-receipt"></i> {% trans "Record Expense" %}
+                        <i class="fas fa-receipt"></i> تسجيل مصروف
                     </a>
                     <a href="{% url 'reports:reports_home' %}" class="btn btn-secondary">
-                        <i class="fas fa-chart-bar"></i> {% trans "View Reports" %}
+                        <i class="fas fa-chart-bar"></i> عرض التقارير
                     </a>
                 </div>
             </div>
@@ -187,7 +187,7 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-history"></i> {% trans "Recent Activities" %}</h5>
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activities</h5>
             </div>
             <div class="card-body">
                 {% if recent_activities %}
@@ -210,17 +210,17 @@
                         <div class="activity-content flex-grow-1">
                             <div class="activity-description">{{ activity.description }}</div>
                             <small class="text-muted">
-                                {{ activity.user.username }} • {{ activity.timestamp|timesince }} {% trans "ago" %}
+                                {{ activity.user.username }} • {{ activity.timestamp|timesince }} ago
                             </small>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
                 <div class="text-center">
-                    <a href="{% url 'dashboard:activity_log' %}" class="btn btn-sm btn-outline-primary">{% trans "View All Activities" %}</a>
+                    <a href="{% url 'dashboard:activity_log' %}" class="btn btn-sm btn-outline-primary">View All Activities</a>
                 </div>
                 {% else %}
-                <p class="text-muted text-center">{% trans "No recent activities" %}</p>
+                <p class="text-muted text-center">No recent activities</p>
                 {% endif %}
             </div>
         </div>
@@ -230,7 +230,7 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-star"></i> {% trans "Top Selling Products" %}</h5>
+                <h5 class="mb-0"><i class="fas fa-star"></i> Top Selling Products</h5>
             </div>
             <div class="card-body">
                 {% if top_products %}
@@ -242,7 +242,7 @@
                             <small class="text-muted">{{ product.sku }}</small>
                         </div>
                         <div class="product-stats text-end">
-                            <span class="badge bg-primary">{{ product.total_sold|default:0 }} {% trans "sold" %}</span>
+                            <span class="badge bg-primary">{{ product.total_sold|default:0 }} sold</span>
                             <br>
                             <small class="text-muted">${{ product.selling_price }}</small>
                         </div>
@@ -250,10 +250,10 @@
                     {% endfor %}
                 </div>
                 <div class="text-center">
-                    <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All Products" %}</a>
+                    <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">View All Products</a>
                 </div>
                 {% else %}
-                <p class="text-muted text-center">{% trans "No sales data available" %}</p>
+                <p class="text-muted text-center">No sales data available</p>
                 {% endif %}
             </div>
         </div>
@@ -274,7 +274,7 @@ const salesTrendChart = new Chart(salesTrendCtx, {
             {% endfor %}
         ],
         datasets: [{
-            label: '{% trans "Sales Amount" %}',
+            label: 'Sales Amount',
             data: [
                 {% for data in sales_trend %}
                     {{ data.amount }}{% if not forloop.last %},{% endif %}

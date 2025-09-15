@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
-{% load i18n %}
 
-{% block title %}{% trans "Notifications" %} - {% trans "SpareSmart" %}{% endblock %}
-{% block page_title %}{% trans "Notifications" %}{% endblock %}
+
+{% block title %}الإشعارات - SpareSmart{% endblock %}
+{% block page_title %}الإشعارات{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -12,16 +12,16 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="mb-0">
-                        <i class="fas fa-bell me-3"></i>{% trans "Notifications" %}
+                        <i class="fas fa-bell me-3"></i>الإشعارات
                     </h4>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">{% trans "Here you can view all system notifications and alerts." %}</p>
+                    <p class="text-muted">Here you can view all system notifications and alerts.</p>
                     
                     <!-- Notifications will be displayed here -->
                     <div class="text-center py-5">
                         <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">{% trans "No notifications at this time" %}</h5>
+                        <h5 class="text-muted">No notifications at this time</h5>
                         <p class="text-muted">{% trans "We'll notify you when there are important updates." %}</p>
                     </div>
                 </div>
