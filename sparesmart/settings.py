@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # Added for language support
+    'django.middleware.locale.LocaleMiddleware',  # Must be after SessionMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',  # Added for language support
             ],
         },
     },
@@ -145,14 +146,18 @@ LANGUAGES = [
 
 TIME_ZONE = 'Africa/Cairo'  # Cairo timezone for Arabic region
 
+# Use fallback to prevent crashes if translation files are corrupted
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Locale paths for translation files
+# Translation settings - use fallback for broken files
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+# Format localization
+USE_THOUSAND_SEPARATOR = True
 
 
 # Static files (CSS, JavaScript, Images)
