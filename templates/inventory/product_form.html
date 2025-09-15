@@ -20,26 +20,26 @@
                         <div class="col-lg-8">
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Basic Information</h6>
+                                    <h6 class="mb-0">Basic معلومات</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="{{ form.name.id_for_label }}" class="form-label">Product Name *</label>
+                                            <label for="{{ form.name.id_for_label }}" class="form-label">اسم المنتج *</label>
                                             {{ form.name|add_class:"form-control" }}
                                             {% if form.name.errors %}
                                                 <div class="text-danger">{{ form.name.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.sku.id_for_label }}" class="form-label">SKU *</label>
+                                            <label for="{{ form.sku.id_for_label }}" class="form-label">رمز المنتج *</label>
                                             {{ form.sku|add_class:"form-control" }}
                                             {% if form.sku.errors %}
                                                 <div class="text-danger">{{ form.sku.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.barcode.id_for_label }}" class="form-label">Barcode</label>
+                                            <label for="{{ form.barcode.id_for_label }}" class="form-label">الباركود</label>
                                             {{ form.barcode|add_class:"form-control" }}
                                             {% if form.barcode.errors %}
                                                 <div class="text-danger">{{ form.barcode.errors.0 }}</div>
@@ -48,7 +48,7 @@
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                        <label for="{{ form.description.id_for_label }}" class="form-label">الوصف</label>
                                         {{ form.description|add_class:"form-control" }}
                                         {% if form.description.errors %}
                                             <div class="text-danger">{{ form.description.errors.0 }}</div>
@@ -57,21 +57,21 @@
                                     
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.category.id_for_label }}" class="form-label">Category *</label>
+                                            <label for="{{ form.category.id_for_label }}" class="form-label">الفئة *</label>
                                             {{ form.category|add_class:"form-control" }}
                                             {% if form.category.errors %}
                                                 <div class="text-danger">{{ form.category.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.brand.id_for_label }}" class="form-label">Brand</label>
+                                            <label for="{{ form.brand.id_for_label }}" class="form-label">العلامة التجارية</label>
                                             {{ form.brand|add_class:"form-control" }}
                                             {% if form.brand.errors %}
                                                 <div class="text-danger">{{ form.brand.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.unit.id_for_label }}" class="form-label">Unit *</label>
+                                            <label for="{{ form.unit.id_for_label }}" class="form-label">وحدة *</label>
                                             {{ form.unit|add_class:"form-control" }}
                                             {% if form.unit.errors %}
                                                 <div class="text-danger">{{ form.unit.errors.0 }}</div>
@@ -84,12 +84,12 @@
                             <!-- Pricing Information -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Pricing Information</h6>
+                                    <h6 class="mb-0">معلومات السعر</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.cost_price.id_for_label }}" class="form-label">Cost Price *</label>
+                                            <label for="{{ form.cost_price.id_for_label }}" class="form-label">سعر التكلفة *</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">$</span>
                                                 {{ form.cost_price|add_class:"form-control" }}
@@ -99,7 +99,7 @@
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.selling_price.id_for_label }}" class="form-label">Selling Price *</label>
+                                            <label for="{{ form.selling_price.id_for_label }}" class="form-label">سعر البيع *</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">$</span>
                                                 {{ form.selling_price|add_class:"form-control" }}
@@ -109,7 +109,7 @@
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.wholesale_price.id_for_label }}" class="form-label">Wholesale Price</label>
+                                            <label for="{{ form.wholesale_price.id_for_label }}" class="form-label">سعر الجملة</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">$</span>
                                                 {{ form.wholesale_price|add_class:"form-control" }}
@@ -121,7 +121,7 @@
                                     </div>
                                     
                                     <div id="profit-margin" class="alert alert-info">
-                                        <strong>Profit Margin:</strong> <span id="margin-value">0%</span>
+                                        <strong>هامش الربح:</strong> <span id="margin-value">0%</span>
                                     </div>
                                 </div>
                             </div>
@@ -129,33 +129,33 @@
                             <!-- Stock Information -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Stock Information</h6>
+                                    <h6 class="mb-0">المخزون معلومات</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.current_stock.id_for_label }}" class="form-label">Current Stock</label>
+                                            <label for="{{ form.current_stock.id_for_label }}" class="form-label">المخزون الحالي</label>
                                             {{ form.current_stock|add_class:"form-control" }}
                                             {% if form.current_stock.errors %}
                                                 <div class="text-danger">{{ form.current_stock.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.minimum_stock.id_for_label }}" class="form-label">Minimum Stock</label>
+                                            <label for="{{ form.minimum_stock.id_for_label }}" class="form-label">الحد الأدنى للمخزون</label>
                                             {{ form.minimum_stock|add_class:"form-control" }}
                                             {% if form.minimum_stock.errors %}
                                                 <div class="text-danger">{{ form.minimum_stock.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.maximum_stock.id_for_label }}" class="form-label">Maximum Stock</label>
+                                            <label for="{{ form.maximum_stock.id_for_label }}" class="form-label">الحد الأقصى للمخزون</label>
                                             {{ form.maximum_stock|add_class:"form-control" }}
                                             {% if form.maximum_stock.errors %}
                                                 <div class="text-danger">{{ form.maximum_stock.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label for="{{ form.reorder_level.id_for_label }}" class="form-label">Reorder Level</label>
+                                            <label for="{{ form.reorder_level.id_for_label }}" class="form-label">إعادة ترتيب المستوى</label>
                                             {{ form.reorder_level|add_class:"form-control" }}
                                             {% if form.reorder_level.errors %}
                                                 <div class="text-danger">{{ form.reorder_level.errors.0 }}</div>
@@ -168,26 +168,26 @@
                             <!-- Product Specifications -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Product Specifications</h6>
+                                    <h6 class="mb-0">المنتج Specifications</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.weight.id_for_label }}" class="form-label">Weight (kg)</label>
+                                            <label for="{{ form.weight.id_for_label }}" class="form-label">الوزن (كجم)</label>
                                             {{ form.weight|add_class:"form-control" }}
                                             {% if form.weight.errors %}
                                                 <div class="text-danger">{{ form.weight.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.dimensions.id_for_label }}" class="form-label">Dimensions</label>
-                                            {{ form.dimensions|add_class:"form-control" }}
-                                            {% if form.dimensions.errors %}
-                                                <div class="text-danger">{{ form.dimensions.errors.0 }}</div>
+                                            <label for="{{ form.الأبعاد.id_for_label }}" class="form-label">الأبعاد</label>
+                                            {{ form.الأبعاد|add_class:"form-control" }}
+                                            {% if form.الأبعاد.errors %}
+                                                <div class="text-danger">{{ form.الأبعاد.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label for="{{ form.color.id_for_label }}" class="form-label">Color</label>
+                                            <label for="{{ form.color.id_for_label }}" class="form-label">اللون</label>
                                             {{ form.color|add_class:"form-control" }}
                                             {% if form.color.errors %}
                                                 <div class="text-danger">{{ form.color.errors.0 }}</div>
@@ -197,14 +197,14 @@
                                     
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="{{ form.material.id_for_label }}" class="form-label">Material</label>
-                                            {{ form.material|add_class:"form-control" }}
-                                            {% if form.material.errors %}
-                                                <div class="text-danger">{{ form.material.errors.0 }}</div>
+                                            <label for="{{ form.materials.id_for_label }}" class="form-label">المادة</label>
+                                            {{ form.materials|add_class:"form-control" }}
+                                            {% if form.materials.errors %}
+                                                <div class="text-danger">{{ form.materials.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="{{ form.compatible_vehicles.id_for_label }}" class="form-label">Compatible Vehicles</label>
+                                            <label for="{{ form.compatible_vehicles.id_for_label }}" class="form-label">المركبات المتوافقة</label>
                                             {{ form.compatible_vehicles|add_class:"form-control" }}
                                             {% if form.compatible_vehicles.errors %}
                                                 <div class="text-danger">{{ form.compatible_vehicles.errors.0 }}</div>
@@ -214,14 +214,14 @@
                                     
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="{{ form.part_number.id_for_label }}" class="form-label">Part Number</label>
+                                            <label for="{{ form.part_number.id_for_label }}" class="form-label">رقم القطعة</label>
                                             {{ form.part_number|add_class:"form-control" }}
                                             {% if form.part_number.errors %}
                                                 <div class="text-danger">{{ form.part_number.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="{{ form.oem_number.id_for_label }}" class="form-label">OEM Number</label>
+                                            <label for="{{ form.oem_number.id_for_label }}" class="form-label">رقم الشركة المصنعة للمعدات الأصلية</label>
                                             {{ form.oem_number|add_class:"form-control" }}
                                             {% if form.oem_number.errors %}
                                                 <div class="text-danger">{{ form.oem_number.errors.0 }}</div>
@@ -237,11 +237,11 @@
                             <!-- Images and Files -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Images & Files</h6>
+                                    <h6 class="mb-0">الملفات والصور</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label for="{{ form.image.id_for_label }}" class="form-label">Product Image</label>
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">صورة المنتج</label>
                                         {{ form.image|add_class:"form-control" }}
                                         {% if form.image.errors %}
                                             <div class="text-danger">{{ form.image.errors.0 }}</div>
@@ -254,7 +254,7 @@
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="{{ form.datasheet.id_for_label }}" class="form-label">Datasheet/Manual</label>
+                                        <label for="{{ form.datasheet.id_for_label }}" class="form-label">ورقة البيانات/الدليل</label>
                                         {{ form.datasheet|add_class:"form-control" }}
                                         {% if form.datasheet.errors %}
                                             <div class="text-danger">{{ form.datasheet.errors.0 }}</div>
@@ -273,23 +273,25 @@
                             <!-- Status & Settings -->
                             <div class="card mb-4">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Status & Settings</h6>
+                                    <h6 class="mb-0">الحالة & الإعدادات</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-check mb-3">
                                         {{ form.is_active|add_class:"form-check-input" }}
                                         <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
-                                            Active Product
+                                            <!-- Active Product -->
+                                             المنتج نشط
                                         </label>
-                                        <div class="form-text">Inactive products won't appear in sales</div>
+                                        <div class="form-text">غير نشط لن تظهر المنتجات فى المبيعات </div>
                                     </div>
                                     
                                     <div class="form-check mb-3">
                                         {{ form.is_featured|add_class:"form-check-input" }}
                                         <label for="{{ form.is_featured.id_for_label }}" class="form-check-label">
-                                            Featured Product
+                                            <!-- Featured Product -->
+                                             المنتج مميز
                                         </label>
-                                        <div class="form-text">Featured products appear prominently</div>
+                                        <div class="form-text">تظهر المنتجات المميزة بشكل بارز</div>
                                     </div>
                                 </div>
                             </div>

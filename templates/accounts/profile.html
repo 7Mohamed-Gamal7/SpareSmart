@@ -57,7 +57,7 @@
             <div class="col-md-8">
                 <div class="d-flex align-items-center">
                     <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://via.placeholder.com/120{% endif %}" 
-                         alt="Profile" class="profile-avatar me-4">
+                         alt="الملف الشخصي" class="profile-avatar me-4">
                     <div>
                         <h1 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h1>
                         <p class="mb-2 opacity-75">{{ user.get_role_display }}</p>
@@ -84,23 +84,23 @@
                 </div>
                 <div class="profile-info">
                     <div class="info-item">
-                        <div class="info-label">First Name</div>
+                        <div class="info-label">الأول الاسم</div>
                         <div class="info-value">{{ user.first_name|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Last Name</div>
+                        <div class="info-label">الأخير الاسم</div>
                         <div class="info-value">{{ user.last_name|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Email</div>
+                        <div class="info-label">البريد الإلكتروني</div>
                         <div class="info-value">{{ user.email|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Phone</div>
+                        <div class="info-label">الهاتف</div>
                         <div class="info-value">{{ user.phone|default:"-" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Address</div>
+                        <div class="info-label">إضافةress</div>
                         <div class="info-value">{{ user.address|default:"-" }}</div>
                     </div>
                 </div>
@@ -135,11 +135,11 @@
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Date Joined</div>
+                        <div class="info-label">التاريخ Joined</div>
                         <div class="info-value">{{ user.date_joined|date:"Y-m-d H:i" }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Last Login</div>
+                        <div class="info-label">الأخير Login</div>
                         <div class="info-value">
                             {% if user.last_login %}
                                 {{ user.last_login|date:"Y-m-d H:i" }}

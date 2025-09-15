@@ -98,7 +98,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Alerts & Pending Items</h5>
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Alerts & Pending العناصر</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -217,7 +217,7 @@
                     {% endfor %}
                 </div>
                 <div class="text-center">
-                    <a href="{% url 'dashboard:activity_log' %}" class="btn btn-sm btn-outline-primary">View All Activities</a>
+                    <a href="{% url 'dashboard:activity_log' %}" class="btn btn-sm btn-outline-primary">عرض All Activities</a>
                 </div>
                 {% else %}
                 <p class="text-muted text-center">No recent activities</p>
@@ -230,7 +230,7 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-star"></i> Top Selling Products</h5>
+                <h5 class="mb-0"><i class="fas fa-star"></i>المنتجات الأكثر مبيعا</h5>
             </div>
             <div class="card-body">
                 {% if top_products %}
@@ -250,10 +250,10 @@
                     {% endfor %}
                 </div>
                 <div class="text-center">
-                    <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">View All Products</a>
+                    <a href="{% url 'inventory:product_list' %}" class="btn btn-sm btn-outline-primary">عرض كل المنتجات</a>
                 </div>
                 {% else %}
-                <p class="text-muted text-center">No sales data available</p>
+                <p class="text-muted text-center">لا توجد بيانات مبيعات متاحة</p>
                 {% endif %}
             </div>
         </div>

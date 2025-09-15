@@ -88,16 +88,16 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-shopping-cart me-3"></i>Purchase Orders
+                    <i class="fas fa-shopping-cart me-3"></i>أوامر الشراء
                 </h1>
-                <p class="mb-0 opacity-75">Manage purchase orders, receiving, and supplier payments</p>
+                <p class="mb-0 opacity-75">إدارة أوامر الشراء والاستلام ومدفوعات الموردين</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'purchases:purchase_create' %}" class="btn btn-light btn-lg me-2">
                     <i class="fas fa-plus me-2"></i>شراء جديد
                 </a>
                 <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
-                    <i class="fas fa-bolt me-2"></i>Quick Purchase
+                    <i class="fas fa-bolt me-2"></i>شراء سريع
                 </a>
             </div>
         </div>
@@ -109,25 +109,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_purchases }}</div>
-                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-label">الإجمالي Orders</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ today_purchases }}</div>
-                    <div class="stat-label">{% trans "Today's Orders" %}</div>
+                    <div class="stat-label">طلبات اليوم</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-warning">{{ pending_orders }}</div>
-                    <div class="stat-label">Pending Orders</div>
+                    <div class="stat-label">الطلبات المعلقة</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-success">${{ today_amount|floatformat:2 }}</div>
-                    <div class="stat-label">{% trans "Today's Amount" %}</div>
+                    <div class="stat-label">مبلغ اليوم</div>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
             </div>
             <div class="col-md-2">
                 <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success w-100">
-                    <i class="fas fa-bolt me-1"></i>Quick Purchase
+                    <i class="fas fa-bolt me-1"></i>شراء سريع
                 </a>
             </div>
             <div class="col-md-2">
@@ -153,7 +153,7 @@
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-warning w-100">
-                    <i class="fas fa-credit-card me-1"></i>Payments
+                    <i class="fas fa-credit-card me-1"></i>الدفع
                 </a>
             </div>
             <div class="col-md-2">
@@ -163,7 +163,7 @@
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-download me-1"></i>Export
+                    <i class="fas fa-download me-1"></i>تصدير
                 </a>
             </div>
         </div>
@@ -173,7 +173,7 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">Search Orders</label>
+                <label class="form-label">بحث Orders</label>
                 {{ filter_form.search }}
             </div>
             <div class="col-md-2">
@@ -185,11 +185,11 @@
                 {{ filter_form.status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">Payment Status</label>
+                <label class="form-label">الدفع الحالة</label>
                 {{ filter_form.payment_status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">Date Range</label>
+                <label class="form-label">نطاق التاريخ</label>
                 {{ filter_form.date_range }}
             </div>
             <div class="col-md-1">
@@ -204,11 +204,11 @@
         
         <div class="row g-3 mt-2">
             <div class="col-md-3">
-                <label class="form-label">From Date</label>
+                <label class="form-label"> التاريخ من</label>
                 {{ filter_form.date_from }}
             </div>
             <div class="col-md-3">
-                <label class="form-label">To Date</label>
+                <label class="form-label"> التاريخ إلي</label>
                 {{ filter_form.date_to }}
             </div>
             <div class="col-md-2">
@@ -223,7 +223,7 @@
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>Clear
+                        <i class="fas fa-times me-1"></i>مسح
                     </a>
                 </div>
             </div>
@@ -236,15 +236,15 @@
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th>Purchase #</th>
+                    <th>رقم الشراء</th>
                     <th>المورد</th>
-                    <th>Order Date</th>
-                    <th>Items</th>
+                    <th>الطلب التاريخ</th>
+                    <th>العناصر</th>
                     <th>المبلغ</th>
-                    <th>Paid</th>
-                    <th>Balance</th>
+                    <th>مدفوع</th>
+                    <th>الرصيد</th>
                     <th>الحالة</th>
-                    <th>Payment</th>
+                    <th>الدفع</th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
@@ -269,24 +269,24 @@
                         <div>{{ purchase.order_date|date:"M d, Y" }}</div>
                         <small class="text-muted">{{ purchase.order_date|time:"H:i" }}</small>
                         {% if purchase.expected_delivery_date %}
-                        <br><small class="text-info">Due: {{ purchase.expected_delivery_date|date:"M d" }}</small>
+                        <br><small class="text-info">مستحق: {{ purchase.expected_delivery_date|date:"M d" }}</small>
                         {% endif %}
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark">{{ purchase.items.count }} items</span>
+                        <span class="badge bg-light text-dark">{{ purchase.items.count }} عنصر</span>
                         {% with total_qty=purchase.items.all|length %}
                         {% if total_qty > 0 %}
-                        <br><small class="text-muted">{{ total_qty }} products</small>
+                        <br><small class="text-muted">{{ total_qty }} منتج</small>
                         {% endif %}
                         {% endwith %}
                     </td>
                     <td>
                         <div class="fw-bold">${{ purchase.total_amount|floatformat:2 }}</div>
                         {% if purchase.discount_amount > 0 %}
-                        <small class="text-success">-${{ purchase.discount_amount|floatformat:2 }} discount</small>
+                        <small class="text-success">-${{ purchase.discount_amount|floatformat:2 }} خصم</small>
                         {% endif %}
                         {% if purchase.shipping_cost > 0 %}
-                        <br><small class="text-info">+${{ purchase.shipping_cost|floatformat:2 }} shipping</small>
+                        <br><small class="text-info">+${{ purchase.shipping_cost|floatformat:2 }} شحن</small>
                         {% endif %}
                     </td>
                     <td>
@@ -326,21 +326,21 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_detail' purchase.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 {% if purchase.status not in 'received,cancelled' %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_update' purchase.id %}">
                                     <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_invoice' purchase.id %}">
-                                    <i class="fas fa-file-invoice me-2"></i>View Invoice</a></li>
+                                    <i class="fas fa-file-invoice me-2"></i>عرض الفاتورة</a></li>
                                 {% if purchase.status in 'ordered,partial_received' %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_receive' purchase.id %}">
-                                    <i class="fas fa-truck me-2"></i>Receive Goods</a></li>
+                                    <i class="fas fa-truck me-2"></i>استلام البضائع</a></li>
                                 {% endif %}
                                 {% if purchase.balance_amount > 0 %}
                                 <li><a class="dropdown-item" href="{% url 'purchases:purchase_payment_create' purchase.id %}">
-                                    <i class="fas fa-credit-card me-2"></i>Record Payment</a></li>
+                                    <i class="fas fa-credit-card me-2"></i>Record الدفع</a></li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -355,13 +355,13 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">No Purchase Orders Found</h3>
-        <p class="text-muted mb-4">Start managing your inventory by creating your first purchase order.</p>
+        <h3 class="text-muted mb-3">لا توجد أوامر شراء</h3>
+        <p class="text-muted mb-4">ابدأ إدارة مخزونك بإنشاء أول أمر شراء.</p>
         <a href="{% url 'purchases:purchase_create' %}" class="btn btn-primary btn-lg me-3">
-            <i class="fas fa-plus me-2"></i>Create First Purchase
+            <i class="fas fa-plus me-2"></i>إنشاء First Purchase
         </a>
         <a href="{% url 'purchases:quick_purchase' %}" class="btn btn-success btn-lg">
-            <i class="fas fa-bolt me-2"></i>Quick Purchase
+            <i class="fas fa-bolt me-2"></i>شراء سريع
         </a>
     </div>
     {% endif %}

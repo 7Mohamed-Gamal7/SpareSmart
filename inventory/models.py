@@ -24,8 +24,8 @@ class Category(models.Model):
     
     class Meta:
         db_table = 'categories'
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'فئة'
+        verbose_name_plural = 'الفئات'
         ordering = ['vehicle_type', 'name']
 
 class Brand(models.Model):
@@ -66,12 +66,12 @@ class Supplier(models.Model):
     
     class Meta:
         db_table = 'suppliers'
-        verbose_name = 'Supplier'
-        verbose_name_plural = 'Suppliers'
+        verbose_name = 'مورد'
+        verbose_name_plural = 'الموردين'
         ordering = ['name']
 
 class Customer(models.Model):
-    """Customers"""
+    """العملاء"""
     CUSTOMER_TYPE_CHOICES = [
         ('individual', 'Individual'),
         ('business', 'Business'),
@@ -97,8 +97,8 @@ class Customer(models.Model):
     
     class Meta:
         db_table = 'customers'
-        verbose_name = 'Customer'
-        verbose_name_plural = 'Customers'
+        verbose_name = 'عميل'
+        verbose_name_plural = 'العملاء'
         ordering = ['name']
 
 class Product(models.Model):
@@ -134,9 +134,9 @@ class Product(models.Model):
     
     # Product specifications
     weight = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
-    dimensions = models.CharField(max_length=100, blank=True)  # L x W x H
+    Dimensions = models.CharField(max_length=100, blank=True)  # L x W x H
     color = models.CharField(max_length=50, blank=True)
-    material = models.CharField(max_length=100, blank=True)
+    materials = models.CharField(max_length=100, blank=True)
     
     # Images and files
     image = models.ImageField(upload_to='products/', blank=True, null=True)
@@ -180,15 +180,15 @@ class Product(models.Model):
     
     class Meta:
         db_table = 'products'
-        verbose_name = 'Product'
-        verbose_name_plural = 'Products'
+        verbose_name = 'منتج'
+        verbose_name_plural = 'المنتجات'
         ordering = ['name']
 
 class StockMovement(models.Model):
     """Track all stock movements"""
     MOVEMENT_TYPE_CHOICES = [
-        ('purchase', 'Purchase'),
-        ('sale', 'Sale'),
+        ('purchase', 'شراء'),
+        ('sale', 'بيع'),
         ('return_in', 'Return In'),
         ('return_out', 'Return Out'),
         ('adjustment', 'Stock Adjustment'),

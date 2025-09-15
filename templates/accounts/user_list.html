@@ -79,7 +79,7 @@
         <div class="row g-2">
             <div class="col-md-2">
                 <a href="{% url 'accounts:user_create' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-plus me-1"></i>Add User
+                    <i class="fas fa-plus me-1"></i>إضافة User
                 </a>
             </div>
             <div class="col-md-2">
@@ -89,7 +89,7 @@
             </div>
             <div class="col-md-2">
                 <button onclick="exportUsers()" class="btn btn-info w-100">
-                    <i class="fas fa-download me-1"></i>Export
+                    <i class="fas fa-download me-1"></i>تصدير
                 </button>
             </div>
         </div>
@@ -101,11 +101,11 @@
         <table class="table table-hover mb-0" id="usersTable">
             <thead>
                 <tr>
-                    <th>User</th>
+                    <th>المستخدم</th>
                     <th>Role</th>
                     <th>الحالة</th>
-                    <th>Last Login</th>
-                    <th>Date Joined</th>
+                    <th>الأخير Login</th>
+                    <th>التاريخ Joined</th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
@@ -115,7 +115,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://via.placeholder.com/40{% endif %}" 
-                                 alt="Profile" class="rounded-circle me-3" width="40" height="40">
+                                 alt="الملف الشخصي" class="rounded-circle me-3" width="40" height="40">
                             <div>
                                 <div class="fw-bold">{{ user.first_name }} {{ user.last_name }}</div>
                                 <small class="text-muted">{{ user.username }} • {{ user.email }}</small>
@@ -147,7 +147,7 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'accounts:user_detail' user.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:user_update' user.id %}">
                                     <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:admin_change_password' user.id %}">
@@ -172,7 +172,7 @@
         <h3 class="text-muted mb-3">No Users Found</h3>
         <p class="text-muted mb-4">Start by creating your first user account.</p>
         <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>Create First User
+            <i class="fas fa-plus me-2"></i>إنشاء First User
         </a>
     </div>
     {% endif %}

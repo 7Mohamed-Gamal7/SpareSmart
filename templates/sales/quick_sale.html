@@ -116,13 +116,13 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-bolt me-3"></i>Quick Sale
+                    <i class="fas fa-bolt me-3"></i>بيع سريع
                 </h1>
                 <p class="mb-0 opacity-75">Fast cash transactions for immediate sales</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'sales:sale_list' %}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                    <i class="fas fa-arrow-left me-2"></i>رجوع إلي البيع
                 </a>
             </div>
         </div>
@@ -134,10 +134,10 @@
             <i class="fas fa-plus me-2"></i>Detailed Sale
         </a>
         <a href="{% url 'inventory:product_list' %}" class="btn btn-outline-info">
-            <i class="fas fa-box me-2"></i>Browse Products
+            <i class="fas fa-box me-2"></i>تصفح Products
         </a>
         <a href="{% url 'inventory:customer_list' %}" class="btn btn-outline-success">
-            <i class="fas fa-users me-2"></i>Customer List
+            <i class="fas fa-users me-2"></i>العميل List
         </a>
     </div>
 
@@ -146,7 +146,7 @@
         <div class="col-lg-8">
             <div class="quick-sale-card">
                 <h4 class="mb-4">
-                    <i class="fas fa-shopping-cart me-2"></i>Sale Details
+                    <i class="fas fa-shopping-cart me-2"></i>تفاصيل البيع
                 </h4>
 
                 <form method="post" id="quickSaleForm">
@@ -155,11 +155,11 @@
                     <!-- Customer Selection -->
                     <div class="form-section">
                         <h5 class="mb-3">
-                            <i class="fas fa-user me-2"></i>Customer Information
+                            <i class="fas fa-user me-2"></i>العميل Information
                         </h5>
                         <div class="row">
                             <div class="col-md-8">
-                                <label class="form-label">Customer *</label>
+                                <label class="form-label">العميل *</label>
                                 {{ form.customer|add_class:"form-select" }}
                                 {% if form.customer.errors %}
                                     <div class="text-danger mt-1">{{ form.customer.errors.0 }}</div>
@@ -179,25 +179,25 @@
                     <!-- Product Selection -->
                     <div class="form-section">
                         <h5 class="mb-3">
-                            <i class="fas fa-box me-2"></i>Product Information
+                            <i class="fas fa-box me-2"></i>المنتج Information
                         </h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="form-label">Product *</label>
+                                <label class="form-label">المنتج *</label>
                                 {{ form.product|add_class:"form-select" }}
                                 {% if form.product.errors %}
                                     <div class="text-danger mt-1">{{ form.product.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Quantity *</label>
+                                <label class="form-label">الكمية *</label>
                                 {{ form.quantity|add_class:"form-control" }}
                                 {% if form.quantity.errors %}
                                     <div class="text-danger mt-1">{{ form.quantity.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Unit Price *</label>
+                                <label class="form-label">سعر الوحدة *</label>
                                 {{ form.unit_price|add_class:"form-control" }}
                                 {% if form.unit_price.errors %}
                                     <div class="text-danger mt-1">{{ form.unit_price.errors.0 }}</div>
@@ -216,14 +216,14 @@
                         </h5>
                         <div class="row">
                             <div class="col-md-4">
-                                <label class="form-label">Discount %</label>
+                                <label class="form-label">الخصم %</label>
                                 {{ form.discount_percentage|add_class:"form-control" }}
                                 {% if form.discount_percentage.errors %}
                                     <div class="text-danger mt-1">{{ form.discount_percentage.errors.0 }}</div>
                                 {% endif %}
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Payment Method *</label>
+                                <label class="form-label">الدفع Method *</label>
                                 {{ form.payment_method|add_class:"form-select" }}
                                 {% if form.payment_method.errors %}
                                     <div class="text-danger mt-1">{{ form.payment_method.errors.0 }}</div>
@@ -252,24 +252,24 @@
                 <div class="amount-display" id="totalAmount">$0.00</div>
                 
                 <div class="breakdown-item">
-                    <span>Subtotal:</span>
+                    <span>المجموع الفرعي:</span>
                     <span id="subtotalAmount">$0.00</span>
                 </div>
                 
                 <div class="breakdown-item">
-                    <span>Discount:</span>
+                    <span>الخصم</span>
                     <span id="discountAmount">$0.00</span>
                 </div>
                 
                 <div class="breakdown-item">
-                    <span>Total:</span>
+                    <span>الإجمالي:</span>
                     <span id="finalAmount">$0.00</span>
                 </div>
 
                 <div class="mt-4">
-                    <h6>Quick Stats</h6>
+                    <h6>إحصائيات سريعة</h6>
                     <div class="breakdown-item">
-                        <span>Quantity:</span>
+                        <span>الكمية:</span>
                         <span id="displayQuantity">0</span>
                     </div>
                     <div class="breakdown-item">
@@ -332,18 +332,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Display product information
                         let infoHtml = `
                             <div class="product-info">
-                                <h6><i class="fas fa-info-circle me-2"></i>Product Information</h6>
+                                <h6><i class="fas fa-info-circle me-2"></i>المنتج معلومات</h6>
                                 <div class="row">
                                     <div class="col-4">
                                         <strong>Available Stock:</strong><br>
                                         <span class="${data.stock > 0 ? 'text-success' : 'text-danger'}">${data.stock} units</span>
                                     </div>
                                     <div class="col-4">
-                                        <strong>Selling Price:</strong><br>
+                                        <strong>سعر البيع:</strong><br>
                                         $${data.price}
                                     </div>
                                     <div class="col-4">
-                                        <strong>Cost Price:</strong><br>
+                                        <strong>سعر التكلفة:</strong><br>
                                         $${data.cost_price}
                                     </div>
                                 </div>
@@ -354,14 +354,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             infoHtml += `
                                 <div class="stock-warning">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>Warning:</strong> This product is out of stock!
+                                    <strong>تحذير:</strong> This product is out of stock!
                                 </div>
                             `;
                         } else if (data.stock < 5) {
                             infoHtml += `
                                 <div class="stock-warning">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>Low Stock:</strong> Only ${data.stock} units remaining!
+                                    <strong>مخزون منخفض:</strong> Only ${data.stock} units remaining!
                                 </div>
                             `;
                         }

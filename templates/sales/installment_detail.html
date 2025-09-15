@@ -157,7 +157,7 @@
             <!-- Plan Information -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Plan Information</h5>
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Plan معلومات</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -171,7 +171,7 @@
                                 </p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Customer</label>
+                                <label class="form-label text-muted">العميل</label>
                                 <p>
                                     <a href="{% url 'inventory:customer_detail' installment.sale.customer.id %}" class="text-decoration-none">
                                         {{ installment.sale.customer.name }}
@@ -180,25 +180,25 @@
                                 </p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Total Amount</label>
+                                <label class="form-label text-muted">الإجمالي المبلغ</label>
                                 <p class="fw-bold">${{ installment.total_amount|floatformat:2 }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Down Payment</label>
+                                <label class="form-label text-muted">Down الدفع</label>
                                 <p class="fw-bold text-success">${{ installment.down_payment|floatformat:2 }}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Start Date</label>
+                                <label class="form-label text-muted">Start التاريخ</label>
                                 <p>{{ installment.start_date|date:"M d, Y" }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Number of Installments</label>
+                                <label class="form-label text-muted">Number of الأقساط</label>
                                 <p class="fw-bold">{{ installment.number_of_installments }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Installment Amount</label>
+                                <label class="form-label text-muted">Installment المبلغ</label>
                                 <p class="fw-bold">${{ installment.installment_amount|floatformat:2 }}</p>
                             </div>
                             <div class="mb-3">
@@ -213,7 +213,7 @@
             <!-- Payment Schedule -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Payment Schedule</h5>
+                    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>الدفع Schedule</h5>
                 </div>
                 <div class="card-body p-0">
                     {% if payments %}
@@ -222,13 +222,13 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>Due Date</th>
-                                    <th>Amount Due</th>
-                                    <th>Paid Amount</th>
-                                    <th>Balance</th>
-                                    <th>Paid Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>مستحق التاريخ</th>
+                                    <th>المبلغ مستحق</th>
+                                    <th>مدفوع المبلغ</th>
+                                    <th>الرصيد</th>
+                                    <th>مدفوع التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -244,7 +244,7 @@
                                         {% if payment.status == 'overdue' %}
                                             <br><small class="text-danger">{{ payment.days_overdue }} days overdue</small>
                                         {% elif payment.due_date > today and payment.due_date <= today|add_days:7 %}
-                                            <br><small class="text-warning">Due soon</small>
+                                            <br><small class="text-warning">مستحق soon</small>
                                         {% endif %}
                                     </td>
                                     <td class="fw-bold">${{ payment.amount|floatformat:2 }}</td>
@@ -280,7 +280,7 @@
                                                 <i class="fas fa-credit-card me-1"></i>Pay
                                             </a>
                                         {% else %}
-                                            <span class="text-muted">Paid</span>
+                                            <span class="text-muted">مدفوع</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -300,7 +300,7 @@
             <!-- Payment Timeline -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Payment Timeline</h5>
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>الدفع Timeline</h5>
                 </div>
                 <div class="card-body">
                     {% if payments %}
@@ -317,12 +317,12 @@
                                     <small class="text-muted">{{ payment.due_date|date:"M d, Y" }}</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <p class="mb-1"><strong>Amount:</strong> ${{ payment.amount|floatformat:2 }}</p>
-                                    <p class="mb-1"><strong>Paid:</strong> ${{ payment.paid_amount|floatformat:2 }}</p>
+                                    <p class="mb-1"><strong>المبلغ:</strong> ${{ payment.amount|floatformat:2 }}</p>
+                                    <p class="mb-1"><strong>مدفوع:</strong> ${{ payment.paid_amount|floatformat:2 }}</p>
                                 </div>
                                 <div class="col-md-4">
                                     {% if payment.paid_date %}
-                                    <p class="mb-1"><strong>Paid on:</strong> {{ payment.paid_date|date:"M d, Y" }}</p>
+                                    <p class="mb-1"><strong>مدفوع on:</strong> {{ payment.paid_date|date:"M d, Y" }}</p>
                                     {% endif %}
                                     {% if payment.notes %}
                                     <p class="mb-1"><strong>Notes:</strong> {{ payment.notes }}</p>
@@ -353,7 +353,7 @@
                 <div class="progress-circle" style="--progress: {{ installment.payment_progress }}%;">
                     <div class="progress-text">{{ installment.payment_progress }}%</div>
                 </div>
-                <div class="mt-3">Payment Progress</div>
+                <div class="mt-3">الدفع Progress</div>
             </div>
 
             <!-- Financial Summary -->
@@ -363,19 +363,19 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label text-muted">Total Amount</label>
+                        <label class="form-label text-muted">الإجمالي المبلغ</label>
                         <p class="fw-bold">${{ installment.total_amount|floatformat:2 }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Total Paid</label>
+                        <label class="form-label text-muted">الإجمالي مدفوع</label>
                         <p class="fw-bold text-success">${{ installment.total_paid|floatformat:2 }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Remaining Balance</label>
+                        <label class="form-label text-muted">Remaining الرصيد</label>
                         <p class="fw-bold text-danger">${{ installment.remaining_balance|floatformat:2 }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Installments Paid</label>
+                        <label class="form-label text-muted">الأقساط مدفوع</label>
                         <p class="fw-bold">{{ installment.paid_installments }}/{{ installment.number_of_installments }}</p>
                     </div>
                 </div>
@@ -386,19 +386,19 @@
             {% if next_payment %}
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Next Payment</h6>
+                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>التالي الدفع</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label text-muted">Due Date</label>
+                        <label class="form-label text-muted">مستحق التاريخ</label>
                         <p class="fw-bold">{{ next_payment.due_date|date:"M d, Y" }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Amount</label>
+                        <label class="form-label text-muted">المبلغ</label>
                         <p class="fw-bold">${{ next_payment.amount|floatformat:2 }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Status</label>
+                        <label class="form-label text-muted">الحالة</label>
                         <p>
                             <span class="badge 
                                 {% if next_payment.status == 'overdue' %}bg-danger
@@ -417,7 +417,7 @@
                     {% if next_payment.status != 'paid' %}
                     <div class="d-grid">
                         <a href="{% url 'sales:installment_payment' next_payment.id %}" class="btn btn-success">
-                            <i class="fas fa-credit-card me-2"></i>Record Payment
+                            <i class="fas fa-credit-card me-2"></i>تسجيل دفعة
                         </a>
                     </div>
                     {% endif %}
@@ -429,17 +429,17 @@
             <!-- Action Buttons -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Actions</h6>
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>الإجراءات</h6>
                 </div>
                 <div class="card-body action-buttons">
                     <a href="{% url 'sales:sale_detail' installment.sale.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-file-invoice me-1"></i>View Sale
+                        <i class="fas fa-file-invoice me-1"></i>عرض Sale
                     </a>
                     <a href="{% url 'sales:sale_invoice' installment.sale.id %}" class="btn btn-info btn-sm">
-                        <i class="fas fa-print me-1"></i>View Invoice
+                        <i class="fas fa-print me-1"></i>عرض Invoice
                     </a>
                     <a href="{% url 'sales:installment_list' %}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                        <i class="fas fa-arrow-left me-1"></i>رجوع to List
                     </a>
                 </div>
             </div>
@@ -449,10 +449,10 @@
                 <div class="card-body">
                     <small class="text-muted">
                         <div class="mb-1">
-                            <strong>Created:</strong> {{ installment.created_at|date:"M d, Y H:i" }}
+                            <strong>إنشاءd:</strong> {{ installment.created_at|date:"M d, Y H:i" }}
                         </div>
                         <div>
-                            <strong>Updated:</strong> {{ installment.updated_at|date:"M d, Y H:i" }}
+                            <strong>تحديثd:</strong> {{ installment.updated_at|date:"M d, Y H:i" }}
                         </div>
                     </small>
                 </div>

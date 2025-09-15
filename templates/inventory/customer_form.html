@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 1rem 1.5rem;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .customer-type-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    .info-icon {
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">{{ title }}</h2>
+            <p class="text-muted mb-0">إضافة عميل جديد إلى النظام</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:customer_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Basic Information -->
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-user me-2"></i>المعلومات الأساسية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label required-field">اسم العميل</label>
+                                {{ form.name|add_class:"form-control" }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.customer_type.id_for_label }}" class="form-label">نوع العميل</label>
+                                <select name="{{ form.customer_type.name }}" id="{{ form.customer_type.id_for_label }}" class="form-select">
+                                    <option value="individual" {% if form.customer_type.value == 'individual' %}selected{% endif %}>فرد</option>
+                                    <option value="business" {% if form.customer_type.value == 'business' %}selected{% endif %}>شركة</option>
+                                    <option value="dealer" {% if form.customer_type.value == 'dealer' %}selected{% endif %}>تاجر</option>
+                                </select>
+                                {% if form.customer_type.errors %}
+                                    <div class="text-danger">{{ form.customer_type.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">البريد الإلكتروني</label>
+                                {{ form.email|add_class:"form-control" }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">رقم الهاتف</label>
+                                {{ form.phone|add_class:"form-control" }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">المدينة</label>
+                                {{ form.city|add_class:"form-control" }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tax_number.id_for_label }}" class="form-label">الرقم الضريبي</label>
+                                {{ form.tax_number|add_class:"form-control" }}
+                                {% if form.tax_number.errors %}
+                                    <div class="text-danger">{{ form.tax_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">العنوان</label>
+                            {{ form.address|add_class:"form-control" }}
+                            {% if form.address.errors %}
+                                <div class="text-danger">{{ form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-dollar-sign me-2"></i>المعلومات المالية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.credit_limit.id_for_label }}" class="form-label">حد الائتمان</label>
+                                <div class="input-group">
+                                    {{ form.credit_limit|add_class:"form-control" }}
+                                    <span class="input-group-text">ج.م</span>
+                                </div>
+                                {% if form.credit_limit.errors %}
+                                    <div class="text-danger">{{ form.credit_limit.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">الحد الأقصى للمبلغ المسموح به كدين على العميل</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.discount_percentage.id_for_label }}" class="form-label">نسبة الخصم</label>
+                                <div class="input-group">
+                                    {{ form.discount_percentage|add_class:"form-control" }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {% if form.discount_percentage.errors %}
+                                    <div class="text-danger">{{ form.discount_percentage.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">نسبة الخصم الافتراضية للعميل (0-100%)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-toggle-on me-2"></i>حالة العميل</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            {{ form.is_active|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                عميل نشط
+                            </label>
+                        </div>
+                        <small class="text-muted">العملاء غير النشطين لا يظهرون في قوائم البحث</small>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Customer Type Info -->
+                <div class="customer-type-info">
+                    <h6><i class="fas fa-info-circle info-icon"></i>أنواع العملاء</h6>
+                    <ul class="mb-0">
+                        <li><strong>فرد:</strong> عميل شخصي</li>
+                        <li><strong>شركة:</strong> عميل مؤسسي</li>
+                        <li><strong>تاجر:</strong> عميل تاجر بالجملة</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ العميل
+                    </button>
+                    <a href="{% url 'inventory:customer_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    const nameField = document.querySelector('input[name="name"]');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        if (!nameField.value.trim()) {
+            isValid = false;
+            nameField.classList.add('is-invalid');
+        } else {
+            nameField.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('يرجى ملء جميع الحقول المطلوبة');
+        }
+    });
+    
+    // Real-time validation
+    nameField.addEventListener('input', function() {
+        if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -83,7 +83,7 @@ class UserCreationForm(BaseUserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'role', 
+        fields = ('username', 'email', 'first_name', 'last_name', 'role',
                  'phone_number', 'address', 'profile_image')
 
     def __init__(self, *args, **kwargs):
@@ -112,7 +112,7 @@ class UserUpdateForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'role', 
+        fields = ('username', 'email', 'first_name', 'last_name', 'role',
                  'phone_number', 'address', 'profile_image', 'is_active', 'is_active_employee')
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
@@ -224,7 +224,7 @@ class RolePermissionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['permissions'].queryset = Permission.objects.all().order_by('module', 'name')
+        self.fields['permissions'].queryset = Permission.objects.all().order_by('content_type', 'name')
 
     def save(self):
         role = self.cleaned_data['role']
@@ -242,12 +242,10 @@ class PermissionForm(forms.ModelForm):
     
     class Meta:
         model = Permission
-        fields = ('name', 'codename', 'description', 'module')
+        fields = ('name', 'codename')
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'codename': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'module': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def clean_codename(self):

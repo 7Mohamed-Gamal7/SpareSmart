@@ -103,8 +103,8 @@ class Sale(models.Model):
     
     class Meta:
         db_table = 'sales'
-        verbose_name = 'Sale'
-        verbose_name_plural = 'Sales'
+        verbose_name = 'بيع'
+        verbose_name_plural = 'المبيعات'
         ordering = ['-created_at']
 
 class SaleItem(models.Model):
@@ -201,8 +201,8 @@ class Payment(models.Model):
     
     class Meta:
         db_table = 'payments'
-        verbose_name = 'Payment'
-        verbose_name_plural = 'Payments'
+        verbose_name = 'دفعة'
+        verbose_name_plural = 'الدفعات'
         ordering = ['-created_at']
 
 class Installment(models.Model):

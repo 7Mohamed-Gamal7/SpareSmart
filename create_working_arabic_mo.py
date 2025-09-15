@@ -107,11 +107,11 @@ def create_minimal_po():
         "Cancel": "إلغاء",
         "Search": "بحث",
         "Actions": "الإجراءات",
-        "Name": "الاسم",
-        "Price": "السعر",
+        "Name": "name",
+        "Price": "price",
         "Stock": "المخزون",
-        "Category": "الفئة",
-        "Brand": "العلامة التجارية"
+        "Category": "category",
+        "Brand": "brand"
     }
     
     po_content = '''# ترجمة عربية أساسية لنظام سبير سمارت

@@ -82,30 +82,30 @@ def clean_trans_tags(file_path):
             "Remove": "إزالة",
             
             # البيانات
-            "Name": "الاسم",
-            "Price": "السعر",
+            "Name": "name",
+            "Price": "price",
             "Stock": "المخزون",
-            "Category": "الفئة",
-            "Brand": "العلامة التجارية",
-            "Description": "الوصف",
-            "Status": "الحالة",
-            "Date": "التاريخ",
-            "Amount": "المبلغ",
+            "Category": "category",
+            "Brand": "brand",
+            "Description": "description",
+            "Status": "status",
+            "Date": "date",
+            "Amount": "amount",
             "Total": "الإجمالي",
-            "Quantity": "الكمية",
+            "Quantity": "quantity",
             "Code": "الكود",
             "SKU": "رقم المنتج",
             
             # الحالات
-            "Active": "نشط",
-            "Inactive": "غير نشط",
+            "Active": "active",
+            "Inactive": "inactive",
             "Available": "متوفر",
             "In Stock": "متوفر",
             "Low Stock": "مخزون منخفض",
             "Out of Stock": "نفد المخزون",
             "Pending": "في الانتظار",
-            "Approved": "موافق عليه",
-            "Rejected": "مرفوض",
+            "Approved": "approved",
+            "Rejected": "rejected",
             
             # الرسائل
             "Loading...": "جاري التحميل...",
@@ -127,7 +127,7 @@ def clean_trans_tags(file_path):
             
             # المخزون
             "Product List": "قائمة المنتجات",
-            "Add New Product": "إضافة منتج جديد",
+            "إضافة منتج جديد": "إضافة منتج جديد",
             "Edit Product": "تعديل المنتج",
             "Product Details": "تفاصيل المنتج",
             "Categories": "الفئات",
@@ -138,14 +138,14 @@ def clean_trans_tags(file_path):
             "Sale List": "قائمة المبيعات",
             "New Sale": "بيع جديد",
             "Sale Details": "تفاصيل البيع",
-            "Customer": "العميل",
+            "Customer": "customer",
             "Invoice": "الفاتورة",
             
             # المشتريات
             "Purchase List": "قائمة المشتريات",
             "New Purchase": "شراء جديد",
             "Purchase Details": "تفاصيل الشراء",
-            "Supplier": "المورد",
+            "Supplier": "supplier",
             
             # المصروفات
             "Expense List": "قائمة المصروفات",

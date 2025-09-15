@@ -65,7 +65,7 @@ class Command(BaseCommand):
             else:
                 alerts_updated += 1
         
-        # Check for low stock (at or below reorder level)
+        # Check for low stock (at or below إعادة ترتيب المستوى)
         elif product.current_stock <= product.reorder_level:
             if product.current_stock <= product.minimum_stock:
                 alert_type = 'low_stock'
@@ -74,7 +74,7 @@ class Command(BaseCommand):
             else:
                 alert_type = 'reorder'
                 priority = 'Medium'
-                message = f'{product.name} has reached reorder level'
+                message = f'{product.name} has reached إعادة ترتيب المستوى'
             
             recommended_quantity = max(
                 product.maximum_stock - product.current_stock,
@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 message=message,
                 recommended_action=f'{priority} Priority: Reorder {recommended_quantity} units of {product.name}. '
                                   f'Current stock: {product.current_stock}, Minimum: {product.minimum_stock}, '
-                                  f'Reorder level: {product.reorder_level}'
+                                  f'إعادة ترتيب المستوى: {product.reorder_level}'
             )
             if created:
                 alerts_created += 1

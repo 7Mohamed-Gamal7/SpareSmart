@@ -87,13 +87,13 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-truck me-3"></i>Suppliers
+                    <i class="fas fa-truck me-3"></i>الموردs
                 </h1>
                 <p class="mb-0 opacity-75">Manage supplier relationships and procurement</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'inventory:supplier_create' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>Add Supplier
+                    <i class="fas fa-plus me-2"></i>إضافة Supplier
                 </a>
             </div>
         </div>
@@ -105,25 +105,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_suppliers }}</div>
-                    <div class="stat-label">Total Suppliers</div>
+                    <div class="stat-label">الإجمالي Suppliers</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ active_suppliers }}</div>
-                    <div class="stat-label">Active</div>
+                    <div class="stat-label">نشط</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-success">${{ total_payable }}</div>
-                    <div class="stat-label">Total Payable</div>
+                    <div class="stat-label">الإجمالي Payable</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">${{ total_purchases_this_month }}</div>
-                    <div class="stat-label">This Month Purchases</div>
+                    <div class="stat-label">هذا الشهر Purchases</div>
                 </div>
             </div>
         </div>
@@ -133,22 +133,22 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">Search Suppliers</label>
+                <label class="form-label">بحث Suppliers</label>
                 <input type="text" class="form-control" name="search" 
                        value="{{ request.GET.search }}" placeholder="Name, company, phone...">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Status</label>
+                <label class="form-label">الحالة</label>
                 <select class="form-select" name="status">
-                    <option value="">All Status</option>
-                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
-                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="">الكل الحالة</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>غير نشط</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Rating</label>
                 <select class="form-select" name="rating">
-                    <option value="">All Ratings</option>
+                    <option value="">الكل Ratings</option>
                     <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
                     <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
                     <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
@@ -156,9 +156,9 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Balance</label>
+                <label class="form-label">الرصيد</label>
                 <select class="form-select" name="balance_filter">
-                    <option value="">All Balances</option>
+                    <option value="">الكل Balances</option>
                     <option value="positive" {% if request.GET.balance_filter == 'positive' %}selected{% endif %}>We Owe</option>
                     <option value="negative" {% if request.GET.balance_filter == 'negative' %}selected{% endif %}>They Owe</option>
                     <option value="zero" {% if request.GET.balance_filter == 'zero' %}selected{% endif %}>Settled</option>
@@ -167,9 +167,9 @@
             <div class="col-md-2">
                 <label class="form-label">Sort By</label>
                 <select class="form-select" name="sort">
-                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
-                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Date Added</option>
-                    <option value="balance" {% if request.GET.sort == 'balance' %}selected{% endif %}>Balance</option>
+                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>الاسم</option>
+                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>التاريخ Added</option>
+                    <option value="balance" {% if request.GET.sort == 'balance' %}selected{% endif %}>الرصيد</option>
                     <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Rating</option>
                 </select>
             </div>
@@ -193,14 +193,14 @@
                     <th>
                         <input type="checkbox" id="selectAll" class="form-check-input">
                     </th>
-                    <th>Supplier</th>
+                    <th>المورد</th>
                     <th>Contact</th>
-                    <th>Address</th>
+                    <th>إضافةress</th>
                     <th>Rating</th>
-                    <th>Balance</th>
-                    <th>Last Purchase</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>الرصيد</th>
+                    <th>الأخير Purchase</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -293,18 +293,18 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'inventory:supplier_detail' supplier.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-edit me-2"></i>Edit</a></li>
+                                    <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-shopping-cart me-2"></i>View Purchases</a></li>
+                                    <i class="fas fa-shopping-cart me-2"></i>عرض Purchases</a></li>
                                 <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-credit-card me-2"></i>Payment History</a></li>
+                                    <i class="fas fa-credit-card me-2"></i>الدفع History</a></li>
                                 <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-star me-2"></i>Rate Supplier</a></li>
+                                    <i class="fas fa-star me-2"></i>Rate المورد</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#">
-                                    <i class="fas fa-file-export me-2"></i>Export Data</a></li>
+                                    <i class="fas fa-file-export me-2"></i>تصدير Data</a></li>
                                 {% if supplier.is_active %}
                                 <li><a class="dropdown-item text-warning" href="#">
                                     <i class="fas fa-pause me-2"></i>Deactivate</a></li>
@@ -332,7 +332,7 @@
                     <i class="fas fa-envelope me-1"></i>Send Email
                 </button>
                 <button type="button" class="btn btn-outline-success btn-sm me-2">
-                    <i class="fas fa-file-export me-1"></i>Export
+                    <i class="fas fa-file-export me-1"></i>تصدير
                 </button>
                 <button type="button" class="btn btn-outline-warning btn-sm">
                     <i class="fas fa-edit me-1"></i>Bulk Edit
@@ -398,7 +398,7 @@
         <h3 class="text-muted mb-3">No Suppliers Found</h3>
         <p class="text-muted mb-4">Start building your supplier network by adding your first supplier.</p>
         <a href="{% url 'inventory:supplier_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>Add First Supplier
+            <i class="fas fa-plus me-2"></i>إضافة First Supplier
         </a>
     </div>
     {% endif %}

@@ -72,9 +72,9 @@ def home(request):
     # Recent Activities
     recent_activities = ActivityLog.objects.select_related('user').order_by('-timestamp')[:10]
     
-    # Pending Items (for admin/manager roles)
+    # Pending Items (for superuser, admin/manager roles)
     pending_items = {}
-    if request.user.role in ['admin', 'manager']:
+    if request.user.is_superuser or request.user.role in ['admin', 'manager']:
         pending_items = {
             'pending_expenses': Expense.objects.filter(status='pending', requires_approval=True).count(),
             'low_stock_alerts': InventoryAlert.objects.filter(status='active', alert_type='low_stock').count(),
@@ -196,16 +196,16 @@ def activity_log(request):
     """Activity log view"""
     activities = ActivityLog.objects.select_related('user').order_by('-timestamp')
     
-    # Filter by user if not admin/manager
-    if request.user.role not in ['admin', 'manager']:
+    # Filter by user if not superuser/admin/manager
+    if not request.user.is_superuser and request.user.role not in ['admin', 'manager']:
         activities = activities.filter(user=request.user)
-    
+
     # Filtering
     user_filter = request.GET.get('user')
     action_filter = request.GET.get('action')
     date_filter = request.GET.get('date')
-    
-    if user_filter and request.user.role in ['admin', 'manager']:
+
+    if user_filter and (request.user.is_superuser or request.user.role in ['admin', 'manager']):
         activities = activities.filter(user__username__icontains=user_filter)
     
     if action_filter:

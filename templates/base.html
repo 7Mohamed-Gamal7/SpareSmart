@@ -259,7 +259,7 @@
         <div class="mt-auto p-3">
             <div class="text-center">
                 <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}https://via.placeholder.com/50{% endif %}" 
-                     alt="Profile" class="rounded-circle" width="50" height="50">
+                     alt="الملف الشخصي" class="rounded-circle" width="50" height="50">
                 <div class="text-white mt-2">
                     <small>{{ user.first_name }} {{ user.last_name }}</small><br>
                     <small class="text-muted">{{ user.get_role_display }}</small>

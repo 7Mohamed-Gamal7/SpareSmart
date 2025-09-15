@@ -30,8 +30,8 @@ class User(AbstractUser):
     
     class Meta:
         db_table = 'users'
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        verbose_name = 'مستخدم'
+        verbose_name_plural = 'المستخدمين'
 
 class UserProfile(models.Model):
     """Additional profile information for users"""

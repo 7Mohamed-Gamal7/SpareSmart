@@ -99,8 +99,8 @@ class Purchase(models.Model):
     
     class Meta:
         db_table = 'purchases'
-        verbose_name = 'Purchase'
-        verbose_name_plural = 'Purchases'
+        verbose_name = 'شراء'
+        verbose_name_plural = 'المشتريات'
         ordering = ['-created_at']
 
 class PurchaseItem(models.Model):

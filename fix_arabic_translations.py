@@ -64,8 +64,8 @@ def create_working_mo_file():
         "Filter": "تصفية",
         
         # حالات
-        "Active": "نشط",
-        "Inactive": "غير نشط",
+        "Active": "active",
+        "Inactive": "inactive",
         "Available": "متوفر",
         "Out of Stock": "نفد المخزون",
         "Low Stock": "مخزون منخفض",

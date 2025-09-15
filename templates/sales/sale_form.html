@@ -110,13 +110,13 @@
                     {% if sale %}
                         Editing sale #{{ sale.sale_number }}
                     {% else %}
-                        Create a new sales transaction
+                        إنشاء معاملة بيع جديدة
                     {% endif %}
                 </p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'sales:sale_list' %}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                    <i class="fas fa-arrow-left me-2"></i>رجوع إلي البيع
                 </a>
             </div>
         </div>
@@ -131,20 +131,20 @@
                 <!-- Sale Information -->
                 <div class="form-card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sale Information</h5>
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sale معلومات</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Customer *</label>
+                                    <label class="form-label">العميل *</label>
                                     {{ form.customer|add_class:"form-select" }}
                                     {% if form.customer.errors %}
                                         <div class="text-danger">{{ form.customer.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Sale Type *</label>
+                                    <label class="form-label">نوع البيع *</label>
                                     {{ form.sale_type|add_class:"form-select" }}
                                     {% if form.sale_type.errors %}
                                         <div class="text-danger">{{ form.sale_type.errors.0 }}</div>
@@ -153,19 +153,19 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Sale Date *</label>
+                                    <label class="form-label">تاريخ البيع *</label>
                                     {{ form.sale_date|add_class:"form-control" }}
                                     {% if form.sale_date.errors %}
                                         <div class="text-danger">{{ form.sale_date.errors.0 }}</div>
                                     {% endif %}
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Due Date</label>
+                                    <label class="form-label">التاريخ المستحق</label>
                                     {{ form.due_date|add_class:"form-control" }}
                                     {% if form.due_date.errors %}
                                         <div class="text-danger">{{ form.due_date.errors.0 }}</div>
                                     {% endif %}
-                                    <small class="text-muted">Required for credit and installment sales</small>
+                                    <small class="text-muted">مطلوب للمبيعات الائتمانية والتقسيط</small>
                                 </div>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Discount Amount</label>
+                                    <label class="form-label">مبلغ الخصم</label>
                                     {{ form.discount_amount|add_class:"form-control" }}
                                     {% if form.discount_amount.errors %}
                                         <div class="text-danger">{{ form.discount_amount.errors.0 }}</div>
@@ -185,7 +185,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Customer Notes</label>
+                                    <label class="form-label">ملاحظات العميل</label>
                                     {{ form.notes|add_class:"form-control" }}
                                     {% if form.notes.errors %}
                                         <div class="text-danger">{{ form.notes.errors.0 }}</div>
@@ -194,7 +194,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Internal Notes</label>
+                                    <label class="form-label">ملاحظات داخلية</label>
                                     {{ form.internal_notes|add_class:"form-control" }}
                                     {% if form.internal_notes.errors %}
                                         <div class="text-danger">{{ form.internal_notes.errors.0 }}</div>
@@ -208,9 +208,9 @@
                 <!-- Sale Items -->
                 <div class="form-card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Sale Items</h5>
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Sale العناصر</h5>
                         <button type="button" class="btn btn-outline-primary btn-sm" id="addItemBtn">
-                            <i class="fas fa-plus me-1"></i>Add Item
+                            <i class="fas fa-plus me-1"></i>إضافة عنصر
                         </button>
                     </div>
                     <div class="card-body">
@@ -241,7 +241,7 @@
                                     
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <label class="form-label">Product *</label>
+                                            <label class="form-label">المنتج *</label>
                                             {{ item_form.product|add_class:"form-select product-select" }}
                                             {% if item_form.product.errors %}
                                                 <div class="text-danger">{{ item_form.product.errors.0 }}</div>
@@ -249,34 +249,34 @@
                                             <div class="stock-info mt-1"></div>
                                         </div>
                                         <div class="col-md-2">
-                                            <label class="form-label">Quantity *</label>
+                                            <label class="form-label">الكمية *</label>
                                             {{ item_form.quantity|add_class:"form-control quantity-input" }}
                                             {% if item_form.quantity.errors %}
                                                 <div class="text-danger">{{ item_form.quantity.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-2">
-                                            <label class="form-label">Unit Price *</label>
+                                            <label class="form-label">سعر الوحدة *</label>
                                             {{ item_form.unit_price|add_class:"form-control price-input" }}
                                             {% if item_form.unit_price.errors %}
                                                 <div class="text-danger">{{ item_form.unit_price.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-2">
-                                            <label class="form-label">Discount %</label>
+                                            <label class="form-label">الخصم %</label>
                                             {{ item_form.discount_percentage|add_class:"form-control discount-input" }}
                                             {% if item_form.discount_percentage.errors %}
                                                 <div class="text-danger">{{ item_form.discount_percentage.errors.0 }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="col-md-2">
-                                            <label class="form-label">Total</label>
+                                            <label class="form-label">الإجمالي</label>
                                             <div class="form-control-plaintext fw-bold item-total">$0.00</div>
                                             <div class="profit-info mt-1"></div>
                                             {% if item_form.DELETE %}
                                                 <div class="form-check mt-2">
                                                     {{ item_form.DELETE }}
-                                                    <label class="form-check-label text-danger">Delete</label>
+                                                    <label class="form-check-label text-danger">حذف</label>
                                                 </div>
                                             {% endif %}
                                         </div>
@@ -287,7 +287,7 @@
                         
                         <!-- Add Item Button -->
                         <button type="button" class="btn btn-add-item w-100" id="addMoreItems">
-                            <i class="fas fa-plus me-2"></i>Add Another Item
+                            <i class="fas fa-plus me-2"></i>إضافة عنصر أخر
                         </button>
                     </div>
                 </div>
@@ -296,35 +296,35 @@
             <!-- Summary Sidebar -->
             <div class="col-lg-4">
                 <div class="summary-card">
-                    <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>Sale Summary</h5>
+                    <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>ملخص البيع</h5>
                     
                     <div class="summary-row">
-                        <span>Subtotal:</span>
+                        <span>المجموع الفرعي:</span>
                         <span id="subtotalAmount">$0.00</span>
                     </div>
                     
                     <div class="summary-row">
-                        <span>Discount:</span>
+                        <span>الخصم:</span>
                         <span id="discountAmount">$0.00</span>
                     </div>
                     
                     <div class="summary-row">
-                        <span>Total Amount:</span>
+                        <span>إجمالي المبلغ:</span>
                         <span id="totalAmount">$0.00</span>
                     </div>
                     
                     <div class="mt-4">
-                        <h6>Sale Details</h6>
+                        <h6>تفاصيل البيع</h6>
                         <div class="summary-row">
-                            <span>Total Items:</span>
+                            <span>إجمالي العناصر:</span>
                             <span id="totalItems">0</span>
                         </div>
                         <div class="summary-row">
-                            <span>Total Quantity:</span>
+                            <span>إجمالي الكمية:</span>
                             <span id="totalQuantity">0</span>
                         </div>
                         <div class="summary-row">
-                            <span>Estimated Profit:</span>
+                            <span>الربح المقدر:</span>
                             <span id="totalProfit">$0.00</span>
                         </div>
                     </div>
@@ -334,7 +334,7 @@
                             <i class="fas fa-save me-2"></i>{{ action }} Sale
                         </button>
                         <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-light">
-                            <i class="fas fa-times me-2"></i>Cancel
+                            <i class="fas fa-times me-2"></i>إلغاء
                         </a>
                     </div>
                 </div>
@@ -348,7 +348,7 @@
     <div class="item-row" data-form-index="__prefix__">
         <div class="row">
             <div class="col-md-4">
-                <label class="form-label">Product *</label>
+                <label class="form-label">المنتج *</label>
                 <select name="items-__prefix__-product" class="form-select product-select">
                     <option value="">Select a product</option>
                     {% for product in form.fields.items.form.fields.product.queryset %}
@@ -360,19 +360,19 @@
                 <div class="stock-info mt-1"></div>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Quantity *</label>
+                <label class="form-label">الكمية *</label>
                 <input type="number" name="items-__prefix__-quantity" class="form-control quantity-input" min="1" value="1">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Unit Price *</label>
+                <label class="form-label">سعر الوحدة *</label>
                 <input type="number" name="items-__prefix__-unit_price" class="form-control price-input" step="0.01" min="0">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Discount %</label>
+                <label class="form-label">الخصم %</label>
                 <input type="number" name="items-__prefix__-discount_percentage" class="form-control discount-input" step="0.01" min="0" max="100" value="0">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Total</label>
+                <label class="form-label">الإجمالي</label>
                 <div class="form-control-plaintext fw-bold item-total">$0.00</div>
                 <div class="profit-info mt-1"></div>
                 <button type="button" class="btn btn-danger btn-sm mt-2 remove-item">
@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show stock info
                 const stockInfo = row.querySelector('.stock-info');
                 if (parseInt(stock) > 0) {
-                    stockInfo.innerHTML = `<small class="text-success">Stock: ${stock}</small>`;
+                    stockInfo.innerHTML = `<small class="text-success">المخزون: ${stock}</small>`;
                 } else {
                     stockInfo.innerHTML = `<small class="text-danger">Out of stock</small>`;
                 }

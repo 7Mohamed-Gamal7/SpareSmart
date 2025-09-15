@@ -126,7 +126,7 @@ def product_create(request):
     
     context = {
         'form': form,
-        'title': 'Add New Product',
+        'title': 'إضافة منتج جديد',
         'action': 'Create'
     }
     
@@ -330,11 +330,11 @@ def customer_list(request):
     
     if balance_filter:
         if balance_filter == 'positive':
-            customers = customers.filter(balance__gt=0)
+            customers = customers.filter(current_balance__gt=0)
         elif balance_filter == 'negative':
-            customers = customers.filter(balance__lt=0)
+            customers = customers.filter(current_balance__lt=0)
         elif balance_filter == 'zero':
-            customers = customers.filter(balance=0)
+            customers = customers.filter(current_balance=0)
     
     # Sorting
     if sort == 'name':
@@ -342,7 +342,7 @@ def customer_list(request):
     elif sort == 'created_at':
         customers = customers.order_by('-created_at')
     elif sort == 'balance':
-        customers = customers.order_by('-balance')
+        customers = customers.order_by('-current_balance')
     elif sort == 'last_sale':
         customers = customers.order_by('-last_sale_date')
     
@@ -354,10 +354,10 @@ def customer_list(request):
     # Calculate statistics
     total_customers = Customer.objects.count()
     active_customers = Customer.objects.filter(is_active=True).count()
-    total_credit_balance = Customer.objects.filter(balance__gt=0).aggregate(
-        total=Sum('balance'))['total'] or 0
-    total_debit_balance = abs(Customer.objects.filter(balance__lt=0).aggregate(
-        total=Sum('balance'))['total'] or 0)
+    total_credit_balance = Customer.objects.filter(current_balance__gt=0).aggregate(
+        total=Sum('current_balance'))['total'] or 0
+    total_debit_balance = abs(Customer.objects.filter(current_balance__lt=0).aggregate(
+        total=Sum('current_balance'))['total'] or 0)
     
     context = {
         'customers': page_obj,
@@ -680,7 +680,7 @@ def alerts_dashboard(request):
     # Get active alerts grouped by type
     alerts = InventoryAlert.objects.select_related('product__category', 'product__brand').filter(status='active')
     
-    # Count by alert type
+    # Count by نوع التنبيه
     alert_counts = {
         'out_of_stock': alerts.filter(alert_type='out_of_stock').count(),
         'low_stock': alerts.filter(alert_type='low_stock').count(),
@@ -860,7 +860,7 @@ def purchase_requirements(request):
             # Low stock - order to safe level
             recommended_qty = product.maximum_stock - product.current_stock
         else:
-            # At reorder level - order standard quantity
+            # At إعادة ترتيب المستوى - order standard quantity
             recommended_qty = product.reorder_level * 2
         
         total_cost = recommended_qty * product.cost_price

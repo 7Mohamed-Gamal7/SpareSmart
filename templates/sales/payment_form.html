@@ -154,7 +154,7 @@
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-light">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Sale
+                    <i class="fas fa-arrow-left me-2"></i>رجوع إلي البيع
                 </a>
             </div>
         </div>
@@ -167,16 +167,16 @@
             <div class="sale-info">
                 <div class="row">
                     <div class="col-md-6">
-                        <h6><i class="fas fa-info-circle me-2"></i>Sale Information</h6>
+                        <h6><i class="fas fa-info-circle me-2"></i>Sale معلومات</h6>
                         <p class="mb-1"><strong>Sale Number:</strong> {{ sale.sale_number }}</p>
-                        <p class="mb-1"><strong>Customer:</strong> {{ sale.customer.name }}</p>
+                        <p class="mb-1"><strong>العميل:</strong> {{ sale.customer.name }}</p>
                         <p class="mb-0"><strong>Sale Date:</strong> {{ sale.sale_date|date:"M d, Y" }}</p>
                     </div>
                     <div class="col-md-6">
                         <h6><i class="fas fa-dollar-sign me-2"></i>Financial Summary</h6>
-                        <p class="mb-1"><strong>Total Amount:</strong> ${{ sale.total_amount|floatformat:2 }}</p>
-                        <p class="mb-1"><strong>Paid Amount:</strong> ${{ sale.paid_amount|floatformat:2 }}</p>
-                        <p class="mb-0"><strong>Balance Due:</strong> <span class="text-danger fw-bold">${{ sale.balance_amount|floatformat:2 }}</span></p>
+                        <p class="mb-1"><strong>الإجمالي Amount:</strong> ${{ sale.total_amount|floatformat:2 }}</p>
+                        <p class="mb-1"><strong>مدفوع Amount:</strong> ${{ sale.paid_amount|floatformat:2 }}</p>
+                        <p class="mb-0"><strong>الرصيد Due:</strong> <span class="text-danger fw-bold">${{ sale.balance_amount|floatformat:2 }}</span></p>
                     </div>
                 </div>
             </div>
@@ -187,12 +187,12 @@
                 <!-- Payment Amount Section -->
                 <div class="payment-card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payment Amount</h5>
+                        <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>الدفع المبلغ</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">
-                                <label class="form-label">Payment Amount *</label>
+                                <label class="form-label">الدفع Amount *</label>
                                 {{ form.amount|add_class:"form-control payment-amount-input" }}
                                 {% if form.amount.errors %}
                                     <div class="text-danger mt-1">{{ form.amount.errors.0 }}</div>
@@ -201,10 +201,10 @@
                                 <!-- Quick Amount Buttons -->
                                 <div class="quick-amount-buttons">
                                     <button type="button" class="quick-amount-btn" data-amount="{{ sale.balance_amount }}">
-                                        Full Amount<br>${{ sale.balance_amount|floatformat:2 }}
+                                        Full المبلغ<br>${{ sale.balance_amount|floatformat:2 }}
                                     </button>
                                     <button type="button" class="quick-amount-btn" data-amount="{% widthratio sale.balance_amount 2 1 %}">
-                                        Half Amount<br>${{ sale.balance_amount|floatformat:2|floatformat:0|add:"0"|mul:"0.5" }}
+                                        Half المبلغ<br>${{ sale.balance_amount|floatformat:2|floatformat:0|add:"0"|mul:"0.5" }}
                                     </button>
                                     <button type="button" class="quick-amount-btn" data-amount="100">
                                         $100
@@ -215,7 +215,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Remaining Balance</label>
+                                <label class="form-label">Remaining الرصيد</label>
                                 <div class="amount-display" id="remainingBalance">${{ sale.balance_amount|floatformat:2 }}</div>
                             </div>
                         </div>
@@ -225,7 +225,7 @@
                 <!-- Payment Method Section -->
                 <div class="payment-card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Method</h5>
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>الدفع Method</h5>
                     </div>
                     <div class="card-body">
                         <!-- Hidden select field -->
@@ -237,15 +237,15 @@
                         <div class="payment-method-cards">
                             <div class="payment-method-card" data-method="cash">
                                 <i class="fas fa-money-bill-wave"></i>
-                                <div>Cash</div>
+                                <div>نقدي</div>
                             </div>
                             <div class="payment-method-card" data-method="card">
                                 <i class="fas fa-credit-card"></i>
-                                <div>Card</div>
+                                <div>بطاقة</div>
                             </div>
                             <div class="payment-method-card" data-method="bank_transfer">
                                 <i class="fas fa-university"></i>
-                                <div>Bank Transfer</div>
+                                <div>تحويل بنكي</div>
                             </div>
                             <div class="payment-method-card" data-method="check">
                                 <i class="fas fa-money-check"></i>
@@ -253,7 +253,7 @@
                             </div>
                             <div class="payment-method-card" data-method="mobile_payment">
                                 <i class="fas fa-mobile-alt"></i>
-                                <div>Mobile Payment</div>
+                                <div>Mobile الدفع</div>
                             </div>
                             <div class="payment-method-card" data-method="credit">
                                 <i class="fas fa-gift"></i>
@@ -270,7 +270,7 @@
                 <!-- Payment Details Section -->
                 <div class="payment-card">
                     <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Payment Details</h5>
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>الدفع Details</h5>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -286,7 +286,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3" id="bankNameField" style="display: none;">
-                                    <label class="form-label">Bank Name</label>
+                                    <label class="form-label">Bank الاسم</label>
                                     {{ form.bank_name|add_class:"form-control" }}
                                     {% if form.bank_name.errors %}
                                         <div class="text-danger">{{ form.bank_name.errors.0 }}</div>
@@ -305,12 +305,12 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="mb-3">
-                                    <label class="form-label">Notes</label>
+                                    <label class="form-label">ملاحظات</label>
                                     {{ form.notes|add_class:"form-control" }}
                                     {% if form.notes.errors %}
                                         <div class="text-danger">{{ form.notes.errors.0 }}</div>
                                     {% endif %}
-                                    <small class="text-muted">Optional notes about this payment</small>
+                                    <small class="text-muted">اختياري notes about this payment</small>
                                 </div>
                             </div>
                         </div>
@@ -320,7 +320,7 @@
                 <!-- Submit Button -->
                 <div class="d-grid">
                     <button type="submit" class="btn btn-record-payment" id="submitBtn">
-                        <i class="fas fa-check me-2"></i>Record Payment
+                        <i class="fas fa-check me-2"></i>تسجيل دفعة
                     </button>
                 </div>
             </form>
@@ -329,7 +329,7 @@
         <!-- Payment Summary -->
         <div class="col-lg-4">
             <div class="sale-summary">
-                <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>Payment Summary</h5>
+                <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>الدفع Summary</h5>
                 
                 <div class="amount-display" id="paymentAmount">$0.00</div>
                 
@@ -339,7 +339,7 @@
                 </div>
                 
                 <div class="summary-row">
-                    <span>Payment Amount:</span>
+                    <span>الدفع Amount:</span>
                     <span id="displayPaymentAmount">$0.00</span>
                 </div>
                 
@@ -349,17 +349,17 @@
                 </div>
 
                 <div class="mt-4">
-                    <h6>Sale Information</h6>
+                    <h6>Sale معلومات</h6>
                     <div class="summary-row">
-                        <span>Total Amount:</span>
+                        <span>الإجمالي Amount:</span>
                         <span>${{ sale.total_amount|floatformat:2 }}</span>
                     </div>
                     <div class="summary-row">
-                        <span>Previously Paid:</span>
+                        <span>السابقly Paid:</span>
                         <span>${{ sale.paid_amount|floatformat:2 }}</span>
                     </div>
                     <div class="summary-row">
-                        <span>Payment Method:</span>
+                        <span>الدفع Method:</span>
                         <span id="selectedMethod">Not selected</span>
                     </div>
                 </div>
@@ -452,13 +452,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.classList.remove('btn-record-payment');
                 submitBtn.classList.add('btn', 'btn-success');
             } else {
-                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Record Payment - $${paymentAmount.toFixed(2)}`;
+                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>تسجيل دفعة - $${paymentAmount.toFixed(2)}`;
                 submitBtn.classList.remove('btn-success');
                 submitBtn.classList.add('btn-record-payment');
             }
         } else {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Record Payment`;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>تسجيل دفعة`;
         }
     }
     

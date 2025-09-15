@@ -159,8 +159,8 @@ class Expense(models.Model):
     
     class Meta:
         db_table = 'expenses'
-        verbose_name = 'Expense'
-        verbose_name_plural = 'Expenses'
+        verbose_name = 'مصروف'
+        verbose_name_plural = 'المصروفات'
         ordering = ['-expense_date', '-created_at']
 
 class RecurringExpense(models.Model):

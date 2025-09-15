@@ -77,9 +77,9 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-receipt me-3"></i>Expense Management
+                    <i class="fas fa-receipt me-3"></i>إدارة المصروفات
                 </h1>
-                <p class="mb-0 opacity-75">Track and manage business expenses and approvals</p>
+                <p class="mb-0 opacity-75">تتبع وإدارة مصروفات الأعمال والموافقات</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'expenses:expense_create' %}" class="btn btn-light btn-lg">
@@ -95,7 +95,7 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_expenses|default:0 }}</div>
-                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-label">الإجمالي Expenses</div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -107,13 +107,13 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-warning">{{ pending_approvals|default:0 }}</div>
-                    <div class="stat-label">Pending Approvals</div>
+                    <div class="stat-label">معلق Approvals</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-success">${{ today_expenses|default:0|floatformat:2 }}</div>
-                    <div class="stat-label">{% trans "Today's Expenses" %}</div>
+                    <div class="stat-label">مصروفات اليوم</div>
                 </div>
             </div>
         </div>
@@ -134,12 +134,12 @@
             </div>
             <div class="col-md-2">
                 <a href="{% url 'expenses:recurring_expense_list' %}" class="btn btn-info w-100">
-                    <i class="fas fa-repeat me-1"></i>Recurring
+                    <i class="fas fa-repeat me-1"></i>متكررة
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'expenses:petty_cash_list' %}" class="btn btn-warning w-100">
-                    <i class="fas fa-money-bill me-1"></i>Petty Cash
+                    <i class="fas fa-money-bill me-1"></i>النثرية
                 </a>
             </div>
             <div class="col-md-2">
@@ -149,7 +149,7 @@
             </div>
             <div class="col-md-2">
                 <button onclick="exportExpenses()" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-download me-1"></i>Export
+                    <i class="fas fa-download me-1"></i>تصدير
                 </button>
             </div>
         </div>
@@ -165,7 +165,7 @@
                     <th>الوصف</th>
                     <th>الفئة</th>
                     <th>المبلغ</th>
-                    <th>Paid By</th>
+                    <th>مدفوع By</th>
                     <th>الحالة</th>
                     <th>الإجراءات</th>
                 </tr>
@@ -209,13 +209,13 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'expenses:expense_detail' expense.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 {% if expense.status == 'pending' %}
                                 <li><a class="dropdown-item" href="{% url 'expenses:expense_update' expense.id %}">
                                     <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 {% if user.role in 'admin,manager' %}
                                 <li><a class="dropdown-item" href="{% url 'expenses:expense_approve' expense.id %}">
-                                    <i class="fas fa-check me-2"></i>Approve</a></li>
+                                    <i class="fas fa-check me-2"></i>موافقة</a></li>
                                 {% endif %}
                                 {% endif %}
                             </ul>
@@ -230,10 +230,10 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-receipt fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">No Expenses Found</h3>
-        <p class="text-muted mb-4">Start tracking your business expenses by creating your first expense record.</p>
+        <h3 class="text-muted mb-3">لا توجد مصروفات</h3>
+        <p class="text-muted mb-4">ابدأ تتبع مصروفات عملك بإنشاء أول سجل مصروف.</p>
         <a href="{% url 'expenses:expense_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>Create First Expense
+            <i class="fas fa-plus me-2"></i>إنشاء First Expense
         </a>
     </div>
     {% endif %}

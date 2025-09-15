@@ -71,7 +71,7 @@
     <div class="sale-header">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="mb-1">Sale #{{ sale.sale_number }}</h1>
+                <h1 class="mb-1">رقم البيع{{ sale.sale_number }}</h1>
                 <p class="mb-0 opacity-75">
                     Customer: {{ sale.customer.name }} | 
                     Date: {{ sale.sale_date|date:"M d, Y H:i" }}
@@ -102,7 +102,7 @@
             <!-- Sale Information -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sale Information</h5>
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Sale معلومات</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -112,7 +112,7 @@
                                 <p class="fw-bold">{{ sale.sale_number }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Customer</label>
+                                <label class="form-label text-muted">العميل</label>
                                 <p>
                                     <a href="{% url 'inventory:customer_detail' sale.customer.id %}" class="text-decoration-none">
                                         {{ sale.customer.name }}
@@ -127,17 +127,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Sale Date</label>
+                                <label class="form-label text-muted">Sale التاريخ</label>
                                 <p>{{ sale.sale_date|date:"M d, Y H:i" }}</p>
                             </div>
                             {% if sale.due_date %}
                             <div class="mb-3">
-                                <label class="form-label text-muted">Due Date</label>
+                                <label class="form-label text-muted">مستحق التاريخ</label>
                                 <p>{{ sale.due_date|date:"M d, Y" }}</p>
                             </div>
                             {% endif %}
                             <div class="mb-3">
-                                <label class="form-label text-muted">Created By</label>
+                                <label class="form-label text-muted">إنشاءd By</label>
                                 <p>{{ sale.created_by.get_full_name }}</p>
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Customer Notes</label>
+                                <label class="form-label text-muted">ملاحظات العميل</label>
                                 <p>{{ sale.notes }}</p>
                             </div>
                         </div>
@@ -159,19 +159,19 @@
             <!-- Sale Items -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Sale Items</h5>
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>بيع العناصر</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover items-table mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Discount</th>
-                                    <th>Total</th>
-                                    <th>Profit</th>
+                                    <th>المنتج</th>
+                                    <th>الكمية</th>
+                                    <th>سعر الوحدة</th>
+                                    <th>الخصم</th>
+                                    <th>الإجمالي</th>
+                                    <th>ربح</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -222,10 +222,10 @@
             <!-- Payments -->
             <div class="card info-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payments</h5>
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>الدفع</h5>
                     {% if sale.balance_amount > 0 %}
                     <a href="{% url 'sales:payment_create' sale.id %}" class="btn btn-success btn-sm">
-                        <i class="fas fa-plus me-1"></i>Record Payment
+                        <i class="fas fa-plus me-1"></i>تسجيل دفعة
                     </a>
                     {% endif %}
                 </div>
@@ -235,12 +235,12 @@
                         <table class="table table-hover payment-table mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Payment #</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
+                                    <th>الدفع #</th>
+                                    <th>التاريخ</th>
+                                    <th>المبلغ</th>
                                     <th>Method</th>
                                     <th>Reference</th>
-                                    <th>Received By</th>
+                                    <th>مستلم By</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -277,32 +277,32 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Installment Plan</h5>
                     <a href="{% url 'sales:installment_detail' installment_plan.id %}" class="btn btn-info btn-sm">
-                        <i class="fas fa-eye me-1"></i>View Details
+                        <i class="fas fa-eye me-1"></i>عرض Details
                     </a>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Total Amount</label>
+                                <label class="form-label text-muted">الإجمالي المبلغ</label>
                                 <p class="fw-bold">${{ installment_plan.total_amount|floatformat:2 }}</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Down Payment</label>
+                                <label class="form-label text-muted">Down الدفع</label>
                                 <p class="fw-bold">${{ installment_plan.down_payment|floatformat:2 }}</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Installment Amount</label>
+                                <label class="form-label text-muted">Installment المبلغ</label>
                                 <p class="fw-bold">${{ installment_plan.installment_amount|floatformat:2 }}</p>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Installments</label>
+                                <label class="form-label text-muted">الأقساط</label>
                                 <p class="fw-bold">{{ installment_plan.paid_installments }}/{{ installment_plan.number_of_installments }}</p>
                             </div>
                         </div>
@@ -314,10 +314,10 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>Due Date</th>
-                                    <th>Amount</th>
-                                    <th>Paid</th>
-                                    <th>Status</th>
+                                    <th>مستحق التاريخ</th>
+                                    <th>المبلغ</th>
+                                    <th>مدفوع</th>
+                                    <th>الحالة</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -360,20 +360,20 @@
             <!-- Financial Summary -->
             <div class="stat-card">
                 <div class="stat-value">${{ sale.total_amount|floatformat:2 }}</div>
-                <div class="stat-label">Total Amount</div>
+                <div class="stat-label">الإجمالي المبلغ</div>
             </div>
 
             <div class="row">
                 <div class="col-6">
                     <div class="stat-card bg-success">
                         <div class="stat-value">${{ sale.paid_amount|floatformat:2 }}</div>
-                        <div class="stat-label">Paid</div>
+                        <div class="stat-label">مدفوع</div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="stat-card {% if sale.balance_amount > 0 %}bg-danger{% else %}bg-secondary{% endif %}">
                         <div class="stat-value">${{ sale.balance_amount|floatformat:2 }}</div>
-                        <div class="stat-label">Balance</div>
+                        <div class="stat-label">الرصيد</div>
                     </div>
                 </div>
             </div>
@@ -381,25 +381,25 @@
             <!-- Sale Summary -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Sale Summary</h6>
+                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>ملخص البيع</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label text-muted">Subtotal</label>
+                        <label class="form-label text-muted">المجموع الفرعي</label>
                         <p class="fw-bold">${{ sale.subtotal|floatformat:2 }}</p>
                     </div>
                     {% if sale.discount_amount > 0 %}
                     <div class="mb-3">
-                        <label class="form-label text-muted">Discount</label>
+                        <label class="form-label text-muted">الخصم</label>
                         <p class="fw-bold text-success">-${{ sale.discount_amount|floatformat:2 }}</p>
                     </div>
                     {% endif %}
                     <div class="mb-3">
-                        <label class="form-label text-muted">Total Items</label>
+                        <label class="form-label text-muted">الإجمالي العناصر</label>
                         <p>{{ sale.items.count }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Total Profit</label>
+                        <label class="form-label text-muted">الإجمالي Profit</label>
                         <p class="fw-bold text-success">${{ sale.profit|floatformat:2 }}</p>
                     </div>
                 </div>
@@ -408,32 +408,32 @@
             <!-- Action Buttons -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Actions</h6>
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>الإجراءات</h6>
                 </div>
                 <div class="card-body action-buttons">
                     {% if sale.status != 'completed' %}
                     <a href="{% url 'sales:sale_update' sale.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit me-1"></i>Edit Sale
+                        <i class="fas fa-edit me-1"></i>تعديل Sale
                     </a>
                     {% endif %}
                     <a href="{% url 'sales:sale_invoice' sale.id %}" class="btn btn-info btn-sm">
-                        <i class="fas fa-file-invoice me-1"></i>View Invoice
+                        <i class="fas fa-file-invoice me-1"></i>عرض Invoice
                     </a>
                     <a href="{% url 'sales:sale_print' sale.id %}" target="_blank" class="btn btn-success btn-sm">
-                        <i class="fas fa-print me-1"></i>Print Invoice
+                        <i class="fas fa-print me-1"></i>طباعة Invoice
                     </a>
                     {% if sale.balance_amount > 0 %}
                     <a href="{% url 'sales:payment_create' sale.id %}" class="btn btn-warning btn-sm">
-                        <i class="fas fa-credit-card me-1"></i>Record Payment
+                        <i class="fas fa-credit-card me-1"></i>تسجيل دفعة
                     </a>
                     {% endif %}
                     {% if sale.sale_type == 'installment' and installment_plan %}
                     <a href="{% url 'sales:installment_detail' installment_plan.id %}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-calendar-alt me-1"></i>Installments
+                        <i class="fas fa-calendar-alt me-1"></i>الأقساط
                     </a>
                     {% endif %}
                     <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i>Back to Sales
+                        <i class="fas fa-arrow-left me-1"></i>رجوع إلي البيع
                     </a>
                 </div>
             </div>
@@ -443,14 +443,14 @@
                 <div class="card-body">
                     <small class="text-muted">
                         <div class="mb-1">
-                            <strong>Created:</strong> {{ sale.created_at|date:"M d, Y H:i" }}
+                            <strong>إنشاءd:</strong> {{ sale.created_at|date:"M d, Y H:i" }}
                         </div>
                         <div>
-                            <strong>Updated:</strong> {{ sale.updated_at|date:"M d, Y H:i" }}
+                            <strong>تحديثd:</strong> {{ sale.updated_at|date:"M d, Y H:i" }}
                         </div>
                         {% if sale.updated_by %}
                         <div>
-                            <strong>Updated by:</strong> {{ sale.updated_by.get_full_name }}
+                            <strong>تحديثd by:</strong> {{ sale.updated_by.get_full_name }}
                         </div>
                         {% endif %}
                     </small>

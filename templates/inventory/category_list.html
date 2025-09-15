@@ -76,13 +76,13 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-tags me-3"></i>Product Categories
+                    <i class="fas fa-tags me-3"></i>المنتج Categories
                 </h1>
                 <p class="mb-0 opacity-75">Manage product categories and vehicle types</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'inventory:category_create' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>Add Category
+                    <i class="fas fa-plus me-2"></i>إضافة Category
                 </a>
             </div>
         </div>
@@ -94,7 +94,7 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_categories }}</div>
-                    <div class="stat-label">Total Categories</div>
+                    <div class="stat-label">الإجمالي Categories</div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -122,14 +122,14 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-4">
-                <label class="form-label">Search Categories</label>
+                <label class="form-label">بحث Categories</label>
                 <input type="text" class="form-control" name="search" 
                        value="{{ request.GET.search }}" placeholder="Search by name...">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Vehicle Type</label>
                 <select class="form-select" name="vehicle_type">
-                    <option value="">All Vehicle Types</option>
+                    <option value="">الكل Vehicle Types</option>
                     <option value="motorcycle" {% if request.GET.vehicle_type == 'motorcycle' %}selected{% endif %}>Motorcycle</option>
                     <option value="car" {% if request.GET.vehicle_type == 'car' %}selected{% endif %}>Car</option>
                     <option value="tuktuk" {% if request.GET.vehicle_type == 'tuktuk' %}selected{% endif %}>Tuk-Tuk</option>
@@ -139,17 +139,17 @@
             <div class="col-md-3">
                 <label class="form-label">Sort By</label>
                 <select class="form-select" name="sort">
-                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>الاسم</option>
                     <option value="vehicle_type" {% if request.GET.sort == 'vehicle_type' %}selected{% endif %}>Vehicle Type</option>
-                    <option value="product_count" {% if request.GET.sort == 'product_count' %}selected{% endif %}>Product Count</option>
-                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Date Created</option>
+                    <option value="product_count" {% if request.GET.sort == 'product_count' %}selected{% endif %}>المنتج Count</option>
+                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>التاريخ Created</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>Filter
+                        <i class="fas fa-search me-1"></i>تصفية
                     </button>
                 </div>
             </div>
@@ -179,10 +179,10 @@
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Edit</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>View Products</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>تعديل</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>عرض المنتجات</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>حذف</a></li>
                             </ul>
                         </div>
                     </div>
@@ -193,14 +193,14 @@
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="product-count">{{ category.product_count|default:0 }}</div>
-                            <small class="text-muted">Products</small>
+                            <small class="text-muted">المنتجs</small>
                         </div>
                         <div class="col-6">
                             <div class="text-muted">
                                 <i class="fas fa-calendar-alt me-1"></i>
                                 {{ category.created_at|date:"M d, Y" }}
                             </div>
-                            <small class="text-muted">Created</small>
+                            <small class="text-muted">إنشاءd</small>
                         </div>
                     </div>
                 </div>
@@ -208,12 +208,12 @@
                     <div class="row g-2">
                         <div class="col-6">
                             <a href="#" class="btn btn-outline-primary btn-sm w-100">
-                                <i class="fas fa-edit me-1"></i>Edit
+                                <i class="fas fa-edit me-1"></i>تعديل
                             </a>
                         </div>
                         <div class="col-6">
                             <a href="#" class="btn btn-outline-success btn-sm w-100">
-                                <i class="fas fa-box me-1"></i>Products
+                                <i class="fas fa-box me-1"></i>المنتجs
                             </a>
                         </div>
                     </div>
@@ -275,7 +275,7 @@
         <h3 class="text-muted mb-3">No Categories Found</h3>
         <p class="text-muted mb-4">Start by creating your first product category.</p>
         <a href="{% url 'inventory:category_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>Create First Category
+            <i class="fas fa-plus me-2"></i>إنشاء First Category
         </a>
     </div>
     {% endif %}

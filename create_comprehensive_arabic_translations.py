@@ -148,28 +148,28 @@ msgid "Product Name"
 msgstr "اسم المنتج"
 
 msgid "Description"
-msgstr "الوصف"
+msgstr "description"
 
 msgid "SKU"
-msgstr "رمز المنتج"
+msgstr "sku"
 
 msgid "Barcode"
-msgstr "الباركود"
+msgstr "barcode"
 
 msgid "Category"
-msgstr "الفئة"
+msgstr "category"
 
 msgid "Brand"
-msgstr "العلامة التجارية"
+msgstr "brand"
 
 msgid "Unit"
 msgstr "الوحدة"
 
 msgid "Cost Price"
-msgstr "سعر التكلفة"
+msgstr "cost_price"
 
 msgid "Selling Price"
-msgstr "سعر البيع"
+msgstr "selling_price"
 
 msgid "Wholesale Price"
 msgstr "سعر الجملة"
@@ -178,40 +178,40 @@ msgid "Current Stock"
 msgstr "المخزون الحالي"
 
 msgid "Minimum Stock"
-msgstr "الحد الأدنى للمخزون"
+msgstr "min_stock_level"
 
 msgid "Maximum Stock"
 msgstr "الحد الأقصى للمخزون"
 
-msgid "Reorder Level"
+msgid "إعادة ترتيب المستوى"
 msgstr "مستوى إعادة الطلب"
 
 msgid "Weight"
 msgstr "الوزن"
 
-msgid "Dimensions"
+msgid "الأبعاد"
 msgstr "الأبعاد"
 
 msgid "Color"
 msgstr "اللون"
 
-msgid "Material"
+msgid "المادة"
 msgstr "المادة"
 
 msgid "Image"
 msgstr "الصورة"
 
-msgid "Compatible Vehicles"
+msgid "المركبات المتوافقة"
 msgstr "المركبات المتوافقة"
 
-msgid "Part Number"
+msgid "رقم القطعة"
 msgstr "رقم القطعة"
 
-msgid "OEM Number"
+msgid "رقم الشركة المصنعة للمعدات الأصلية"
 msgstr "رقم الشركة المصنعة"
 
 msgid "Active"
-msgstr "نشط"
+msgstr "active"
 
 msgid "Featured"
 msgstr "مميز"
@@ -272,7 +272,7 @@ msgid "Sale Details"
 msgstr "تفاصيل البيع"
 
 msgid "Customer"
-msgstr "العميل"
+msgstr "customer"
 
 msgid "Sale Date"
 msgstr "تاريخ البيع"
@@ -284,10 +284,10 @@ msgid "Sale Type"
 msgstr "نوع البيع"
 
 msgid "Cash"
-msgstr "نقدي"
+msgstr "cash"
 
 msgid "Credit"
-msgstr "آجل"
+msgstr "credit"
 
 msgid "Installment"
 msgstr "تقسيط"
@@ -296,16 +296,16 @@ msgid "Discount Amount"
 msgstr "مبلغ الخصم"
 
 msgid "Total Amount"
-msgstr "المبلغ الإجمالي"
+msgstr "total_amount"
 
 msgid "Paid Amount"
-msgstr "المبلغ المدفوع"
+msgstr "paid_amount"
 
 msgid "Remaining Amount"
-msgstr "المبلغ المتبقي"
+msgstr "balance_amount"
 
 msgid "Notes"
-msgstr "ملاحظات"
+msgstr "notes"
 
 msgid "Internal Notes"
 msgstr "ملاحظات داخلية"
@@ -323,13 +323,13 @@ msgid "Add Payment"
 msgstr "إضافة دفعة"
 
 msgid "Payment Method"
-msgstr "طريقة الدفع"
+msgstr "payment_method"
 
 msgid "Payment Date"
 msgstr "تاريخ الدفع"
 
 msgid "Amount"
-msgstr "المبلغ"
+msgstr "amount"
 
 # Customer Types
 msgid "Individual"
@@ -496,28 +496,28 @@ msgid "Last Name"
 msgstr "اسم العائلة"
 
 msgid "Email"
-msgstr "البريد الإلكتروني"
+msgstr "email"
 
 msgid "Phone"
-msgstr "الهاتف"
+msgstr "phone"
 
 msgid "Address"
-msgstr "العنوان"
+msgstr "address"
 
 msgid "Role"
 msgstr "الدور"
 
 msgid "Admin"
-msgstr "مدير"
+msgstr "admin"
 
 msgid "Manager"
-msgstr "مدير"
+msgstr "admin"
 
 msgid "Employee"
 msgstr "موظف"
 
 msgid "Cashier"
-msgstr "أمين صندوق"
+msgstr "cashier"
 
 # Date and Time
 msgid "Today"
@@ -536,7 +536,7 @@ msgid "This Year"
 msgstr "هذا العام"
 
 msgid "Date"
-msgstr "التاريخ"
+msgstr "date"
 
 msgid "Time"
 msgstr "الوقت"
@@ -715,28 +715,28 @@ def main():
         "Edit Product": "تعديل المنتج",
         "Product Details": "تفاصيل المنتج",
         "Product Name": "اسم المنتج",
-        "Description": "الوصف",
-        "SKU": "رمز المنتج",
-        "Barcode": "الباركود",
-        "Category": "الفئة",
-        "Brand": "العلامة التجارية",
+        "Description": "description",
+        "SKU": "sku",
+        "Barcode": "barcode",
+        "Category": "category",
+        "Brand": "brand",
         "Unit": "الوحدة",
-        "Cost Price": "سعر التكلفة",
-        "Selling Price": "سعر البيع",
+        "Cost Price": "cost_price",
+        "Selling Price": "selling_price",
         "Wholesale Price": "سعر الجملة",
         "Current Stock": "المخزون الحالي",
-        "Minimum Stock": "الحد الأدنى للمخزون",
+        "Minimum Stock": "min_stock_level",
         "Maximum Stock": "الحد الأقصى للمخزون",
-        "Reorder Level": "مستوى إعادة الطلب",
+        "إعادة ترتيب المستوى": "مستوى إعادة الطلب",
         "Weight": "الوزن",
-        "Dimensions": "الأبعاد",
+        "الأبعاد": "الأبعاد",
         "Color": "اللون",
-        "Material": "المادة",
+        "المادة": "المادة",
         "Image": "الصورة",
-        "Compatible Vehicles": "المركبات المتوافقة",
-        "Part Number": "رقم القطعة",
-        "OEM Number": "رقم الشركة المصنعة",
-        "Active": "نشط",
+        "المركبات المتوافقة": "المركبات المتوافقة",
+        "رقم القطعة": "رقم القطعة",
+        "رقم الشركة المصنعة للمعدات الأصلية": "رقم الشركة المصنعة",
+        "Active": "active",
         "Featured": "مميز",
 
         # Vehicle Types
@@ -763,26 +763,26 @@ def main():
         # Sales Module
         "New Sale": "بيع جديد",
         "Sale Details": "تفاصيل البيع",
-        "Customer": "العميل",
+        "Customer": "customer",
         "Sale Date": "تاريخ البيع",
         "Due Date": "تاريخ الاستحقاق",
         "Sale Type": "نوع البيع",
-        "Cash": "نقدي",
-        "Credit": "آجل",
+        "Cash": "cash",
+        "Credit": "credit",
         "Installment": "تقسيط",
         "Discount Amount": "مبلغ الخصم",
-        "Total Amount": "المبلغ الإجمالي",
-        "Paid Amount": "المبلغ المدفوع",
-        "Remaining Amount": "المبلغ المتبقي",
-        "Notes": "ملاحظات",
+        "Total Amount": "total_amount",
+        "Paid Amount": "paid_amount",
+        "Remaining Amount": "balance_amount",
+        "Notes": "notes",
         "Internal Notes": "ملاحظات داخلية",
         "Invoice": "فاتورة",
         "Print Invoice": "طباعة الفاتورة",
         "Payment": "الدفع",
         "Add Payment": "إضافة دفعة",
-        "Payment Method": "طريقة الدفع",
+        "Payment Method": "payment_method",
         "Payment Date": "تاريخ الدفع",
-        "Amount": "المبلغ",
+        "Amount": "amount",
 
         # Customer Types
         "Individual": "فرد",
@@ -840,14 +840,14 @@ def main():
         "Register": "تسجيل",
         "First Name": "الاسم الأول",
         "Last Name": "اسم العائلة",
-        "Email": "البريد الإلكتروني",
-        "Phone": "الهاتف",
-        "Address": "العنوان",
+        "Email": "email",
+        "Phone": "phone",
+        "Address": "address",
         "Role": "الدور",
-        "Admin": "مدير",
-        "Manager": "مدير",
+        "Admin": "admin",
+        "Manager": "admin",
         "Employee": "موظف",
-        "Cashier": "أمين صندوق",
+        "Cashier": "cashier",
 
         # Date and Time
         "Today": "اليوم",
@@ -855,7 +855,7 @@ def main():
         "This Week": "هذا الأسبوع",
         "This Month": "هذا الشهر",
         "This Year": "هذا العام",
-        "Date": "التاريخ",
+        "Date": "date",
         "Time": "الوقت",
         "Created": "تم الإنشاء",
         "Updated": "تم التحديث",
@@ -865,9 +865,9 @@ def main():
         # Additional translations for comprehensive coverage
         "Purchase Order": "أمر شراء",
         "New Purchase": "شراء جديد",
-        "Supplier": "المورد",
+        "Supplier": "supplier",
         "Purchase Date": "تاريخ الشراء",
-        "Quantity": "الكمية",
+        "Quantity": "quantity",
         "Unit Price": "سعر الوحدة",
         "Total": "الإجمالي",
         "Expense": "مصروف",

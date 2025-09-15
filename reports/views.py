@@ -205,7 +205,7 @@ def export_sales_csv(sales, date_from, date_to):
     
     writer = csv.writer(response)
     writer.writerow([
-        'Sale Number', 'Date', 'Customer', 'Type', 'Total Amount', 
+        'Sale Number', 'Date', 'عميل', 'Type', 'Total Amount', 
         'Paid Amount', 'Balance', 'Payment Status', 'Salesperson'
     ])
     
@@ -380,8 +380,8 @@ def export_inventory_csv(products):
     
     writer = csv.writer(response)
     writer.writerow([
-        'SKU', 'Name', 'Category', 'Brand', 'Current Stock', 'Min Stock', 
-        'Reorder Level', 'Max Stock', 'Cost Price', 'Selling Price', 
+        'SKU', 'Name', 'فئة', 'Brand', 'Current Stock', 'Min Stock', 
+        'إعادة ترتيب المستوى', 'Max Stock', 'Cost Price', 'Selling Price', 
         'Stock Value', 'Profit Margin %'
     ])
     

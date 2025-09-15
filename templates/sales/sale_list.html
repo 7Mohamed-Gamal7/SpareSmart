@@ -87,16 +87,16 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-shopping-cart me-3"></i>Sales Management
+                    <i class="fas fa-shopping-cart me-3"></i>إدارة المبيعات
                 </h1>
                 <p class="mb-0 opacity-75">Manage sales transactions, payments, and invoices</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'sales:sale_create' %}" class="btn btn-light btn-lg me-2">
-                    <i class="fas fa-plus me-2"></i>New Sale
+                    <i class="fas fa-plus me-2"></i>بيع جديد
                 </a>
                 <a href="{% url 'sales:quick_sale' %}" class="btn btn-success btn-lg">
-                    <i class="fas fa-bolt me-2"></i>Quick Sale
+                    <i class="fas fa-bolt me-2"></i>بيع سريع
                 </a>
             </div>
         </div>
@@ -108,25 +108,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_sales }}</div>
-                    <div class="stat-label">Total Sales</div>
+                    <div class="stat-label">الإجمالي المبيعات</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ today_sales }}</div>
-                    <div class="stat-label">Today's Sales</div>
+                    <div class="stat-label">اليوم's المبيعات</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-success">${{ today_revenue|floatformat:2 }}</div>
-                    <div class="stat-label">Today's Revenue</div>
+                    <div class="stat-label">اليوم's Revenue</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-warning">${{ pending_payments|floatformat:2 }}</div>
-                    <div class="stat-label">Pending Payments</div>
+                    <div class="stat-label">معلق Payments</div>
                 </div>
             </div>
         </div>
@@ -137,32 +137,32 @@
         <div class="row g-2">
             <div class="col-md-2">
                 <a href="{% url 'sales:sale_create' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-plus me-1"></i>New Sale
+                    <i class="fas fa-plus me-1"></i>بيع جديد
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'sales:quick_sale' %}" class="btn btn-success w-100">
-                    <i class="fas fa-bolt me-1"></i>Quick Sale
+                    <i class="fas fa-bolt me-1"></i>بيع سريع
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="{% url 'sales:installment_list' %}" class="btn btn-info w-100">
-                    <i class="fas fa-calendar-alt me-1"></i>Installments
+                    <i class="fas fa-calendar-alt me-1"></i>الأقساط
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-warning w-100">
-                    <i class="fas fa-file-invoice me-1"></i>Invoices
+                    <i class="fas fa-file-invoice me-1"></i>الفاتورةs
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-secondary w-100">
-                    <i class="fas fa-chart-bar me-1"></i>Reports
+                    <i class="fas fa-chart-bar me-1"></i>التقارير
                 </a>
             </div>
             <div class="col-md-2">
                 <a href="#" class="btn btn-outline-primary w-100">
-                    <i class="fas fa-download me-1"></i>Export
+                    <i class="fas fa-download me-1"></i>تصدير
                 </a>
             </div>
         </div>
@@ -172,11 +172,11 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">Search Sales</label>
+                <label class="form-label">بحث المبيعات</label>
                 {{ filter_form.search }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">Customer</label>
+                <label class="form-label">العميل</label>
                 {{ filter_form.customer }}
             </div>
             <div class="col-md-2">
@@ -184,33 +184,33 @@
                 {{ filter_form.sale_type }}
             </div>
             <div class="col-md-1">
-                <label class="form-label">Status</label>
+                <label class="form-label">الحالة</label>
                 {{ filter_form.status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">Payment Status</label>
+                <label class="form-label">الدفع الحالة</label>
                 {{ filter_form.payment_status }}
             </div>
             <div class="col-md-2">
-                <label class="form-label">Date Range</label>
+                <label class="form-label">نطاق التاريخ</label>
                 {{ filter_form.date_range }}
             </div>
         </form>
         
         <div class="row g-3 mt-2">
             <div class="col-md-3">
-                <label class="form-label">From Date</label>
+                <label class="form-label"> التاريخ من</label>
                 {{ filter_form.date_from }}
             </div>
             <div class="col-md-3">
-                <label class="form-label">To Date</label>
+                <label class="form-label"> التاريخ إلي</label>
                 {{ filter_form.date_to }}
             </div>
             <div class="col-md-2">
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>Filter
+                        <i class="fas fa-search me-1"></i>تصفية
                     </button>
                 </div>
             </div>
@@ -218,7 +218,7 @@
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <a href="{% url 'sales:sale_list' %}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>Clear
+                        <i class="fas fa-times me-1"></i>مسح
                     </a>
                 </div>
             </div>
@@ -231,17 +231,17 @@
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th>Sale #</th>
-                    <th>Customer</th>
-                    <th>Date</th>
+                    <th>رقم البيع</th>
+                    <th>العميل</th>
+                    <th>التاريخ</th>
                     <th>Type</th>
-                    <th>Items</th>
-                    <th>Amount</th>
-                    <th>Paid</th>
-                    <th>Balance</th>
-                    <th>Status</th>
-                    <th>Payment</th>
-                    <th>Actions</th>
+                    <th>العناصر</th>
+                    <th>المبلغ</th>
+                    <th>مدفوع</th>
+                    <th>الرصيد</th>
+                    <th>الحالة</th>
+                    <th>الدفع</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -272,12 +272,12 @@
                         </span>
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark">{{ sale.items.count }} items</span>
+                        <span class="badge bg-light text-dark">{{ sale.items.count }} عنصر</span>
                     </td>
                     <td>
                         <div class="fw-bold">${{ sale.total_amount|floatformat:2 }}</div>
                         {% if sale.discount_amount > 0 %}
-                        <small class="text-success">-${{ sale.discount_amount|floatformat:2 }} discount</small>
+                        <small class="text-success">-${{ sale.discount_amount|floatformat:2 }} خصم</small>
                         {% endif %}
                     </td>
                     <td>
@@ -315,19 +315,19 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'sales:sale_detail' sale.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 {% if sale.status != 'completed' %}
                                 <li><a class="dropdown-item" href="{% url 'sales:sale_update' sale.id %}">
-                                    <i class="fas fa-edit me-2"></i>Edit</a></li>
+                                    <i class="fas fa-edit me-2"></i>تعديل</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'sales:sale_invoice' sale.id %}">
-                                    <i class="fas fa-file-invoice me-2"></i>View Invoice</a></li>
+                                    <i class="fas fa-file-invoice me-2"></i>عرض الفاتورة</a></li>
                                 <li><a class="dropdown-item" href="{% url 'sales:sale_print' sale.id %}" target="_blank">
-                                    <i class="fas fa-print me-2"></i>Print Invoice</a></li>
+                                    <i class="fas fa-print me-2"></i>طباعة الفاتورة</a></li>
                                 {% if sale.balance_amount > 0 %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'sales:payment_create' sale.id %}">
-                                    <i class="fas fa-credit-card me-2"></i>Record Payment</a></li>
+                                    <i class="fas fa-credit-card me-2"></i>Record الدفع</a></li>
                                 {% endif %}
                                 {% if sale.sale_type == 'installment' %}
                                 <li><a class="dropdown-item" href="{% url 'sales:installment_detail' sale.installment_plan.id %}">
@@ -391,13 +391,13 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">No Sales Found</h3>
+        <h3 class="text-muted mb-3">لا توجد مبيعات</h3>
         <p class="text-muted mb-4">Start making sales by creating your first transaction.</p>
         <a href="{% url 'sales:sale_create' %}" class="btn btn-primary btn-lg me-3">
-            <i class="fas fa-plus me-2"></i>Create First Sale
+            <i class="fas fa-plus me-2"></i>إنشاء First Sale
         </a>
         <a href="{% url 'sales:quick_sale' %}" class="btn btn-success btn-lg">
-            <i class="fas fa-bolt me-2"></i>Quick Sale
+            <i class="fas fa-bolt me-2"></i>بيع سريع
         </a>
     </div>
     {% endif %}

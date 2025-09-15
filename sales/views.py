@@ -170,8 +170,8 @@ def sale_create(request):
     context = {
         'form': form,
         'formset': formset,
-        'title': 'Create New Sale',
-        'action': 'Create'
+        'title': 'عملية بيع جديدة',
+        'action': 'إنشاء'
     }
     
     return render(request, 'sales/sale_form.html', context)

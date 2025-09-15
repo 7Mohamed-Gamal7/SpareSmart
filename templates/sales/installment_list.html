@@ -100,7 +100,7 @@
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'sales:sale_list' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Sales
+                    <i class="fas fa-arrow-left me-2"></i>رجوع إلي البيع
                 </a>
             </div>
         </div>
@@ -112,25 +112,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_installments }}</div>
-                    <div class="stat-label">Total Plans</div>
+                    <div class="stat-label">الإجمالي Plans</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ active_installments }}</div>
-                    <div class="stat-label">Active Plans</div>
+                    <div class="stat-label">نشط Plans</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-warning">{{ overdue_payments }}</div>
-                    <div class="stat-label">Overdue Payments</div>
+                    <div class="stat-label">متأخر Payments</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value text-success">${{ total_collected|floatformat:2 }}</div>
-                    <div class="stat-label">Total Collected</div>
+                    <div class="stat-label">الإجمالي Collected</div>
                 </div>
             </div>
         </div>
@@ -140,41 +140,41 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">Search</label>
+                <label class="form-label">بحث</label>
                 <input type="text" name="search" class="form-control" placeholder="Customer name, sale number..." value="{{ request.GET.search }}">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Status</label>
+                <label class="form-label">الحالة</label>
                 <select name="status" class="form-select">
-                    <option value="">All Statuses</option>
-                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
-                    <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="">الكل Statuses</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>مكتمل</option>
                     <option value="defaulted" {% if request.GET.status == 'defaulted' %}selected{% endif %}>Defaulted</option>
-                    <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>إلغاءled</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Payment Status</label>
+                <label class="form-label">الدفع الحالة</label>
                 <select name="payment_status" class="form-select">
-                    <option value="">All</option>
+                    <option value="">الكل</option>
                     <option value="current" {% if request.GET.payment_status == 'current' %}selected{% endif %}>Current</option>
-                    <option value="overdue" {% if request.GET.payment_status == 'overdue' %}selected{% endif %}>Overdue</option>
+                    <option value="overdue" {% if request.GET.payment_status == 'overdue' %}selected{% endif %}>متأخر</option>
                     <option value="upcoming" {% if request.GET.payment_status == 'upcoming' %}selected{% endif %}>Upcoming</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label">Sort By</label>
                 <select name="sort" class="form-select">
-                    <option value="start_date" {% if request.GET.sort == 'start_date' %}selected{% endif %}>Start Date</option>
-                    <option value="total_amount" {% if request.GET.sort == 'total_amount' %}selected{% endif %}>Total Amount</option>
-                    <option value="remaining" {% if request.GET.sort == 'remaining' %}selected{% endif %}>Remaining Balance</option>
+                    <option value="start_date" {% if request.GET.sort == 'start_date' %}selected{% endif %}>Start التاريخ</option>
+                    <option value="total_amount" {% if request.GET.sort == 'total_amount' %}selected{% endif %}>الإجمالي المبلغ</option>
+                    <option value="remaining" {% if request.GET.sort == 'remaining' %}selected{% endif %}>Remaining الرصيد</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <label class="form-label">&nbsp;</label>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search me-1"></i>Filter
+                        <i class="fas fa-search me-1"></i>تصفية
                     </button>
                 </div>
             </div>
@@ -195,16 +195,16 @@
         <table class="table table-hover mb-0">
             <thead>
                 <tr>
-                    <th>Sale #</th>
-                    <th>Customer</th>
-                    <th>Total Amount</th>
-                    <th>Down Payment</th>
-                    <th>Installments</th>
+                    <th>رقم البيع</th>
+                    <th>العميل</th>
+                    <th>الإجمالي المبلغ</th>
+                    <th>Down الدفع</th>
+                    <th>الأقساط</th>
                     <th>Progress</th>
                     <th>Remaining</th>
-                    <th>Next Due</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>التالي مستحق</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -248,7 +248,7 @@
                         {% if installment.remaining_balance > 0 %}
                             <div class="text-danger fw-bold">${{ installment.remaining_balance|floatformat:2 }}</div>
                         {% else %}
-                            <div class="text-success fw-bold">Paid</div>
+                            <div class="text-success fw-bold">مدفوع</div>
                         {% endif %}
                     </td>
                     <td>
@@ -258,7 +258,7 @@
                             {% if next_payment.is_overdue %}
                                 <small class="overdue-indicator">{{ next_payment.days_overdue }} days overdue</small>
                             {% elif next_payment.days_until_due <= 7 %}
-                                <small class="upcoming-indicator">Due in {{ next_payment.days_until_due }} days</small>
+                                <small class="upcoming-indicator">مستحق in {{ next_payment.days_until_due }} days</small>
                             {% endif %}
                         {% else %}
                             <span class="text-muted">-</span>
@@ -282,14 +282,14 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'sales:installment_detail' installment.id %}">
-                                    <i class="fas fa-eye me-2"></i>View Details</a></li>
+                                    <i class="fas fa-eye me-2"></i>عرض Details</a></li>
                                 <li><a class="dropdown-item" href="{% url 'sales:sale_detail' installment.sale.id %}">
-                                    <i class="fas fa-file-invoice me-2"></i>View Sale</a></li>
+                                    <i class="fas fa-file-invoice me-2"></i>عرض Sale</a></li>
                                 {% with next_payment=installment.next_due_payment %}
                                 {% if next_payment and next_payment.status != 'paid' %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'sales:installment_payment' next_payment.id %}">
-                                    <i class="fas fa-credit-card me-2"></i>Record Payment</a></li>
+                                    <i class="fas fa-credit-card me-2"></i>Record الدفع</a></li>
                                 {% endif %}
                                 {% endwith %}
                             </ul>
@@ -353,7 +353,7 @@
         <h3 class="text-muted mb-3">No Installment Plans Found</h3>
         <p class="text-muted mb-4">Start creating sales with installment payment options.</p>
         <a href="{% url 'sales:sale_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>Create Sale with Installments
+            <i class="fas fa-plus me-2"></i>إنشاء البيع بالتقسيط
         </a>
     </div>
     {% endif %}

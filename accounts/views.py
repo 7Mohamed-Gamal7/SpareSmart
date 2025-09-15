@@ -177,7 +177,7 @@ def user_detail(request, user_id):
     user = get_object_or_404(User, id=user_id)
     
     # Check permissions
-    if not (request.user.role in ['admin', 'manager'] or request.user == user):
+    if not (request.user.is_superuser or request.user.role in ['admin', 'manager'] or request.user == user):
         messages.error(request, 'You do not have permission to view this user.')
         return redirect('dashboard:home')
     
@@ -297,7 +297,7 @@ def profile(request):
     return render(request, 'accounts/profile.html')
 
 @login_required
-@user_passes_test(lambda u: u.role == 'admin')
+@user_passes_test(lambda u: u.is_superuser or u.role == 'admin')
 def role_permissions(request):
     """Manage role permissions"""
     if request.method == 'POST':
@@ -364,12 +364,27 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+# Utility function to check if user is admin
+def is_admin_user(user):
+    """Check if user is superuser or admin"""
+    return user.is_superuser or user.role == 'admin'
+
+# Utility function to check if user is admin or manager
+def is_admin_or_manager(user):
+    """Check if user is superuser, admin, or manager"""
+    return user.is_superuser or user.role in ['admin', 'manager']
+
 # Utility function to check user permissions
 def has_permission(user, permission_codename):
     """Check if user has specific permission"""
+    # Superuser has all permissions
+    if user.is_superuser:
+        return True
+
+    # Admin role has all permissions
     if user.role == 'admin':
         return True
-    
+
     return RolePermission.objects.filter(
         role=user.role,
         permission__codename=permission_codename

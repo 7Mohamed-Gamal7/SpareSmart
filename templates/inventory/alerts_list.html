@@ -97,10 +97,10 @@
             </div>
             <div class=\"col-md-4 text-md-end\">
                 <a href=\"{% url 'inventory:alerts_dashboard' %}\" class=\"btn btn-light btn-lg me-2\">
-                    <i class=\"fas fa-dashboard me-2\"></i>Dashboard
+                    <i class=\"fas fa-dashboard me-2\"></i>لوحة التحكم
                 </a>
                 <a href=\"{% url 'inventory:refresh_alerts' %}\" class=\"btn btn-warning btn-lg\">
-                    <i class=\"fas fa-sync me-2\"></i>Refresh
+                    <i class=\"fas fa-sync me-2\"></i>تحديث
                 </a>
             </div>
         </div>
@@ -110,13 +110,13 @@
     <div class=\"filter-card\">
         <form method=\"get\" class=\"row g-3\">
             <div class=\"col-md-3\">
-                <label class=\"form-label\">Search Alerts</label>
+                <label class=\"form-label\">بحث Alerts</label>
                 <input type=\"text\" name=\"search\" class=\"form-control\" placeholder=\"Product name, SKU, message...\" value=\"{{ filters.search }}\">
             </div>
             <div class=\"col-md-2\">
-                <label class=\"form-label\">Alert Type</label>
+                <label class=\"form-label\">نوع التنبيه</label>
                 <select name=\"alert_type\" class=\"form-select\">
-                    <option value=\"\">All Types</option>
+                    <option value=\"\">الكل Types</option>
                     {% for value, label in alert_types %}
                     <option value=\"{{ value }}\" {% if filters.alert_type == value %}selected{% endif %}>
                         {{ label }}
@@ -125,7 +125,7 @@
                 </select>
             </div>
             <div class=\"col-md-2\">
-                <label class=\"form-label\">Status</label>
+                <label class=\"form-label\">الحالة</label>
                 <select name=\"status\" class=\"form-select\">
                     {% for value, label in status_choices %}
                     <option value=\"{{ value }}\" {% if filters.status == value %}selected{% endif %}>
@@ -137,7 +137,7 @@
             <div class=\"col-md-2\">
                 <label class=\"form-label\">Vehicle Type</label>
                 <select name=\"vehicle_type\" class=\"form-select\">
-                    <option value=\"\">All Vehicles</option>
+                    <option value=\"\">الكل Vehicles</option>
                     {% for value, label in vehicle_types %}
                     <option value=\"{{ value }}\" {% if filters.vehicle_type == value %}selected{% endif %}>
                         {{ label }}
@@ -149,7 +149,7 @@
                 <label class=\"form-label\">&nbsp;</label>
                 <div class=\"d-grid\">
                     <button type=\"submit\" class=\"btn btn-primary\">
-                        <i class=\"fas fa-search me-1\"></i>Filter
+                        <i class=\"fas fa-search me-1\"></i>تصفية
                     </button>
                 </div>
             </div>
@@ -178,7 +178,7 @@
                         <i class=\"fas fa-check me-1\"></i>Acknowledge Selected
                     </button>
                     <button type=\"button\" class=\"btn btn-outline-secondary\" onclick=\"clearSelection()\">
-                        <i class=\"fas fa-times me-1\"></i>Clear
+                        <i class=\"fas fa-times me-1\"></i>مسح
                     </button>
                 </div>
             </div>
@@ -194,14 +194,14 @@
                     <th style=\"width: 50px;\">
                         <input type=\"checkbox\" id=\"selectAll\" class=\"form-check-input\">
                     </th>
-                    <th>Product</th>
-                    <th>Alert Type</th>
-                    <th>Message</th>
-                    <th>Current Stock</th>
-                    <th>Recommended Action</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Actions</th>
+                    <th>المنتج</th>
+                    <th>نوع التنبيه</th>
+                    <th>رسالة</th>
+                    <th>المخزون الحالي</th>
+                    <th>الإجراء الموصى به</th>
+                    <th>الحالة</th>
+                    <th>إنشاء</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -289,7 +289,7 @@
                             </button>
                             <ul class=\"dropdown-menu\">
                                 <li><a class=\"dropdown-item\" href=\"{% url 'inventory:product_detail' alert.product.id %}\">
-                                    <i class=\"fas fa-eye me-2\"></i>View Product</a></li>
+                                    <i class=\"fas fa-eye me-2\"></i>عرض المنتج</a></li>
                                 {% if alert.status == 'active' %}
                                 <li><hr class=\"dropdown-divider\"></li>
                                 <li><a class=\"dropdown-item\" href=\"#\" onclick=\"acknowledgeAlert({{ alert.id }})\">
@@ -364,10 +364,10 @@
             {% endif %}
         </p>
         <a href=\"{% url 'inventory:alerts_dashboard' %}\" class=\"btn btn-primary me-3\">
-            <i class=\"fas fa-dashboard me-2\"></i>View Dashboard
+            <i class=\"fas fa-dashboard me-2\"></i>عرض Dashboard
         </a>
         <a href=\"{% url 'inventory:product_list' %}\" class=\"btn btn-outline-secondary\">
-            <i class=\"fas fa-boxes me-2\"></i>View Products
+            <i class=\"fas fa-boxes me-2\"></i>عرض Products
         </a>
     </div>
     {% endif %}

@@ -11,8 +11,8 @@ class ProductForm(forms.ModelForm):
         fields = [
             'name', 'description', 'sku', 'barcode', 'category', 'brand', 'unit',
             'cost_price', 'selling_price', 'wholesale_price', 'current_stock',
-            'minimum_stock', 'maximum_stock', 'reorder_level', 'weight', 'dimensions',
-            'color', 'material', 'image', 'datasheet', 'compatible_vehicles',
+            'minimum_stock', 'maximum_stock', 'reorder_level', 'weight', 'Dimensions',
+            'color', 'materials', 'image', 'datasheet', 'compatible_vehicles',
             'part_number', 'oem_number', 'is_active', 'is_featured'
         ]
         widgets = {
@@ -31,14 +31,14 @@ class ProductForm(forms.ModelForm):
             'maximum_stock': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'reorder_level': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
             'weight': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
-            'dimensions': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'L x W x H'}),
+            'Dimensions': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'L x W x H'}),
             'color': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Color'}),
-            'material': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Material'}),
+            'materials': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'materials'}),
             'image': forms.FileInput(attrs={'class': 'form-control-file'}),
             'datasheet': forms.FileInput(attrs={'class': 'form-control-file'}),
-            'compatible_vehicles': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Compatible vehicles'}),
-            'part_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Part Number'}),
-            'oem_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'OEM Number'}),
+            'compatible_vehicles': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'المركبات المتوافقة'}),
+            'part_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'رقم القطعة'}),
+            'oem_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'رقم الشركة المصنعة للمعدات الأصلية'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -90,7 +90,7 @@ class ProductForm(forms.ModelForm):
 
         if reorder_level and minimum_stock:
             if reorder_level < minimum_stock:
-                raise ValidationError("Reorder level should not be less than minimum stock.")
+                raise ValidationError("إعادة ترتيب المستوى should not be less than minimum stock.")
 
         return cleaned_data
 

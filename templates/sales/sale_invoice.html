@@ -123,17 +123,17 @@
     <!-- Action Buttons -->
     <div class="action-buttons no-print">
         <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to Sale
+            <i class="fas fa-arrow-left me-2"></i>رجوع إلي البيع
         </a>
         <button onclick="window.print()" class="btn btn-primary">
-            <i class="fas fa-print me-2"></i>Print Invoice
+            <i class="fas fa-print me-2"></i>طباعة Invoice
         </button>
         <a href="{% url 'sales:sale_print' sale.id %}" target="_blank" class="btn btn-success">
-            <i class="fas fa-file-pdf me-2"></i>Download PDF
+            <i class="fas fa-file-pdf me-2"></i>تحميل PDF
         </a>
         {% if sale.balance_amount > 0 %}
         <a href="{% url 'sales:payment_create' sale.id %}" class="btn btn-warning">
-            <i class="fas fa-credit-card me-2"></i>Record Payment
+            <i class="fas fa-credit-card me-2"></i>تسجيل دفعة
         </a>
         {% endif %}
     </div>
@@ -154,7 +154,7 @@
                     <p class="text-muted">Email: info@sparesmart.com</p>
                 </div>
                 <div class="col-md-6 company-info">
-                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-title">فاتورة</div>
                     <div class="invoice-number">#{{ sale.sale_number }}</div>
                     <div class="mt-3">
                         <span class="badge status-badge 
@@ -187,14 +187,14 @@
             </div>
             <div class="col-md-6">
                 <div class="invoice-details">
-                    <h5 class="mb-3"><i class="fas fa-calendar me-2"></i>Invoice Details:</h5>
+                    <h5 class="mb-3"><i class="fas fa-calendar me-2"></i>الفاتورة Details:</h5>
                     <div class="row mb-2">
-                        <div class="col-6"><strong>Invoice Date:</strong></div>
+                        <div class="col-6"><strong>الفاتورة Date:</strong></div>
                         <div class="col-6">{{ sale.sale_date|date:"M d, Y" }}</div>
                     </div>
                     {% if sale.due_date %}
                     <div class="row mb-2">
-                        <div class="col-6"><strong>Due Date:</strong></div>
+                        <div class="col-6"><strong>مستحق Date:</strong></div>
                         <div class="col-6">{{ sale.due_date|date:"M d, Y" }}</div>
                     </div>
                     {% endif %}
@@ -203,7 +203,7 @@
                         <div class="col-6">{{ sale.get_sale_type_display }}</div>
                     </div>
                     <div class="row mb-2">
-                        <div class="col-6"><strong>Salesperson:</strong></div>
+                        <div class="col-6"><strong>المبيعاتperson:</strong></div>
                         <div class="col-6">{{ sale.created_by.get_full_name }}</div>
                     </div>
                 </div>
@@ -216,11 +216,11 @@
                 <thead>
                     <tr>
                         <th style="width: 5%">#</th>
-                        <th style="width: 40%">Product Description</th>
+                        <th style="width: 40%">المنتج الوصف</th>
                         <th style="width: 10%">Qty</th>
-                        <th style="width: 15%">Unit Price</th>
-                        <th style="width: 10%">Discount</th>
-                        <th style="width: 20%">Total</th>
+                        <th style="width: 15%">Unit السعر</th>
+                        <th style="width: 10%">الخصم</th>
+                        <th style="width: 20%">الإجمالي</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -229,9 +229,9 @@
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>
                             <div class="fw-bold">{{ item.product.name }}</div>
-                            <small class="text-muted">SKU: {{ item.product.sku }}</small>
+                            <small class="text-muted">رمز المنتج: {{ item.product.sku }}</small>
                             {% if item.product.brand %}
-                            <br><small class="text-muted">Brand: {{ item.product.brand.name }}</small>
+                            <br><small class="text-muted">العلامة التجارية: {{ item.product.brand.name }}</small>
                             {% endif %}
                         </td>
                         <td class="text-center">{{ item.quantity }}</td>
@@ -264,17 +264,17 @@
             <div class="col-md-6">
                 <div class="total-section">
                     <div class="total-row">
-                        <span>Subtotal:</span>
+                        <span>المجموع الفرعي:</span>
                         <span>${{ sale.subtotal|floatformat:2 }}</span>
                     </div>
                     {% if sale.discount_amount > 0 %}
                     <div class="total-row">
-                        <span>Discount:</span>
+                        <span>الخصم:</span>
                         <span class="text-success">-${{ sale.discount_amount|floatformat:2 }}</span>
                     </div>
                     {% endif %}
                     <div class="total-row final">
-                        <span>Total Amount:</span>
+                        <span>الإجمالي Amount:</span>
                         <span>${{ sale.total_amount|floatformat:2 }}</span>
                     </div>
                 </div>
@@ -284,21 +284,21 @@
         <!-- Payment Information -->
         {% if payments or sale.paid_amount > 0 %}
         <div class="payment-info">
-            <h6><i class="fas fa-credit-card me-2"></i>Payment Information:</h6>
+            <h6><i class="fas fa-credit-card me-2"></i>الدفع Information:</h6>
             <div class="row">
                 <div class="col-md-4">
                     <div class="mb-2">
-                        <strong>Total Amount:</strong> ${{ sale.total_amount|floatformat:2 }}
+                        <strong>الإجمالي Amount:</strong> ${{ sale.total_amount|floatformat:2 }}
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mb-2">
-                        <strong>Amount Paid:</strong> <span class="text-success">${{ sale.paid_amount|floatformat:2 }}</span>
+                        <strong>المبلغ Paid:</strong> <span class="text-success">${{ sale.paid_amount|floatformat:2 }}</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mb-2">
-                        <strong>Balance Due:</strong> 
+                        <strong>الرصيد Due:</strong> 
                         {% if sale.balance_amount > 0 %}
                             <span class="text-danger">${{ sale.balance_amount|floatformat:2 }}</span>
                         {% else %}
@@ -310,13 +310,13 @@
 
             {% if payments %}
             <div class="mt-3">
-                <h6>Payment History:</h6>
+                <h6>الدفع History:</h6>
                 <div class="table-responsive">
                     <table class="table table-sm">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
                                 <th>Method</th>
                                 <th>Reference</th>
                             </tr>

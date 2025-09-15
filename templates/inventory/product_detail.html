@@ -1,55 +1,98 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}Product Details - {{ product.name }} | SpareSmart{% endblock %}
+{% block title %}تفاصيل المنتج - {{ product.name }} | SpareSmart{% endblock %}
 
 {% block extra_css %}
 <style>
     .product-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
-        border-radius: 10px;
-        padding: 2rem;
+        border-radius: 15px;
+        padding: 2.5rem;
         margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    }
+    .product-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 15px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
     }
     .info-card {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 15px;
         border: none;
         margin-bottom: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    .info-card:hover {
+        transform: translateY(-2px);
     }
     .info-card .card-header {
-        background: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 2px solid #dee2e6;
         font-weight: 600;
+        border-radius: 15px 15px 0 0;
+        padding: 1rem 1.5rem;
     }
     .status-badge {
-        font-size: 0.875rem;
-        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
     }
     .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
         color: white;
-        border-radius: 10px;
+        border-radius: 15px;
         text-align: center;
-        padding: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        margin-bottom: 1.5rem;
     }
     .stat-value {
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
     }
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
     .action-buttons .btn {
-        margin: 0.25rem;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
+        margin: 0.3rem;
+        border-radius: 10px;
+        padding: 0.7rem 1.2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     .stock-movement-table {
         font-size: 0.9rem;
     }
     .profit-badge {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    .price-display {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+    .materials-badge {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
         padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin: 0.2rem;
+        display: inline-block;
     }
 </style>
 {% endblock %}
@@ -59,17 +102,45 @@
     <!-- Product Header -->
     <div class="product-header">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="mb-1">{{ product.name }}</h1>
-                <p class="mb-0 opacity-75">{{ product.description|default:"No description available" }}</p>
+            <div class="col-md-2">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                    <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                        <i class="fas fa-box fa-3x text-muted"></i>
+                    </div>
+                {% endif %}
             </div>
-            <div class="col-md-4 text-md-end">
-                <span class="badge status-badge 
-                    {% if product.status == 'active' %}bg-success
-                    {% elif product.status == 'inactive' %}bg-secondary
-                    {% else %}bg-warning{% endif %}">
-                    {{ product.get_status_display }}
+            <div class="col-md-7">
+                <h1 class="mb-2">{{ product.name }}</h1>
+                <p class="mb-2 opacity-90">{{ product.description|default:"لا يوجد وصف متاح" }}</p>
+                <div class="d-flex flex-wrap">
+                    <span class="badge bg-light text-dark me-2 mb-1">
+                        <i class="fas fa-barcode me-1"></i>{{ product.sku }}
+                    </span>
+                    {% if product.barcode %}
+                    <span class="badge bg-light text-dark me-2 mb-1">
+                        <i class="fas fa-qrcode me-1"></i>{{ product.barcode }}
+                    </span>
+                    {% endif %}
+                    {% if product.materials %}
+                    <span class="materials-badge">
+                        <i class="fas fa-industry me-1"></i>{{ product.materials }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-3 text-md-end">
+                <span class="badge status-badge
+                    {% if product.is_active %}bg-success
+                    {% else %}bg-secondary{% endif %}">
+                    {% if product.is_active %}نشط{% else %}غير نشط{% endif %}
                 </span>
+                {% if product.is_featured %}
+                <br><span class="badge bg-warning text-dark mt-2">
+                    <i class="fas fa-star me-1"></i>منتج مميز
+                </span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -80,36 +151,45 @@
             <!-- Basic Information -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>المعلومات الأساسية</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label text-muted">SKU</label>
-                                <p class="fw-bold">{{ product.sku }}</p>
+                                <label class="form-label text-muted">رمز المنتج</label>
+                                <p class="fw-bold text-primary">{{ product.sku }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Category</label>
-                                <p>{{ product.category.name }} ({{ product.category.get_vehicle_type_display }})</p>
+                                <label class="form-label text-muted">الفئة</label>
+                                <p><span class="badge bg-info">{{ product.category.name }}</span></p>
+                                <small class="text-muted">{{ product.category.get_vehicle_type_display }}</small>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Brand</label>
-                                <p>{{ product.brand.name|default:"Not specified" }}</p>
+                                <label class="form-label text-muted">العلامة التجارية</label>
+                                <p>{{ product.brand.name|default:"غير محدد" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">الوحدة</label>
+                                <p>{{ product.get_unit_display }}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label text-muted">Barcode</label>
-                                <p>{{ product.barcode|default:"Not set" }}</p>
+                                <label class="form-label text-muted">الباركود</label>
+                                <p>{{ product.barcode|default:"غير محدد" }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Unit</label>
-                                <p>{{ product.get_unit_display }}</p>
+                                <label class="form-label text-muted">الوزن</label>
+                                <p>{{ product.weight|default:"غير محدد" }} {% if product.weight %}كجم{% endif %}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label text-muted">Location</label>
-                                <p>{{ product.location|default:"Not specified" }}</p>
+                                <label class="form-label text-muted">الأبعاد</label>
+                                <p>{{ product.Dimensions|default:"غير محدد" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">اللون</label>
+                                <p>{{ product.color|default:"غير محدد" }}</p>
                             </div>
                         </div>
                     </div>
@@ -119,74 +199,122 @@
             <!-- Pricing Information -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Pricing & Profit</h5>
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>الأسعار والأرباح</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Cost Price</label>
-                                <p class="fw-bold text-danger">${{ product.cost_price }}</p>
+                            <div class="mb-3 text-center">
+                                <label class="form-label text-muted">سعر التكلفة</label>
+                                <p class="price-display text-danger">{{ product.cost_price }} ج.م</p>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Selling Price</label>
-                                <p class="fw-bold text-success">${{ product.selling_price }}</p>
+                            <div class="mb-3 text-center">
+                                <label class="form-label text-muted">سعر البيع</label>
+                                <p class="price-display text-success">{{ product.selling_price }} ج.م</p>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label text-muted">Profit Margin</label>
-                                <span class="badge profit-badge 
+                            <div class="mb-3 text-center">
+                                <label class="form-label text-muted">هامش الربح</label>
+                                <br>
+                                <span class="badge profit-badge
                                     {% if product.profit_margin >= 30 %}bg-success
                                     {% elif product.profit_margin >= 15 %}bg-warning
                                     {% else %}bg-danger{% endif %}">
-                                    {{ product.profit_margin }}%
+                                    {{ product.profit_margin|floatformat:1 }}%
                                 </span>
                             </div>
                         </div>
                     </div>
+                    {% if product.wholesale_price %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3 text-center">
+                                <label class="form-label text-muted">سعر الجملة</label>
+                                <p class="price-display text-info">{{ product.wholesale_price }} ج.م</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
+
+            <!-- Product Specifications -->
+            {% if product.part_number or product.oem_number or product.compatible_vehicles %}
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>المواصفات التقنية</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if product.part_number %}
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">رقم القطعة</label>
+                                <p class="fw-bold">{{ product.part_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if product.oem_number %}
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">رقم OEM</label>
+                                <p class="fw-bold">{{ product.oem_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if product.compatible_vehicles %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted">المركبات المتوافقة</label>
+                        <p>{{ product.compatible_vehicles }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Stock Movements -->
             <div class="card info-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Recent Stock Movements</h5>
-                    <small class="text-muted">Last 10 transactions</small>
+                    <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>حركات المخزون الأخيرة</h5>
+                    <small class="text-muted">آخر 10 عمليات</small>
                 </div>
                 <div class="card-body p-0">
-                    {% if stock_movements %}
+                    {% if recent_movements %}
                     <div class="table-responsive">
                         <table class="table table-hover stock-movement-table mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Quantity</th>
-                                    <th>Reference</th>
-                                    <th>User</th>
+                                    <th>التاريخ</th>
+                                    <th>نوع الحركة</th>
+                                    <th>الكمية</th>
+                                    <th>المرجع</th>
+                                    <th>المستخدم</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for movement in stock_movements %}
+                                {% for movement in recent_movements %}
                                 <tr>
-                                    <td>{{ movement.date }}</td>
+                                    <td>{{ movement.created_at|date:"Y/m/d H:i" }}</td>
                                     <td>
-                                        <span class="badge 
-                                            {% if movement.movement_type == 'in' %}bg-success
-                                            {% else %}bg-danger{% endif %}">
+                                        <span class="badge
+                                            {% if movement.movement_type == 'purchase' %}bg-success
+                                            {% elif movement.movement_type == 'sale' %}bg-danger
+                                            {% elif movement.movement_type == 'adjustment' %}bg-warning
+                                            {% else %}bg-info{% endif %}">
                                             {{ movement.get_movement_type_display }}
                                         </span>
                                     </td>
                                     <td class="
-                                        {% if movement.movement_type == 'in' %}text-success
+                                        {% if movement.movement_type == 'purchase' or movement.movement_type == 'return_in' %}text-success
                                         {% else %}text-danger{% endif %}">
-                                        {% if movement.movement_type == 'in' %}+{% else %}-{% endif %}{{ movement.quantity }}
+                                        {% if movement.movement_type == 'purchase' or movement.movement_type == 'return_in' %}+{% else %}-{% endif %}{{ movement.quantity }}
                                     </td>
-                                    <td>{{ movement.reference|default:"-" }}</td>
-                                    <td>{{ movement.user.get_full_name }}</td>
+                                    <td>{{ movement.reference_number|default:"-" }}</td>
+                                    <td>{{ movement.created_by.get_full_name|default:movement.created_by.username }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -195,7 +323,7 @@
                     {% else %}
                     <div class="text-center py-4">
                         <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">No stock movements recorded yet.</p>
+                        <p class="text-muted">لم يتم تسجيل أي حركات مخزون بعد</p>
                     </div>
                     {% endif %}
                 </div>
@@ -205,46 +333,61 @@
         <!-- Sidebar Stats -->
         <div class="col-lg-4">
             <!-- Current Stock -->
-            <div class="stat-card mb-4">
+            <div class="stat-card">
                 <div class="stat-value">{{ product.current_stock }}</div>
-                <div class="stat-label">Current Stock</div>
+                <div class="stat-label">المخزون الحالي</div>
+                <small class="opacity-75">{{ product.get_unit_display }}</small>
             </div>
 
             <!-- Stock Status -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-warehouse me-2"></i>Stock Information</h6>
+                    <h6 class="mb-0"><i class="fas fa-warehouse me-2"></i>معلومات المخزون</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label text-muted">Minimum Stock</label>
-                        <p class="fw-bold">{{ product.minimum_stock }}</p>
+                        <label class="form-label text-muted">الحد الأدنى للمخزون</label>
+                        <p class="fw-bold text-warning">{{ product.minimum_stock }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Maximum Stock</label>
-                        <p class="fw-bold">{{ product.maximum_stock|default:"Not set" }}</p>
+                        <label class="form-label text-muted">الحد الأقصى للمخزون</label>
+                        <p class="fw-bold text-info">{{ product.maximum_stock|default:"غير محدد" }}</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">Stock Status</label>
+                        <label class="form-label text-muted">مستوى إعادة الطلب</label>
+                        <p class="fw-bold text-primary">{{ product.reorder_level }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">حالة المخزون</label>
                         <br>
-                        <span class="badge status-badge 
+                        <span class="badge status-badge
                             {% if product.stock_status == 'in_stock' %}bg-success
                             {% elif product.stock_status == 'low_stock' %}bg-warning
-                            {% else %}bg-danger{% endif %}">
-                            {{ product.get_stock_status_display }}
+                            {% elif product.stock_status == 'out_of_stock' %}bg-danger
+                            {% else %}bg-info{% endif %}">
+                            {% if product.stock_status == 'in_stock' %}متوفر
+                            {% elif product.stock_status == 'low_stock' %}مخزون منخفض
+                            {% elif product.stock_status == 'out_of_stock' %}نفد المخزون
+                            {% else %}{{ product.stock_status }}{% endif %}
                         </span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">القيمة الإجمالية</label>
+                        <p class="fw-bold text-success">{{ total_value|floatformat:2 }} ج.م</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Vehicle Compatibility -->
-            {% if product.compatible_vehicles %}
+            <!-- Files and Documents -->
+            {% if product.datasheet %}
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-car me-2"></i>Vehicle Compatibility</h6>
+                    <h6 class="mb-0"><i class="fas fa-file-pdf me-2"></i>المستندات</h6>
                 </div>
                 <div class="card-body">
-                    <p>{{ product.compatible_vehicles }}</p>
+                    <a href="{{ product.datasheet.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-download me-1"></i>تحميل ورقة البيانات
+                    </a>
                 </div>
             </div>
             {% endif %}
@@ -252,69 +395,116 @@
             <!-- Action Buttons -->
             <div class="card info-card">
                 <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Actions</h6>
+                    <h6 class="mb-0"><i class="fas fa-tools me-2"></i>الإجراءات</h6>
                 </div>
-                <div class="card-body action-buttons">
-                    <a href="{% url 'inventory:product_update' product.id %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit me-1"></i>Edit Product
+                <div class="card-body action-buttons text-center">
+                    <a href="{% url 'inventory:product_update' product.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>تعديل المنتج
                     </a>
-                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#stockModal">
-                        <i class="fas fa-plus me-1"></i>Add Stock
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#stockModal">
+                        <i class="fas fa-plus me-1"></i>إضافة مخزون
                     </button>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#adjustModal">
-                        <i class="fas fa-adjust me-1"></i>Adjust Stock
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#adjustModal">
+                        <i class="fas fa-adjust me-1"></i>تعديل المخزون
                     </button>
-                    <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    <a href="{% url 'inventory:product_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-1"></i>العودة للقائمة
                     </a>
                 </div>
             </div>
 
             <!-- Timestamps -->
             <div class="card info-card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>معلومات التوقيت</h6>
+                </div>
                 <div class="card-body">
-                    <small class="text-muted">
-                        <div class="mb-1">
-                            <strong>Created:</strong> {{ product.created_at|date:"M d, Y H:i" }}
-                        </div>
-                        <div>
-                            <strong>Updated:</strong> {{ product.updated_at|date:"M d, Y H:i" }}
-                        </div>
-                    </small>
+                    <div class="mb-2">
+                        <small class="text-muted">تاريخ الإنشاء:</small>
+                        <br><strong>{{ product.created_at|date:"Y/m/d H:i" }}</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted">آخر تحديث:</small>
+                        <br><strong>{{ product.updated_at|date:"Y/m/d H:i" }}</strong>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Stock Adjustment Modal -->
+<!-- Stock Addition Modal -->
 <div class="modal fade" id="stockModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Stock</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>إضافة مخزون</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="#">
+                <form method="post" action="#" id="addStockForm">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label">Quantity to Add</label>
+                        <label class="form-label">الكمية المراد إضافتها</label>
                         <input type="number" class="form-control" name="quantity" min="1" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Reference</label>
-                        <input type="text" class="form-control" name="reference" placeholder="Purchase order, etc.">
+                        <label class="form-label">المرجع</label>
+                        <input type="text" class="form-control" name="reference" placeholder="رقم أمر الشراء، إلخ...">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                        <label class="form-label">ملاحظات</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-success">Add Stock</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="submit" form="addStockForm" class="btn btn-success">إضافة المخزون</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Adjustment Modal -->
+<div class="modal fade" id="adjustModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title"><i class="fas fa-adjust me-2"></i>تعديل المخزون</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="#" id="adjustStockForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">المخزون الحالي</label>
+                        <input type="number" class="form-control" value="{{ product.current_stock }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">المخزون الجديد</label>
+                        <input type="number" class="form-control" name="new_stock" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">سبب التعديل</label>
+                        <select class="form-control" name="reason" required>
+                            <option value="">اختر السبب</option>
+                            <option value="damaged">تالف</option>
+                            <option value="lost">مفقود</option>
+                            <option value="expired">منتهي الصلاحية</option>
+                            <option value="recount">إعادة عد</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ملاحظات</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="تفاصيل التعديل..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="submit" form="adjustStockForm" class="btn btn-warning">تعديل المخزون</button>
             </div>
         </div>
     </div>
