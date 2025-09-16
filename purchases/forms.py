@@ -8,7 +8,7 @@ from inventory.models import Product, Supplier
 
 class PurchaseForm(forms.ModelForm):
     """Form for creating and editing purchase orders"""
-    
+
     class Meta:
         model = Purchase
         fields = [
@@ -17,6 +17,20 @@ class PurchaseForm(forms.ModelForm):
             'tax_amount', 'discount_amount', 'shipping_cost',
             'notes', 'internal_notes', 'terms_and_conditions'
         ]
+        labels = {
+            'supplier': 'المورد',
+            'expected_delivery_date': 'تاريخ التسليم المتوقع',
+            'payment_due_date': 'تاريخ استحقاق الدفع',
+            'supplier_invoice_number': 'رقم فاتورة المورد',
+            'supplier_reference': 'مرجع المورد',
+            'delivery_address': 'عنوان التسليم',
+            'tax_amount': 'مبلغ الضريبة',
+            'discount_amount': 'مبلغ الخصم',
+            'shipping_cost': 'تكلفة الشحن',
+            'notes': 'ملاحظات',
+            'internal_notes': 'ملاحظات داخلية',
+            'terms_and_conditions': 'الشروط والأحكام',
+        }
         widgets = {
             'supplier': forms.Select(attrs={
                 'class': 'form-select',
@@ -32,16 +46,16 @@ class PurchaseForm(forms.ModelForm):
             }),
             'supplier_invoice_number': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Supplier\'s invoice number'
+                'placeholder': 'رقم فاتورة المورد'
             }),
             'supplier_reference': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Supplier reference or PO number'
+                'placeholder': 'مرجع المورد أو رقم أمر الشراء'
             }),
             'delivery_address': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Delivery address (leave empty for default address)'
+                'placeholder': 'عنوان التسليم (اتركه فارغاً للعنوان الافتراضي)'
             }),
             'tax_amount': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -61,17 +75,17 @@ class PurchaseForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Purchase notes visible to supplier'
+                'placeholder': 'ملاحظات الشراء (مرئية للمورد)'
             }),
             'internal_notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Internal notes (not visible to supplier)'
+                'placeholder': 'ملاحظات داخلية (غير مرئية للمورد)'
             }),
             'terms_and_conditions': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Terms and conditions for this purchase'
+                'placeholder': 'الشروط والأحكام لهذا الشراء'
             }),
         }
 
@@ -87,30 +101,45 @@ class PurchaseForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        
-        # Validate financial fields
+
+        # Validate and convert financial fields to Decimal
+        from decimal import Decimal
+
         tax_amount = cleaned_data.get('tax_amount', 0)
         discount_amount = cleaned_data.get('discount_amount', 0)
         shipping_cost = cleaned_data.get('shipping_cost', 0)
-        
-        if tax_amount < 0:
-            raise ValidationError("Tax amount cannot be negative.")
-        
-        if discount_amount < 0:
-            raise ValidationError("Discount amount cannot be negative.")
-            
-        if shipping_cost < 0:
-            raise ValidationError("Shipping cost cannot be negative.")
-        
+
+        # Convert to Decimal for consistency
+        if tax_amount is not None:
+            cleaned_data['tax_amount'] = Decimal(str(tax_amount))
+            if cleaned_data['tax_amount'] < 0:
+                raise ValidationError("Tax amount cannot be negative.")
+
+        if discount_amount is not None:
+            cleaned_data['discount_amount'] = Decimal(str(discount_amount))
+            if cleaned_data['discount_amount'] < 0:
+                raise ValidationError("Discount amount cannot be negative.")
+
+        if shipping_cost is not None:
+            cleaned_data['shipping_cost'] = Decimal(str(shipping_cost))
+            if cleaned_data['shipping_cost'] < 0:
+                raise ValidationError("Shipping cost cannot be negative.")
+
         return cleaned_data
 
 
 class PurchaseItemForm(forms.ModelForm):
     """Form for purchase order line items"""
-    
+
     class Meta:
         model = PurchaseItem
         fields = ['product', 'quantity_ordered', 'unit_cost', 'discount_percentage']
+        labels = {
+            'product': 'المنتج',
+            'quantity_ordered': 'الكمية المطلوبة',
+            'unit_cost': 'سعر الوحدة',
+            'discount_percentage': 'نسبة الخصم (%)',
+        }
         widgets = {
             'product': forms.Select(attrs={
                 'class': 'form-select product-select',
@@ -138,7 +167,7 @@ class PurchaseItemForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['product'].queryset = Product.objects.filter(status='active').order_by('name')
+        self.fields['product'].queryset = Product.objects.filter(is_active=True).order_by('name')
         
         # Set default values
         if not self.instance.pk:

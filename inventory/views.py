@@ -502,24 +502,24 @@ def supplier_create(request):
         form = SupplierForm(request.POST)
         if form.is_valid():
             supplier = form.save()
-            
+
             ActivityLog.objects.create(
                 user=request.user,
                 action='create',
-                description=f'Created supplier: {supplier.name}',
+                description=f'تم إنشاء مورد جديد: {supplier.name}',
                 content_object=supplier
             )
-            
-            messages.success(request, f'Supplier "{supplier.name}" created successfully.')
+
+            messages.success(request, f'تم إنشاء المورد "{supplier.name}" بنجاح.')
             return redirect('inventory:supplier_detail', supplier_id=supplier.id)
     else:
         form = SupplierForm()
-    
+
     context = {
         'form': form,
-        'title': 'Add New Supplier'
+        'title': 'إضافة مورد جديد'
     }
-    
+
     return render(request, 'inventory/supplier_form.html', context)
 
 @login_required

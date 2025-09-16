@@ -71,18 +71,19 @@
 
 {% block content %}
 <div class="container-fluid">
+    {% csrf_token %}
     <!-- Page Header -->
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="mb-1">
-                    <i class="fas fa-tags me-3"></i>المنتج Categories
+                    <i class="fas fa-tags me-3"></i>فئات المنتجات
                 </h1>
-                <p class="mb-0 opacity-75">Manage product categories and vehicle types</p>
+                <p class="mb-0 opacity-75">إدارة فئات المنتجات وأنواع المركبات</p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'inventory:category_create' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>إضافة Category
+                    <i class="fas fa-plus me-2"></i>إضافة فئة جديدة
                 </a>
             </div>
         </div>
@@ -94,25 +95,25 @@
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ total_categories }}</div>
-                    <div class="stat-label">الإجمالي Categories</div>
+                    <div class="stat-label">إجمالي الفئات</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ motorcycle_categories }}</div>
-                    <div class="stat-label">Motorcycle</div>
+                    <div class="stat-label">دراجة نارية</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ car_categories }}</div>
-                    <div class="stat-label">Car</div>
+                    <div class="stat-label">سيارة</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-item">
                     <div class="stat-value">{{ tuktuk_categories }}</div>
-                    <div class="stat-label">Tuk-Tuk</div>
+                    <div class="stat-label">توكتوك</div>
                 </div>
             </div>
         </div>
@@ -122,27 +123,27 @@
     <div class="filter-card">
         <form method="get" class="row g-3">
             <div class="col-md-4">
-                <label class="form-label">بحث Categories</label>
+                <label class="form-label">بحث عن فئة معينة</label>
                 <input type="text" class="form-control" name="search" 
-                       value="{{ request.GET.search }}" placeholder="Search by name...">
+                       value="{{ request.GET.search }}" placeholder="بحث بالإسم .....">
             </div>
             <div class="col-md-3">
-                <label class="form-label">Vehicle Type</label>
+                <label class="form-label">نوع المركبة</label>
                 <select class="form-select" name="vehicle_type">
-                    <option value="">الكل Vehicle Types</option>
-                    <option value="motorcycle" {% if request.GET.vehicle_type == 'motorcycle' %}selected{% endif %}>Motorcycle</option>
-                    <option value="car" {% if request.GET.vehicle_type == 'car' %}selected{% endif %}>Car</option>
-                    <option value="tuktuk" {% if request.GET.vehicle_type == 'tuktuk' %}selected{% endif %}>Tuk-Tuk</option>
-                    <option value="general" {% if request.GET.vehicle_type == 'general' %}selected{% endif %}>General</option>
+                    <option value="">كل انواع المركبات</option>
+                    <option value="motorcycle" {% if request.GET.vehicle_type == 'motorcycle' %}selected{% endif %}>دراجية نارية</option>
+                    <option value="car" {% if request.GET.vehicle_type == 'car' %}selected{% endif %}>سيارة</option>
+                    <option value="tuktuk" {% if request.GET.vehicle_type == 'tuktuk' %}selected{% endif %}>توكتوك</option>
+                    <option value="general" {% if request.GET.vehicle_type == 'general' %}selected{% endif %}>عاك</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Sort By</label>
+                <label class="form-label">تصفية البيانات بواسطة</label>
                 <select class="form-select" name="sort">
                     <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>الاسم</option>
-                    <option value="vehicle_type" {% if request.GET.sort == 'vehicle_type' %}selected{% endif %}>Vehicle Type</option>
-                    <option value="product_count" {% if request.GET.sort == 'product_count' %}selected{% endif %}>المنتج Count</option>
-                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>التاريخ Created</option>
+                    <option value="vehicle_type" {% if request.GET.sort == 'vehicle_type' %}selected{% endif %}>نوع المركبة</option>
+                    <option value="product_count" {% if request.GET.sort == 'product_count' %}selected{% endif %}>عدد المنتجات</option>
+                    <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>تاريخ الانشاء</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -179,10 +180,10 @@
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>تعديل</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>عرض المنتجات</a></li>
+                                <li><a class="dropdown-item" href="{% url 'inventory:category_update' category.id %}"><i class="fas fa-edit me-2"></i>تعديل</a></li>
+                                <li><a class="dropdown-item" href="{% url 'inventory:product_list' %}?category={{ category.id }}"><i class="fas fa-eye me-2"></i>عرض المنتجات</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>حذف</a></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete({{ category.id }}, '{{ category.name|escapejs }}')"><i class="fas fa-trash me-2"></i>حذف</a></li>
                             </ul>
                         </div>
                     </div>
@@ -193,27 +194,27 @@
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="product-count">{{ category.product_count|default:0 }}</div>
-                            <small class="text-muted">المنتجs</small>
+                            <small class="text-muted">المنتج</small>
                         </div>
                         <div class="col-6">
                             <div class="text-muted">
                                 <i class="fas fa-calendar-alt me-1"></i>
                                 {{ category.created_at|date:"M d, Y" }}
                             </div>
-                            <small class="text-muted">إنشاءd</small>
+                            <small class="text-muted">إنشاء</small>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer bg-transparent">
                     <div class="row g-2">
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-primary btn-sm w-100">
+                            <a href="{% url 'inventory:category_update' category.id %}" class="btn btn-outline-primary btn-sm w-100">
                                 <i class="fas fa-edit me-1"></i>تعديل
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="btn btn-outline-success btn-sm w-100">
-                                <i class="fas fa-box me-1"></i>المنتجs
+                            <a href="{% url 'inventory:product_list' %}?category={{ category.id }}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="fas fa-box me-1"></i>المنتجات
                             </a>
                         </div>
                     </div>
@@ -272,15 +273,50 @@
     <!-- Empty State -->
     <div class="text-center py-5">
         <i class="fas fa-tags fa-5x text-muted mb-4"></i>
-        <h3 class="text-muted mb-3">No Categories Found</h3>
-        <p class="text-muted mb-4">Start by creating your first product category.</p>
+        <h3 class="text-muted mb-3">لم يتم العثور على فئات</h3>
+        <p class="text-muted mb-4">ابدأ بإنشاء فئة المنتج الأولى الخاصة بك.</p>
         <a href="{% url 'inventory:category_create' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus me-2"></i>إنشاء First Category
+            <i class="fas fa-plus me-2"></i>إنشاء اول فئة
         </a>
     </div>
     {% endif %}
 </div>
 {% endblock %}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>تأكيد الحذف
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                </div>
+                <h6 class="mb-3">هل أنت متأكد من حذف هذه الفئة؟</h6>
+                <p class="text-muted mb-3">
+                    <strong id="categoryName"></strong>
+                </p>
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>تحذير:</strong> لا يمكن التراجع عن هذا الإجراء!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>إلغاء
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-2"></i>حذف نهائياً
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% block extra_js %}
 <script>
@@ -292,17 +328,36 @@ document.addEventListener('DOMContentLoaded', function() {
             this.form.submit();
         });
     });
-
-    // Confirm delete actions
-    document.querySelectorAll('.dropdown-item.text-danger').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
-                // Implement delete action
-                console.log('Delete category');
-            }
-        });
-    });
 });
+
+// Global function for delete confirmation
+function confirmDelete(categoryId, categoryName) {
+    // Set category name in modal
+    document.getElementById('categoryName').textContent = categoryName;
+
+    // Set up delete action
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/inventory/categories/${categoryId}/delete/`;
+
+        // Add CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Submit form
+        document.body.appendChild(form);
+        form.submit();
+    };
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
 </script>
 {% endblock %}

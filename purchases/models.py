@@ -130,11 +130,16 @@ class PurchaseItem(models.Model):
         return self.quantity_received >= self.quantity_ordered
     
     def save(self, *args, **kwargs):
-        # Calculate total cost
-        discount_amt = (self.unit_cost * self.quantity_ordered * self.discount_percentage) / 100
+        # Calculate total cost using Decimal for precision
+        unit_cost = Decimal(str(self.unit_cost))
+        quantity = Decimal(str(self.quantity_ordered))
+        discount_pct = Decimal(str(self.discount_percentage or 0))
+
+        subtotal = unit_cost * quantity
+        discount_amt = (subtotal * discount_pct) / Decimal('100')
         self.discount_amount = discount_amt
-        self.total_cost = (self.unit_cost * self.quantity_ordered) - discount_amt
-        
+        self.total_cost = subtotal - discount_amt
+
         super().save(*args, **kwargs)
     
     class Meta:

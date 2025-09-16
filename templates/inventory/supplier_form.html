@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 1rem 1.5rem;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .sidebar-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .sidebar-info h6 {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .sidebar-info .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+    .sidebar-info .info-icon {
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">إضافة مورد جديد</h2>
+            <p class="text-muted mb-0">إضافة مورد جديد إلى النظام</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:supplier_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Basic Information -->
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-truck me-2"></i>المعلومات الأساسية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label required-field">اسم المورد</label>
+                                {{ form.name|add_class:"form-control"|attr:"placeholder:اسم المورد أو الشركة" }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.contact_person.id_for_label }}" class="form-label">الشخص المسؤول</label>
+                                {{ form.contact_person|add_class:"form-control"|attr:"placeholder:اسم الشخص المسؤول" }}
+                                {% if form.contact_person.errors %}
+                                    <div class="text-danger">{{ form.contact_person.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">البريد الإلكتروني</label>
+                                {{ form.email|add_class:"form-control"|attr:"placeholder:البريد الإلكتروني" }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">رقم الهاتف</label>
+                                {{ form.phone|add_class:"form-control"|attr:"placeholder:رقم الهاتف" }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">المدينة</label>
+                                {{ form.city|add_class:"form-control"|attr:"placeholder:المدينة" }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tax_number.id_for_label }}" class="form-label">الرقم الضريبي</label>
+                                {{ form.tax_number|add_class:"form-control"|attr:"placeholder:الرقم الضريبي" }}
+                                {% if form.tax_number.errors %}
+                                    <div class="text-danger">{{ form.tax_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">العنوان</label>
+                            {{ form.address|add_class:"form-control"|attr:"placeholder:العنوان التفصيلي" }}
+                            {% if form.address.errors %}
+                                <div class="text-danger">{{ form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-money-bill-wave me-2"></i>المعلومات المالية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.payment_terms.id_for_label }}" class="form-label">شروط الدفع</label>
+                                {{ form.payment_terms|add_class:"form-control"|attr:"placeholder:مثال: 30 يوم" }}
+                                {% if form.payment_terms.errors %}
+                                    <div class="text-danger">{{ form.payment_terms.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.credit_limit.id_for_label }}" class="form-label">الحد الائتماني</label>
+                                <div class="input-group">
+                                    {{ form.credit_limit|add_class:"form-control"|attr:"placeholder:0.00" }}
+                                    <span class="input-group-text">ج.م</span>
+                                </div>
+                                {% if form.credit_limit.errors %}
+                                    <div class="text-danger">{{ form.credit_limit.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-toggle-on me-2"></i>حالة المورد</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            {{ form.is_active|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                مورد نشط
+                            </label>
+                        </div>
+                        <small class="text-muted">يمكن إلغاء تفعيل المورد لإخفائه من القوائم</small>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ المورد
+                    </button>
+                    <a href="{% url 'inventory:supplier_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+
+                <!-- Help Information -->
+                <div class="sidebar-info">
+                    <h6><i class="fas fa-info-circle info-icon"></i>معلومات مهمة</h6>
+                    <div class="info-item">
+                        <i class="fas fa-check-circle info-icon"></i>
+                        <span>اسم المورد مطلوب</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope info-icon"></i>
+                        <span>البريد الإلكتروني للتواصل</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone info-icon"></i>
+                        <span>رقم الهاتف للتواصل السريع</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-money-bill info-icon"></i>
+                        <span>الحد الائتماني للمشتريات الآجلة</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-calendar info-icon"></i>
+                        <span>شروط الدفع تحدد مدة السداد</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -148,15 +148,15 @@ def purchase_create(request):
                             item = item_form.save(commit=False)
                             item.purchase = purchase
                             item.save()
-                            subtotal += item.total_cost
+                            subtotal += Decimal(str(item.total_cost))
                     
                     # Update purchase totals
                     purchase.subtotal = subtotal
                     purchase.total_amount = (
-                        subtotal + 
-                        (purchase.tax_amount or 0) + 
-                        (purchase.shipping_cost or 0) - 
-                        (purchase.discount_amount or 0)
+                        subtotal +
+                        Decimal(str(purchase.tax_amount or 0)) +
+                        Decimal(str(purchase.shipping_cost or 0)) -
+                        Decimal(str(purchase.discount_amount or 0))
                     )
                     purchase.balance_amount = purchase.total_amount
                     purchase.save()
@@ -165,24 +165,24 @@ def purchase_create(request):
                     ActivityLog.objects.create(
                         user=request.user,
                         action='create',
-                        description=f'Created purchase order: {purchase.purchase_number}',
+                        description=f'تم إنشاء أمر شراء: {purchase.purchase_number}',
                         content_object=purchase
                     )
-                    
-                    messages.success(request, f'Purchase order {purchase.purchase_number} created successfully.')
+
+                    messages.success(request, f'تم إنشاء أمر الشراء {purchase.purchase_number} بنجاح.')
                     return redirect('purchases:purchase_detail', purchase_id=purchase.id)
                     
             except Exception as e:
-                messages.error(request, f'Error creating purchase order: {str(e)}')
+                messages.error(request, f'خطأ في إنشاء أمر الشراء: {str(e)}')
     else:
         form = PurchaseForm()
         formset = PurchaseItemFormSet()
-    
+
     context = {
         'form': form,
         'formset': formset,
-        'title': 'Create Purchase Order',
-        'action': 'Create'
+        'title': 'إنشاء أمر شراء جديد',
+        'action': 'إنشاء'
     }
     
     return render(request, 'purchases/purchase_form.html', context)
@@ -242,15 +242,15 @@ def purchase_update(request, purchase_id):
                     formset.save()
                     
                     for item in updated_purchase.items.all():
-                        subtotal += item.total_cost
+                        subtotal += Decimal(str(item.total_cost))
                     
                     # Update purchase totals
                     updated_purchase.subtotal = subtotal
                     updated_purchase.total_amount = (
-                        subtotal + 
-                        (updated_purchase.tax_amount or 0) + 
-                        (updated_purchase.shipping_cost or 0) - 
-                        (updated_purchase.discount_amount or 0)
+                        subtotal +
+                        Decimal(str(updated_purchase.tax_amount or 0)) +
+                        Decimal(str(updated_purchase.shipping_cost or 0)) -
+                        Decimal(str(updated_purchase.discount_amount or 0))
                     )
                     updated_purchase.save()
                     
@@ -493,7 +493,7 @@ def quick_purchase(request):
                             quantity_ordered=quantity,
                             unit_cost=unit_cost
                         )
-                        subtotal += item.total_cost
+                        subtotal += Decimal(str(item.total_cost))
                     
                     # Update purchase totals
                     purchase.subtotal = subtotal

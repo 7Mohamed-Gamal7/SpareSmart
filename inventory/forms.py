@@ -171,7 +171,7 @@ class CustomerForm(forms.ModelForm):
 
 class SupplierForm(forms.ModelForm):
     """Form for creating and updating suppliers"""
-    
+
     class Meta:
         model = Supplier
         fields = [
@@ -179,16 +179,58 @@ class SupplierForm(forms.ModelForm):
             'tax_number', 'payment_terms', 'credit_limit', 'is_active'
         ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Supplier Name'}),
-            'contact_person': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact Person'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email Address'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Address'}),
-            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}),
-            'tax_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tax Number'}),
-            'payment_terms': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Payment Terms'}),
-            'credit_limit': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم المورد أو الشركة'
+            }),
+            'contact_person': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم الشخص المسؤول'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'البريد الإلكتروني'
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم الهاتف'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'العنوان التفصيلي'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'المدينة'
+            }),
+            'tax_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'الرقم الضريبي'
+            }),
+            'payment_terms': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'مثال: 30 يوم'
+            }),
+            'credit_limit': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'placeholder': '0.00'
+            }),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': 'اسم المورد',
+            'contact_person': 'الشخص المسؤول',
+            'email': 'البريد الإلكتروني',
+            'phone': 'رقم الهاتف',
+            'address': 'العنوان',
+            'city': 'المدينة',
+            'tax_number': 'الرقم الضريبي',
+            'payment_terms': 'شروط الدفع',
+            'credit_limit': 'الحد الائتماني',
+            'is_active': 'مورد نشط',
         }
 
 class StockAdjustmentForm(forms.ModelForm):

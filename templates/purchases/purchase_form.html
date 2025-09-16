@@ -1,0 +1,720 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        border: none;
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 1rem 1.5rem;
+        border: none;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+        color: white !important;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .item-row {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+    }
+    .item-row:hover {
+        background: #e9ecef;
+        transition: background-color 0.2s ease;
+    }
+    .delete-item {
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+    .delete-item:hover {
+        color: #c82333;
+    }
+    .summary-card {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .summary-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .add-item-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .add-item-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-shopping-cart me-3"></i>{{ title }}
+                </h1>
+                <p class="mb-0 opacity-75">إنشاء أمر شراء جديد من المورد</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'purchases:purchase_list' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate id="purchaseForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <!-- Purchase Information -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-info-circle me-2"></i>معلومات أمر الشراء</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.supplier.id_for_label }}" class="form-label required-field">المورد</label>
+                                {{ form.supplier|add_class:"form-select" }}
+                                {% if form.supplier.errors %}
+                                    <div class="text-danger">{{ form.supplier.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.expected_delivery_date.id_for_label }}" class="form-label">تاريخ التسليم المتوقع</label>
+                                {{ form.expected_delivery_date|add_class:"form-control" }}
+                                {% if form.expected_delivery_date.errors %}
+                                    <div class="text-danger">{{ form.expected_delivery_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.payment_due_date.id_for_label }}" class="form-label">تاريخ استحقاق الدفع</label>
+                                {{ form.payment_due_date|add_class:"form-control" }}
+                                {% if form.payment_due_date.errors %}
+                                    <div class="text-danger">{{ form.payment_due_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.supplier_invoice_number.id_for_label }}" class="form-label">رقم فاتورة المورد</label>
+                                {{ form.supplier_invoice_number|add_class:"form-control" }}
+                                {% if form.supplier_invoice_number.errors %}
+                                    <div class="text-danger">{{ form.supplier_invoice_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.supplier_reference.id_for_label }}" class="form-label">مرجع المورد</label>
+                                {{ form.supplier_reference|add_class:"form-control" }}
+                                {% if form.supplier_reference.errors %}
+                                    <div class="text-danger">{{ form.supplier_reference.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.delivery_address.id_for_label }}" class="form-label">عنوان التسليم</label>
+                            {{ form.delivery_address|add_class:"form-control" }}
+                            {% if form.delivery_address.errors %}
+                                <div class="text-danger">{{ form.delivery_address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Items -->
+                <div class="form-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6><i class="fas fa-list me-2"></i>عناصر أمر الشراء</h6>
+                        <button type="button" class="add-item-btn" id="addItemBtn">
+                            <i class="fas fa-plus me-1"></i>إضافة عنصر
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {{ formset.management_form }}
+                        
+                        <div id="itemsContainer">
+                            {% for form in formset %}
+                                <div class="item-row" data-form-index="{{ forloop.counter0 }}">
+                                    <div class="row align-items-end">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">المنتج</label>
+                                            {{ form.product|add_class:"form-select product-select" }}
+                                            {% if form.product.errors %}
+                                                <div class="text-danger">{{ form.product.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2 mb-3">
+                                            <label class="form-label">الكمية</label>
+                                            {{ form.quantity_ordered|add_class:"form-control quantity-input" }}
+                                            {% if form.quantity_ordered.errors %}
+                                                <div class="text-danger">{{ form.quantity_ordered.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2 mb-3">
+                                            <label class="form-label">سعر الوحدة</label>
+                                            {{ form.unit_cost|add_class:"form-control cost-input" }}
+                                            {% if form.unit_cost.errors %}
+                                                <div class="text-danger">{{ form.unit_cost.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-2 mb-3">
+                                            <label class="form-label">خصم (%)</label>
+                                            {{ form.discount_percentage|add_class:"form-control discount-input" }}
+                                            {% if form.discount_percentage.errors %}
+                                                <div class="text-danger">{{ form.discount_percentage.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-1 mb-3">
+                                            <label class="form-label">الإجمالي</label>
+                                            <div class="form-control-plaintext item-total">0.00</div>
+                                        </div>
+                                        <div class="col-md-1 mb-3">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-item-btn">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {{ form.DELETE }}
+                                        </div>
+                                    </div>
+                                    {% for hidden in form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Details -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-calculator me-2"></i>التفاصيل المالية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.tax_amount.id_for_label }}" class="form-label">مبلغ الضريبة</label>
+                                <div class="input-group">
+                                    {{ form.tax_amount|add_class:"form-control" }}
+                                    <span class="input-group-text">ج.م</span>
+                                </div>
+                                {% if form.tax_amount.errors %}
+                                    <div class="text-danger">{{ form.tax_amount.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.discount_amount.id_for_label }}" class="form-label">مبلغ الخصم</label>
+                                <div class="input-group">
+                                    {{ form.discount_amount|add_class:"form-control" }}
+                                    <span class="input-group-text">ج.م</span>
+                                </div>
+                                {% if form.discount_amount.errors %}
+                                    <div class="text-danger">{{ form.discount_amount.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.shipping_cost.id_for_label }}" class="form-label">تكلفة الشحن</label>
+                                <div class="input-group">
+                                    {{ form.shipping_cost|add_class:"form-control" }}
+                                    <span class="input-group-text">ج.م</span>
+                                </div>
+                                {% if form.shipping_cost.errors %}
+                                    <div class="text-danger">{{ form.shipping_cost.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes and Terms -->
+                <div class="form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-sticky-note me-2"></i>الملاحظات والشروط</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">ملاحظات</label>
+                            {{ form.notes|add_class:"form-control" }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger">{{ form.notes.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.internal_notes.id_for_label }}" class="form-label">ملاحظات داخلية</label>
+                            {{ form.internal_notes|add_class:"form-control" }}
+                            {% if form.internal_notes.errors %}
+                                <div class="text-danger">{{ form.internal_notes.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.terms_and_conditions.id_for_label }}" class="form-label">الشروط والأحكام</label>
+                            {{ form.terms_and_conditions|add_class:"form-control" }}
+                            {% if form.terms_and_conditions.errors %}
+                                <div class="text-danger">{{ form.terms_and_conditions.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Summary -->
+                <div class="summary-card">
+                    <h6 class="mb-3"><i class="fas fa-chart-line me-2"></i>ملخص أمر الشراء</h6>
+                    
+                    <div class="summary-item">
+                        <span>المجموع الفرعي:</span>
+                        <span id="subtotalAmount">0.00 ج.م</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>الضريبة:</span>
+                        <span id="taxAmount">0.00 ج.م</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>الخصم:</span>
+                        <span id="discountAmount">0.00 ج.م</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>الشحن:</span>
+                        <span id="shippingAmount">0.00 ج.م</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>الإجمالي النهائي:</span>
+                        <span id="totalAmount">0.00 ج.م</span>
+                    </div>
+                    
+                    <hr class="my-3" style="border-color: rgba(255, 255, 255, 0.3);">
+                    
+                    <div class="summary-item">
+                        <span>عدد العناصر:</span>
+                        <span id="totalItems">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>إجمالي الكمية:</span>
+                        <span id="totalQuantity">0</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>{{ action }} أمر الشراء
+                    </button>
+                    <a href="{% url 'purchases:purchase_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let formIndex = {{ formset.total_form_count }};
+    const maxForms = parseInt(document.getElementById('id_items-MAX_NUM_FORMS').value);
+
+    console.log('Initial formIndex:', formIndex, 'maxForms:', maxForms);
+
+    // Initialize existing forms
+    const existingRows = document.querySelectorAll('.item-row');
+    console.log('Found', existingRows.length, 'existing rows');
+
+    existingRows.forEach(function(row, index) {
+        console.log('Initializing row', index);
+        initializeItemRow(row);
+    });
+
+    // Ensure we have at least one row
+    if (existingRows.length === 0) {
+        console.log('No existing rows found, this might cause issues');
+    }
+
+    // Add new item button
+    document.getElementById('addItemBtn').addEventListener('click', function() {
+        if (formIndex < maxForms) {
+            addNewItemRow();
+        } else {
+            alert('تم الوصول للحد الأقصى من العناصر');
+        }
+    });
+
+    // Form submission validation
+    document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+        }
+    });
+
+    function addNewItemRow() {
+        const container = document.getElementById('itemsContainer');
+        const existingRows = document.querySelectorAll('.item-row');
+
+        if (existingRows.length === 0) {
+            console.error('No existing item rows found to clone');
+            return;
+        }
+
+        const emptyForm = existingRows[0].cloneNode(true);
+
+        // Update form index
+        emptyForm.setAttribute('data-form-index', formIndex);
+
+        // Clear values and update field names
+        emptyForm.querySelectorAll('input, select, textarea').forEach(function(field) {
+            const name = field.name;
+            if (name) {
+                field.name = name.replace(/items-\d+/, `items-${formIndex}`);
+                field.id = field.id.replace(/items-\d+/, `items-${formIndex}`);
+            }
+
+            if (field.type === 'checkbox') {
+                field.checked = false;
+            } else if (field.type !== 'hidden') {
+                field.value = '';
+            }
+
+            // Clear any error classes
+            field.classList.remove('is-invalid');
+        });
+
+        // Clear error messages
+        emptyForm.querySelectorAll('.text-danger').forEach(function(errorDiv) {
+            errorDiv.remove();
+        });
+
+        // Clear total display
+        const totalDisplay = emptyForm.querySelector('.item-total');
+        if (totalDisplay) {
+            totalDisplay.textContent = '0.00';
+        }
+
+        // Add to container
+        container.appendChild(emptyForm);
+
+        // Initialize the new row
+        initializeItemRow(emptyForm);
+
+        // Update form count
+        formIndex++;
+        updateFormCount();
+        calculateTotals();
+
+        console.log('Added new item row with index:', formIndex - 1);
+    }
+
+    function initializeItemRow(row) {
+        const deleteBtn = row.querySelector('.delete-item-btn');
+        const quantityInput = row.querySelector('.quantity-input');
+        const costInput = row.querySelector('.cost-input');
+        const discountInput = row.querySelector('.discount-input');
+        const productSelect = row.querySelector('.product-select');
+
+        // Remove existing event listeners to prevent duplicates
+        const newDeleteBtn = deleteBtn.cloneNode(true);
+        deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+
+        // Delete button
+        newDeleteBtn.addEventListener('click', function() {
+            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                row.style.display = 'none';
+                console.log('Marked row for deletion');
+            } else {
+                row.remove();
+                console.log('Removed row from DOM');
+            }
+            updateFormCount();
+            calculateTotals();
+        });
+
+        // Calculate item total on input change
+        [quantityInput, costInput, discountInput, productSelect].forEach(function(input) {
+            if (input) {
+                // Remove existing listeners
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+
+                newInput.addEventListener('input', function() {
+                    // Remove error styling
+                    newInput.style.borderColor = '';
+                    calculateItemTotal(row);
+                    calculateTotals();
+                });
+
+                newInput.addEventListener('change', function() {
+                    // Remove error styling
+                    newInput.style.borderColor = '';
+                    calculateItemTotal(row);
+                    calculateTotals();
+                });
+            }
+        });
+
+        // Initial calculation
+        calculateItemTotal(row);
+    }
+
+    function calculateItemTotal(row) {
+        const quantityInput = row.querySelector('.quantity-input');
+        const costInput = row.querySelector('.cost-input');
+        const discountInput = row.querySelector('.discount-input');
+        const totalDisplay = row.querySelector('.item-total');
+
+        if (!quantityInput || !costInput || !totalDisplay) {
+            console.error('Missing required inputs in row');
+            return;
+        }
+
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const unitCost = parseFloat(costInput.value) || 0;
+        const discountPercentage = parseFloat(discountInput ? discountInput.value : 0) || 0;
+
+        const subtotal = quantity * unitCost;
+        const discountAmount = (subtotal * discountPercentage) / 100;
+        const total = Math.max(0, subtotal - discountAmount);
+
+        totalDisplay.textContent = total.toFixed(2);
+
+        console.log(`Item total calculated: ${quantity} × ${unitCost} - ${discountPercentage}% = ${total.toFixed(2)}`);
+    }
+
+    function calculateTotals() {
+        let subtotal = 0;
+        let totalItems = 0;
+        let totalQuantity = 0;
+
+        document.querySelectorAll('.item-row').forEach(function(row) {
+            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteCheckbox && deleteCheckbox.checked) return;
+            if (row.style.display === 'none') return;
+
+            const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            const itemTotal = parseFloat(row.querySelector('.item-total').textContent) || 0;
+
+            if (quantity > 0 && itemTotal > 0) {
+                subtotal += itemTotal;
+                totalItems++;
+                totalQuantity += quantity;
+            }
+        });
+
+        const taxAmount = parseFloat(document.querySelector('input[name="tax_amount"]').value) || 0;
+        const discountAmount = parseFloat(document.querySelector('input[name="discount_amount"]').value) || 0;
+        const shippingCost = parseFloat(document.querySelector('input[name="shipping_cost"]').value) || 0;
+        const totalAmount = subtotal + taxAmount - discountAmount + shippingCost;
+
+        document.getElementById('subtotalAmount').textContent = `${subtotal.toFixed(2)} ج.م`;
+        document.getElementById('taxAmount').textContent = `${taxAmount.toFixed(2)} ج.م`;
+        document.getElementById('discountAmount').textContent = `${discountAmount.toFixed(2)} ج.م`;
+        document.getElementById('shippingAmount').textContent = `${shippingCost.toFixed(2)} ج.م`;
+        document.getElementById('totalAmount').textContent = `${totalAmount.toFixed(2)} ج.م`;
+        document.getElementById('totalItems').textContent = totalItems;
+        document.getElementById('totalQuantity').textContent = totalQuantity;
+    }
+
+    function updateFormCount() {
+        const totalForms = document.querySelectorAll('.item-row').length;
+        const totalFormsInput = document.getElementById('id_items-TOTAL_FORMS');
+
+        if (totalFormsInput) {
+            totalFormsInput.value = totalForms;
+            console.log('Updated TOTAL_FORMS to:', totalForms);
+        } else {
+            console.error('TOTAL_FORMS input not found');
+        }
+    }
+
+    function validateForm() {
+        const items = document.querySelectorAll('.item-row');
+        let hasValidItem = false;
+        let validItemsCount = 0;
+        let totalRows = 0;
+        let deletedRows = 0;
+
+        console.log('Validating form with', items.length, 'item rows');
+
+        items.forEach(function(row, index) {
+            totalRows++;
+            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            const isDeleted = deleteCheckbox && deleteCheckbox.checked;
+            const isHidden = row.style.display === 'none';
+
+            if (isDeleted || isHidden) {
+                deletedRows++;
+                console.log(`Row ${index}: DELETED or HIDDEN`);
+                return;
+            }
+
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const costInput = row.querySelector('.cost-input');
+
+            const product = productSelect ? productSelect.value : '';
+            const quantity = parseFloat(quantityInput ? quantityInput.value : 0) || 0;
+            const unitCost = parseFloat(costInput ? costInput.value : 0) || 0;
+
+            console.log(`Row ${index}: product="${product}", quantity=${quantity}, cost=${unitCost}`);
+
+            if (product && product !== '' && quantity > 0 && unitCost > 0) {
+                hasValidItem = true;
+                validItemsCount++;
+                console.log(`Row ${index}: VALID ITEM`);
+            } else {
+                console.log(`Row ${index}: INVALID - missing product, quantity, or cost`);
+            }
+        });
+
+        console.log(`Summary: Total rows: ${totalRows}, Deleted: ${deletedRows}, Valid: ${validItemsCount}`);
+
+        if (!hasValidItem) {
+            alert('يرجى إضافة عنصر واحد على الأقل لأمر الشراء.\n\nتأكد من:\n- اختيار المنتج\n- إدخال الكمية (أكبر من 0)\n- إدخال سعر الوحدة (أكبر من 0)\n- عدم حذف جميع العناصر');
+
+            // Highlight first invalid row
+            items.forEach(function(row, index) {
+                const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (deleteCheckbox && deleteCheckbox.checked) return;
+                if (row.style.display === 'none') return;
+
+                const productSelect = row.querySelector('.product-select');
+                const quantityInput = row.querySelector('.quantity-input');
+                const costInput = row.querySelector('.cost-input');
+
+                if (!productSelect.value) {
+                    productSelect.focus();
+                    productSelect.style.borderColor = '#dc3545';
+                    return false;
+                }
+                if (!quantityInput.value || parseFloat(quantityInput.value) <= 0) {
+                    quantityInput.focus();
+                    quantityInput.style.borderColor = '#dc3545';
+                    return false;
+                }
+                if (!costInput.value || parseFloat(costInput.value) <= 0) {
+                    costInput.focus();
+                    costInput.style.borderColor = '#dc3545';
+                    return false;
+                }
+            });
+
+            return false;
+        }
+
+        // Update total forms count before submission
+        updateFormCount();
+
+        console.log('Form validation PASSED');
+        return true;
+    }
+
+    // Listen for changes in financial fields
+    ['tax_amount', 'discount_amount', 'shipping_cost'].forEach(function(fieldName) {
+        const field = document.querySelector(`input[name="${fieldName}"]`);
+        if (field) {
+            field.addEventListener('input', calculateTotals);
+        }
+    });
+
+    // Initial calculations
+    calculateTotals();
+});
+</script>
+{% endblock %}
