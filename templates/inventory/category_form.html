@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 15px;
+        border: none;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    .form-card:hover {
+        transform: translateY(-2px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    .info-icon {
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .vehicle-type-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0.2rem;
+    }
+    .vehicle-motorcycle { background: #e3f2fd; color: #1976d2; }
+    .vehicle-car { background: #f3e5f5; color: #7b1fa2; }
+    .vehicle-tuktuk { background: #fff3e0; color: #f57c00; }
+    .vehicle-general { background: #e8f5e8; color: #388e3c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">{{ title }}</h2>
+                <p class="text-muted mb-0">إضافة أو تعديل فئة للمنتجات</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-tags me-2"></i>معلومات الفئة</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label required-field">اسم الفئة</label>
+                            {{ form.name|add_class:"form-control" }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">مثال: قطع غيار المحرك، إطارات، زيوت</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">الوصف</label>
+                            {{ form.description|add_class:"form-control" }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">وصف اختياري للفئة</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.vehicle_type.id_for_label }}" class="form-label">نوع المركبة</label>
+                                {{ form.vehicle_type|add_class:"form-select" }}
+                                {% if form.vehicle_type.errors %}
+                                    <div class="text-danger">{{ form.vehicle_type.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">نوع المركبة المناسبة لهذه الفئة</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.parent_category.id_for_label }}" class="form-label">الفئة الأب</label>
+                                {{ form.parent_category|add_class:"form-select" }}
+                                {% if form.parent_category.errors %}
+                                    <div class="text-danger">{{ form.parent_category.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">اختياري - لإنشاء فئة فرعية</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-toggle-on me-2"></i>حالة الفئة</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            {{ form.is_active|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                فئة نشطة
+                            </label>
+                        </div>
+                        <small class="text-muted">الفئات غير النشطة لا تظهر في قوائم الاختيار</small>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Vehicle Types Info -->
+                <div class="info-box">
+                    <h6><i class="fas fa-car info-icon"></i>أنواع المركبات</h6>
+                    <div class="mb-3">
+                        <span class="vehicle-type-badge vehicle-motorcycle">دراجة نارية</span>
+                        <span class="vehicle-type-badge vehicle-car">سيارة</span>
+                        <span class="vehicle-type-badge vehicle-tuktuk">توك توك</span>
+                        <span class="vehicle-type-badge vehicle-general">عام</span>
+                    </div>
+                    <ul class="mb-0">
+                        <li><strong>دراجة نارية:</strong> قطع غيار الدراجات النارية</li>
+                        <li><strong>سيارة:</strong> قطع غيار السيارات</li>
+                        <li><strong>توك توك:</strong> قطع غيار التوك توك</li>
+                        <li><strong>عام:</strong> قطع غيار مشتركة</li>
+                    </ul>
+                </div>
+
+                <!-- Category Hierarchy Info -->
+                <div class="info-box">
+                    <h6><i class="fas fa-sitemap info-icon"></i>التسلسل الهرمي</h6>
+                    <p class="mb-2">يمكنك إنشاء فئات فرعية عن طريق اختيار فئة أب:</p>
+                    <ul class="mb-0">
+                        <li><strong>مثال:</strong> قطع غيار المحرك</li>
+                        <li class="ms-3">└ مكابس</li>
+                        <li class="ms-3">└ صمامات</li>
+                        <li class="ms-3">└ حلقات مكبس</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ الفئة
+                    </button>
+                    <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    const nameField = document.querySelector('input[name="name"]');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        if (!nameField.value.trim()) {
+            isValid = false;
+            nameField.classList.add('is-invalid');
+        } else {
+            nameField.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('يرجى ملء جميع الحقول المطلوبة');
+        }
+    });
+    
+    // Real-time validation
+    nameField.addEventListener('input', function() {
+        if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        } else {
+            this.classList.remove('is-valid');
+        }
+    });
+    
+    // Vehicle type badge update
+    const vehicleTypeSelect = document.querySelector('select[name="vehicle_type"]');
+    if (vehicleTypeSelect) {
+        vehicleTypeSelect.addEventListener('change', function() {
+            // Visual feedback for selected vehicle type
+            const badges = document.querySelectorAll('.vehicle-type-badge');
+            badges.forEach(badge => badge.style.opacity = '0.5');
+            
+            const selectedClass = 'vehicle-' + this.value;
+            const selectedBadge = document.querySelector('.' + selectedClass);
+            if (selectedBadge) {
+                selectedBadge.style.opacity = '1';
+                selectedBadge.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    selectedBadge.style.transform = 'scale(1)';
+                }, 200);
+            }
+        });
+        
+        // Trigger on page load
+        vehicleTypeSelect.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

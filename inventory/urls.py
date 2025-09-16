@@ -14,6 +14,14 @@ urlpatterns = [
     # Categories
     path('categories/', views.category_list, name='category_list'),
     path('categories/create/', views.category_create, name='category_create'),
+    path('categories/<int:category_id>/edit/', views.category_update, name='category_update'),
+    path('categories/<int:category_id>/delete/', views.category_delete, name='category_delete'),
+
+    # Units
+    path('units/', views.unit_list, name='unit_list'),
+    path('units/create/', views.unit_create, name='unit_create'),
+    path('units/<int:unit_id>/edit/', views.unit_update, name='unit_update'),
+    path('units/<int:unit_id>/delete/', views.unit_delete, name='unit_delete'),
     
     # Customers
     path('customers/', views.customer_list, name='customer_list'),
@@ -38,4 +46,13 @@ urlpatterns = [
     path('alerts/bulk-acknowledge/', views.bulk_acknowledge_alerts, name='bulk_acknowledge_alerts'),
     path('alerts/refresh/', views.refresh_alerts, name='refresh_alerts'),
     path('purchase-requirements/', views.purchase_requirements, name='purchase_requirements'),
+
+    # Settings Management
+    path('settings/', views.settings_dashboard, name='settings_dashboard'),
+    path('settings/shop/', views.shop_settings, name='shop_settings'),
+
+    # Invoice Management
+    path('invoices/', views.invoice_list, name='invoice_list'),
+    path('invoices/create/', views.invoice_create, name='invoice_create'),
+    path('invoices/<int:invoice_id>/', views.invoice_detail, name='invoice_detail'),
 ]

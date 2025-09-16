@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 15px;
+        border: none;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    .form-card:hover {
+        transform: translateY(-2px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25em;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    .info-icon {
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">{{ title }}</h2>
+                <p class="text-muted mb-0">إضافة أو تعديل وحدة قياس للمنتجات</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:unit_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-ruler me-2"></i>معلومات الوحدة</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name_arabic.id_for_label }}" class="form-label required-field">اسم الوحدة (عربي)</label>
+                                {{ form.name_arabic|add_class:"form-control" }}
+                                {% if form.name_arabic.errors %}
+                                    <div class="text-danger">{{ form.name_arabic.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">مثال: قطعة، متر، كيلوجرام</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.abbreviation.id_for_label }}" class="form-label required-field">الاختصار</label>
+                                {{ form.abbreviation|add_class:"form-control" }}
+                                {% if form.abbreviation.errors %}
+                                    <div class="text-danger">{{ form.abbreviation.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted">مثال: قطع، م، كجم</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label required-field">اسم الوحدة (إنجليزي)</label>
+                            {{ form.name|add_class:"form-control" }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">مثال: piece, meter, kilogram</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">الوصف</label>
+                            {{ form.description|add_class:"form-control" }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">وصف اختياري للوحدة</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-toggle-on me-2"></i>حالة الوحدة</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check">
+                            {{ form.is_active|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                وحدة نشطة
+                            </label>
+                        </div>
+                        <small class="text-muted">الوحدات غير النشطة لا تظهر في قوائم الاختيار</small>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger">{{ form.is_active.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <h6><i class="fas fa-info-circle info-icon"></i>نصائح مهمة</h6>
+                    <ul class="mb-0">
+                        <li><strong>الاسم العربي:</strong> سيظهر في واجهة المستخدم</li>
+                        <li><strong>الاختصار:</strong> يستخدم في التقارير والطباعة</li>
+                        <li><strong>الاسم الإنجليزي:</strong> للاستخدام التقني</li>
+                        <li><strong>تأكد من الدقة:</strong> لأن الوحدة ستستخدم في المنتجات</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ الوحدة
+                    </button>
+                    <a href="{% url 'inventory:unit_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    const nameArabicField = document.querySelector('input[name="name_arabic"]');
+    const nameField = document.querySelector('input[name="name"]');
+    const abbreviationField = document.querySelector('input[name="abbreviation"]');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        if (!nameArabicField.value.trim()) {
+            isValid = false;
+            nameArabicField.classList.add('is-invalid');
+        } else {
+            nameArabicField.classList.remove('is-invalid');
+        }
+        
+        if (!nameField.value.trim()) {
+            isValid = false;
+            nameField.classList.add('is-invalid');
+        } else {
+            nameField.classList.remove('is-invalid');
+        }
+        
+        if (!abbreviationField.value.trim()) {
+            isValid = false;
+            abbreviationField.classList.add('is-invalid');
+        } else {
+            abbreviationField.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('يرجى ملء جميع الحقول المطلوبة');
+        }
+    });
+    
+    // Real-time validation
+    [nameArabicField, nameField, abbreviationField].forEach(field => {
+        field.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Auto-generate abbreviation from Arabic name
+    nameArabicField.addEventListener('input', function() {
+        if (!abbreviationField.value && this.value) {
+            // Simple abbreviation logic - take first 3 characters
+            abbreviationField.value = this.value.substring(0, 3);
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

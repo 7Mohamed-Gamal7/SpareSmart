@@ -8,10 +8,11 @@ from django.db import transaction
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from accounts.views import permission_required
-from .models import Product, Category, Brand, Customer, Supplier, StockMovement, InventoryAlert
+from .models import Product, Category, Brand, Customer, Supplier, StockMovement, InventoryAlert, Unit, ShopSettings, Invoice, InvoiceItem
 from .forms import (
     ProductForm, CategoryForm, BrandForm, CustomerForm, SupplierForm,
-    StockAdjustmentForm, ProductFilterForm, BulkActionForm
+    StockAdjustmentForm, ProductFilterForm, BulkActionForm, UnitForm,
+    ShopSettingsForm, InvoiceForm, InvoiceItemForm
 )
 from dashboard.models import ActivityLog
 import json
@@ -915,3 +916,379 @@ def refresh_alerts(request):
         messages.error(request, f'Error refreshing alerts: {str(e)}')
     
     return redirect('inventory:alerts_dashboard')
+
+# ==================== UNITS MANAGEMENT ====================
+
+@login_required
+@permission_required('view_products')
+def unit_list(request):
+    """List all units with filtering and pagination"""
+    units = Unit.objects.all()
+
+    # Apply filters
+    search = request.GET.get('search')
+    status = request.GET.get('status')
+
+    if search:
+        units = units.filter(
+            Q(name__icontains=search) |
+            Q(name_arabic__icontains=search) |
+            Q(abbreviation__icontains=search)
+        )
+
+    if status:
+        if status == 'active':
+            units = units.filter(is_active=True)
+        elif status == 'inactive':
+            units = units.filter(is_active=False)
+
+    # Pagination
+    paginator = Paginator(units, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Statistics
+    total_units = Unit.objects.count()
+    active_units = Unit.objects.filter(is_active=True).count()
+
+    context = {
+        'units': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'total_units': total_units,
+        'active_units': active_units,
+    }
+
+    return render(request, 'inventory/unit_list.html', context)
+
+@login_required
+@permission_required('add_products')
+def unit_create(request):
+    """Create new unit"""
+    if request.method == 'POST':
+        form = UnitForm(request.POST)
+        if form.is_valid():
+            unit = form.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='create',
+                description=f'Created unit: {unit.name_arabic}',
+                content_object=unit
+            )
+
+            messages.success(request, f'تم إنشاء الوحدة "{unit.name_arabic}" بنجاح.')
+            return redirect('inventory:unit_list')
+    else:
+        form = UnitForm()
+
+    context = {
+        'form': form,
+        'title': 'إضافة وحدة قياس جديدة'
+    }
+
+    return render(request, 'inventory/unit_form.html', context)
+
+@login_required
+@permission_required('change_products')
+def unit_update(request, unit_id):
+    """Update existing unit"""
+    unit = get_object_or_404(Unit, id=unit_id)
+
+    if request.method == 'POST':
+        form = UnitForm(request.POST, instance=unit)
+        if form.is_valid():
+            unit = form.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='update',
+                description=f'Updated unit: {unit.name_arabic}',
+                content_object=unit
+            )
+
+            messages.success(request, f'تم تحديث الوحدة "{unit.name_arabic}" بنجاح.')
+            return redirect('inventory:unit_list')
+    else:
+        form = UnitForm(instance=unit)
+
+    context = {
+        'form': form,
+        'unit': unit,
+        'title': f'تعديل الوحدة: {unit.name_arabic}'
+    }
+
+    return render(request, 'inventory/unit_form.html', context)
+
+@login_required
+@permission_required('delete_products')
+def unit_delete(request, unit_id):
+    """Delete unit"""
+    unit = get_object_or_404(Unit, id=unit_id)
+
+    # Check if unit is being used by any products
+    if unit.products.exists():
+        messages.error(request, f'لا يمكن حذف الوحدة "{unit.name_arabic}" لأنها مستخدمة في {unit.products.count()} منتج.')
+        return redirect('inventory:unit_list')
+
+    unit_name = unit.name_arabic
+    unit.delete()
+
+    ActivityLog.objects.create(
+        user=request.user,
+        action='delete',
+        description=f'Deleted unit: {unit_name}'
+    )
+
+    messages.success(request, f'تم حذف الوحدة "{unit_name}" بنجاح.')
+    return redirect('inventory:unit_list')
+
+# ==================== CATEGORIES MANAGEMENT ====================
+
+@login_required
+@permission_required('add_products')
+def category_create(request):
+    """Create new category"""
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='create',
+                description=f'Created category: {category.name}',
+                content_object=category
+            )
+
+            messages.success(request, f'تم إنشاء الفئة "{category.name}" بنجاح.')
+            return redirect('inventory:category_list')
+    else:
+        form = CategoryForm()
+
+    context = {
+        'form': form,
+        'title': 'إضافة فئة جديدة'
+    }
+
+    return render(request, 'inventory/category_form.html', context)
+
+@login_required
+@permission_required('change_products')
+def category_update(request, category_id):
+    """Update existing category"""
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='update',
+                description=f'Updated category: {category.name}',
+                content_object=category
+            )
+
+            messages.success(request, f'تم تحديث الفئة "{category.name}" بنجاح.')
+            return redirect('inventory:category_list')
+    else:
+        form = CategoryForm(instance=category)
+
+    context = {
+        'form': form,
+        'category': category,
+        'title': f'تعديل الفئة: {category.name}'
+    }
+
+    return render(request, 'inventory/category_form.html', context)
+
+@login_required
+@permission_required('delete_products')
+def category_delete(request, category_id):
+    """Delete category"""
+    category = get_object_or_404(Category, id=category_id)
+
+    # Check if category is being used by any products
+    if category.products.exists():
+        messages.error(request, f'لا يمكن حذف الفئة "{category.name}" لأنها تحتوي على {category.products.count()} منتج.')
+        return redirect('inventory:category_list')
+
+    # Check if category has subcategories
+    if category.subcategories.exists():
+        messages.error(request, f'لا يمكن حذف الفئة "{category.name}" لأنها تحتوي على {category.subcategories.count()} فئة فرعية.')
+        return redirect('inventory:category_list')
+
+    category_name = category.name
+    category.delete()
+
+    ActivityLog.objects.create(
+        user=request.user,
+        action='delete',
+        description=f'Deleted category: {category_name}'
+    )
+
+    messages.success(request, f'تم حذف الفئة "{category_name}" بنجاح.')
+    return redirect('inventory:category_list')
+
+# ==================== SETTINGS MANAGEMENT ====================
+
+@login_required
+@permission_required('change_products')
+def settings_dashboard(request):
+    """لوحة تحكم الإعدادات"""
+    settings = ShopSettings.get_settings()
+
+    # Statistics
+    total_products = Product.objects.count()
+    total_customers = Customer.objects.count()
+    total_suppliers = Supplier.objects.count()
+    total_categories = Category.objects.count()
+    total_units = Unit.objects.count()
+
+    context = {
+        'settings': settings,
+        'total_products': total_products,
+        'total_customers': total_customers,
+        'total_suppliers': total_suppliers,
+        'total_categories': total_categories,
+        'total_units': total_units,
+    }
+
+    return render(request, 'inventory/settings_dashboard.html', context)
+
+@login_required
+@permission_required('change_products')
+def shop_settings(request):
+    """إعدادات المحل التجاري"""
+    settings = ShopSettings.get_settings()
+
+    if request.method == 'POST':
+        form = ShopSettingsForm(request.POST, request.FILES, instance=settings)
+        if form.is_valid():
+            settings = form.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='update',
+                description='Updated shop settings',
+                content_object=settings
+            )
+
+            messages.success(request, 'تم حفظ إعدادات المحل بنجاح.')
+            return redirect('inventory:shop_settings')
+    else:
+        form = ShopSettingsForm(instance=settings)
+
+    context = {
+        'form': form,
+        'settings': settings,
+        'title': 'إعدادات المحل التجاري'
+    }
+
+    return render(request, 'inventory/shop_settings.html', context)
+
+# ==================== INVOICES MANAGEMENT ====================
+
+@login_required
+@permission_required('view_products')
+def invoice_list(request):
+    """قائمة الفواتير مع البحث والفلترة"""
+    invoices = Invoice.objects.all()
+
+    # Apply filters
+    search = request.GET.get('search')
+    invoice_type = request.GET.get('invoice_type')
+    status = request.GET.get('status')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+
+    if search:
+        invoices = invoices.filter(
+            Q(invoice_number__icontains=search) |
+            Q(customer__name__icontains=search) |
+            Q(supplier__name__icontains=search)
+        )
+
+    if invoice_type:
+        invoices = invoices.filter(invoice_type=invoice_type)
+
+    if status:
+        invoices = invoices.filter(status=status)
+
+    if date_from:
+        invoices = invoices.filter(invoice_date__gte=date_from)
+
+    if date_to:
+        invoices = invoices.filter(invoice_date__lte=date_to)
+
+    # Pagination
+    paginator = Paginator(invoices, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Statistics
+    total_invoices = Invoice.objects.count()
+    sale_invoices = Invoice.objects.filter(invoice_type='sale').count()
+    purchase_invoices = Invoice.objects.filter(invoice_type='purchase').count()
+    total_sales = Invoice.objects.filter(invoice_type='sale', status__in=['confirmed', 'paid']).aggregate(
+        total=models.Sum('total_amount'))['total'] or 0
+
+    context = {
+        'invoices': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+        'total_invoices': total_invoices,
+        'sale_invoices': sale_invoices,
+        'purchase_invoices': purchase_invoices,
+        'total_sales': total_sales,
+    }
+
+    return render(request, 'inventory/invoice_list.html', context)
+
+@login_required
+@permission_required('add_products')
+def invoice_create(request):
+    """إنشاء فاتورة جديدة"""
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            invoice = form.save(commit=False)
+            invoice.created_by = request.user
+            invoice.generate_invoice_number()
+            invoice.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                action='create',
+                description=f'Created invoice: {invoice.invoice_number}',
+                content_object=invoice
+            )
+
+            messages.success(request, f'تم إنشاء الفاتورة "{invoice.invoice_number}" بنجاح.')
+            return redirect('inventory:invoice_detail', invoice_id=invoice.id)
+    else:
+        form = InvoiceForm()
+
+    context = {
+        'form': form,
+        'title': 'إنشاء فاتورة جديدة'
+    }
+
+    return render(request, 'inventory/invoice_form.html', context)
+
+@login_required
+@permission_required('view_products')
+def invoice_detail(request, invoice_id):
+    """تفاصيل الفاتورة"""
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+    items = invoice.items.all()
+
+    context = {
+        'invoice': invoice,
+        'items': items,
+        'settings': ShopSettings.get_settings(),
+    }
+
+    return render(request, 'inventory/invoice_detail.html', context)

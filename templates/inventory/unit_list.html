@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}إدارة وحدات القياس - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .unit-table {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    .unit-table .table {
+        margin-bottom: 0;
+    }
+    .unit-table .table thead th {
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        padding: 1rem;
+    }
+    .unit-table .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    .unit-table .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .unit-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .filter-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.7rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-primary:hover {
+        background: #667eea;
+        border-color: #667eea;
+        transform: translateY(-1px);
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">إدارة وحدات القياس</h2>
+                <p class="text-muted mb-0">إدارة وحدات القياس المستخدمة في المنتجات</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:unit_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>إضافة وحدة جديدة
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="stats-card">
+                <div class="stat-value">{{ total_units }}</div>
+                <div class="stat-label">إجمالي الوحدات</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stats-card">
+                <div class="stat-value">{{ active_units }}</div>
+                <div class="stat-label">الوحدات النشطة</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">البحث</label>
+                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" 
+                       placeholder="البحث في الوحدات...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">الحالة</label>
+                <select class="form-select" name="status">
+                    <option value="">جميع الحالات</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>غير نشط</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-1"></i>بحث
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Units Table -->
+    {% if units %}
+    <div class="unit-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>الوحدة</th>
+                    <th>الاختصار</th>
+                    <th>الاسم الإنجليزي</th>
+                    <th>الوصف</th>
+                    <th>الحالة</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit in units %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ unit.name_arabic }}</div>
+                    </td>
+                    <td>
+                        <span class="badge bg-info unit-badge">{{ unit.abbreviation }}</span>
+                    </td>
+                    <td>
+                        <span class="text-muted">{{ unit.name }}</span>
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            {{ unit.description|default:"لا يوجد وصف"|truncatewords:8 }}
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge unit-badge 
+                            {% if unit.is_active %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {% if unit.is_active %}نشط{% else %}غير نشط{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <small class="text-muted">{{ unit.created_at|date:"Y/m/d" }}</small>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'inventory:unit_update' unit.id %}">
+                                        <i class="fas fa-edit me-2"></i>تعديل
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'inventory:unit_delete' unit.id %}"
+                                       onclick="return confirm('هل أنت متأكد من حذف هذه الوحدة؟')">
+                                        <i class="fas fa-trash me-2"></i>حذف
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="صفحات الوحدات">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">السابق</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">التالي</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-ruler fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">لا توجد وحدات قياس</h4>
+        <p class="text-muted">ابدأ بإضافة وحدة قياس جديدة</p>
+        <a href="{% url 'inventory:unit_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>إضافة وحدة جديدة
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

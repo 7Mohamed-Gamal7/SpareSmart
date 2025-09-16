@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 15px;
+        border: none;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    .form-card:hover {
+        transform: translateY(-2px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    .form-card .card-header h6 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .current-logo {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    .info-icon {
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">{{ title }}</h2>
+                <p class="text-muted mb-0">إدارة معلومات المحل التجاري والإعدادات العامة</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:settings_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للإعدادات
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Main Form -->
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-store me-2"></i>المعلومات الأساسية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.shop_name.id_for_label }}" class="form-label required-field">اسم المحل</label>
+                                {{ form.shop_name|add_class:"form-control" }}
+                                {% if form.shop_name.errors %}
+                                    <div class="text-danger">{{ form.shop_name.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.shop_name_english.id_for_label }}" class="form-label">اسم المحل بالإنجليزية</label>
+                                {{ form.shop_name_english|add_class:"form-control" }}
+                                {% if form.shop_name_english.errors %}
+                                    <div class="text-danger">{{ form.shop_name_english.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.logo.id_for_label }}" class="form-label">شعار المحل</label>
+                            {{ form.logo|add_class:"form-control" }}
+                            {% if form.logo.errors %}
+                                <div class="text-danger">{{ form.logo.errors.0 }}</div>
+                            {% endif %}
+                            {% if settings.logo %}
+                                <div class="mt-2">
+                                    <p class="small text-muted">الشعار الحالي:</p>
+                                    <img src="{{ settings.logo.url }}" alt="شعار المحل" class="current-logo">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-phone me-2"></i>معلومات الاتصال</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">رقم الهاتف</label>
+                                {{ form.phone|add_class:"form-control" }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.mobile.id_for_label }}" class="form-label">رقم الموبايل</label>
+                                {{ form.mobile|add_class:"form-control" }}
+                                {% if form.mobile.errors %}
+                                    <div class="text-danger">{{ form.mobile.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">البريد الإلكتروني</label>
+                                {{ form.email|add_class:"form-control" }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.website.id_for_label }}" class="form-label">الموقع الإلكتروني</label>
+                                {{ form.website|add_class:"form-control" }}
+                                {% if form.website.errors %}
+                                    <div class="text-danger">{{ form.website.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-map-marker-alt me-2"></i>معلومات العنوان</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">العنوان</label>
+                            {{ form.address|add_class:"form-control" }}
+                            {% if form.address.errors %}
+                                <div class="text-danger">{{ form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.city.id_for_label }}" class="form-label">المدينة</label>
+                                {{ form.city|add_class:"form-control" }}
+                                {% if form.city.errors %}
+                                    <div class="text-danger">{{ form.city.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.state.id_for_label }}" class="form-label">المحافظة</label>
+                                {{ form.state|add_class:"form-control" }}
+                                {% if form.state.errors %}
+                                    <div class="text-danger">{{ form.state.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.postal_code.id_for_label }}" class="form-label">الرمز البريدي</label>
+                                {{ form.postal_code|add_class:"form-control" }}
+                                {% if form.postal_code.errors %}
+                                    <div class="text-danger">{{ form.postal_code.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.country.id_for_label }}" class="form-label">البلد</label>
+                            {{ form.country|add_class:"form-control" }}
+                            {% if form.country.errors %}
+                                <div class="text-danger">{{ form.country.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Business Information -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-building me-2"></i>المعلومات التجارية</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.tax_number.id_for_label }}" class="form-label">الرقم الضريبي</label>
+                            {{ form.tax_number|add_class:"form-control" }}
+                            {% if form.tax_number.errors %}
+                                <div class="text-danger">{{ form.tax_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.commercial_register.id_for_label }}" class="form-label">السجل التجاري</label>
+                            {{ form.commercial_register|add_class:"form-control" }}
+                            {% if form.commercial_register.errors %}
+                                <div class="text-danger">{{ form.commercial_register.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.license_number.id_for_label }}" class="form-label">رقم الترخيص</label>
+                            {{ form.license_number|add_class:"form-control" }}
+                            {% if form.license_number.errors %}
+                                <div class="text-danger">{{ form.license_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Settings -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-file-invoice me-2"></i>إعدادات الفواتير</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.invoice_prefix.id_for_label }}" class="form-label">بادئة رقم الفاتورة</label>
+                            {{ form.invoice_prefix|add_class:"form-control" }}
+                            {% if form.invoice_prefix.errors %}
+                                <div class="text-danger">{{ form.invoice_prefix.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.currency_symbol.id_for_label }}" class="form-label">رمز العملة</label>
+                            {{ form.currency_symbol|add_class:"form-control" }}
+                            {% if form.currency_symbol.errors %}
+                                <div class="text-danger">{{ form.currency_symbol.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.currency_name.id_for_label }}" class="form-label">اسم العملة</label>
+                            {{ form.currency_name|add_class:"form-control" }}
+                            {% if form.currency_name.errors %}
+                                <div class="text-danger">{{ form.currency_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ الإعدادات
+                    </button>
+                    <a href="{% url 'inventory:settings_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>إلغاء
+                    </a>
+                </div>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <h6><i class="fas fa-info-circle info-icon"></i>معلومات مهمة</h6>
+                    <ul class="mb-0">
+                        <li><strong>الشعار:</strong> يُفضل أن يكون بحجم 200x200 بكسل</li>
+                        <li><strong>بادئة الفاتورة:</strong> ستظهر في رقم كل فاتورة</li>
+                        <li><strong>العملة:</strong> ستستخدم في جميع الفواتير</li>
+                        <li><strong>المعلومات التجارية:</strong> ستظهر في الفواتير المطبوعة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+[
+    {
+        "model": "inventory.unit",
+        "pk": 1,
+        "fields": {
+            "name": "piece",
+            "name_arabic": "قطعة",
+            "abbreviation": "قطع",
+            "description": "وحدة العد للقطع الفردية",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 2,
+        "fields": {
+            "name": "set",
+            "name_arabic": "طقم",
+            "abbreviation": "طقم",
+            "description": "مجموعة من القطع المترابطة",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 3,
+        "fields": {
+            "name": "pair",
+            "name_arabic": "زوج",
+            "abbreviation": "زوج",
+            "description": "زوج من القطع المتطابقة",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 4,
+        "fields": {
+            "name": "meter",
+            "name_arabic": "متر",
+            "abbreviation": "م",
+            "description": "وحدة قياس الطول",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 5,
+        "fields": {
+            "name": "liter",
+            "name_arabic": "لتر",
+            "abbreviation": "لتر",
+            "description": "وحدة قياس السوائل",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 6,
+        "fields": {
+            "name": "kilogram",
+            "name_arabic": "كيلوجرام",
+            "abbreviation": "كجم",
+            "description": "وحدة قياس الوزن",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 7,
+        "fields": {
+            "name": "box",
+            "name_arabic": "صندوق",
+            "abbreviation": "صندوق",
+            "description": "وحدة التعبئة في صناديق",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 8,
+        "fields": {
+            "name": "bottle",
+            "name_arabic": "زجاجة",
+            "abbreviation": "زجاجة",
+            "description": "وحدة التعبئة في زجاجات",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 9,
+        "fields": {
+            "name": "roll",
+            "name_arabic": "لفة",
+            "abbreviation": "لفة",
+            "description": "وحدة للمواد الملفوفة",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    },
+    {
+        "model": "inventory.unit",
+        "pk": 10,
+        "fields": {
+            "name": "tube",
+            "name_arabic": "أنبوبة",
+            "abbreviation": "أنبوبة",
+            "description": "وحدة التعبئة في أنابيب",
+            "is_active": true,
+            "created_at": "2024-09-16T10:00:00Z",
+            "updated_at": "2024-09-16T10:00:00Z"
+        }
+    }
+]

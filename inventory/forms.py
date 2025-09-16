@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Product, Category, Brand, Customer, Supplier, StockMovement
+from .models import Product, Category, Brand, Customer, Supplier, StockMovement, Unit, ShopSettings, Invoice, InvoiceItem
 import re
 
 class ProductForm(forms.ModelForm):
@@ -42,6 +42,12 @@ class ProductForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(is_active=True)
+        self.fields['brand'].queryset = Brand.objects.filter(is_active=True)
+        self.fields['unit'].queryset = Unit.objects.filter(is_active=True)
 
     def clean_sku(self):
         sku = self.cleaned_data.get('sku')
@@ -293,3 +299,361 @@ class BulkActionForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+
+class UnitForm(forms.ModelForm):
+    """Form for creating and updating units"""
+
+    class Meta:
+        model = Unit
+        fields = ['name', 'name_arabic', 'abbreviation', 'description', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم الوحدة بالإنجليزية (مثل: piece, meter)'
+            }),
+            'name_arabic': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم الوحدة بالعربية (مثل: قطعة, متر)'
+            }),
+            'abbreviation': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'الاختصار (مثل: قطع, م)'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'وصف الوحدة (اختياري)'
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': 'اسم الوحدة (إنجليزي)',
+            'name_arabic': 'اسم الوحدة (عربي)',
+            'abbreviation': 'الاختصار',
+            'description': 'الوصف',
+            'is_active': 'وحدة نشطة',
+        }
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name:
+            query = Unit.objects.filter(name=name)
+            if self.instance.pk:
+                query = query.exclude(pk=self.instance.pk)
+            if query.exists():
+                raise ValidationError("وحدة بهذا الاسم موجودة بالفعل.")
+        return name
+
+    def clean_abbreviation(self):
+        abbreviation = self.cleaned_data.get('abbreviation')
+        if abbreviation:
+            query = Unit.objects.filter(abbreviation=abbreviation)
+            if self.instance.pk:
+                query = query.exclude(pk=self.instance.pk)
+            if query.exists():
+                raise ValidationError("وحدة بهذا الاختصار موجودة بالفعل.")
+        return abbreviation
+
+class CategoryForm(forms.ModelForm):
+    """Form for creating and updating categories"""
+
+    class Meta:
+        model = Category
+        fields = ['name', 'description', 'vehicle_type', 'parent_category', 'is_active']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم الفئة'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'وصف الفئة (اختياري)'
+            }),
+            'vehicle_type': forms.Select(attrs={'class': 'form-select'}),
+            'parent_category': forms.Select(attrs={'class': 'form-select'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': 'اسم الفئة',
+            'description': 'الوصف',
+            'vehicle_type': 'نوع المركبة',
+            'parent_category': 'الفئة الأب',
+            'is_active': 'فئة نشطة',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # تحديث خيارات نوع المركبة بالعربية
+        self.fields['vehicle_type'].choices = [
+            ('motorcycle', 'دراجة نارية'),
+            ('car', 'سيارة'),
+            ('tuktuk', 'توك توك'),
+            ('general', 'عام'),
+        ]
+
+        # تحديث خيارات الفئة الأب لتستبعد الفئة الحالية
+        if self.instance.pk:
+            self.fields['parent_category'].queryset = Category.objects.filter(
+                is_active=True
+            ).exclude(pk=self.instance.pk)
+        else:
+            self.fields['parent_category'].queryset = Category.objects.filter(is_active=True)
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name:
+            query = Category.objects.filter(name=name)
+            if self.instance.pk:
+                query = query.exclude(pk=self.instance.pk)
+            if query.exists():
+                raise ValidationError("فئة بهذا الاسم موجودة بالفعل.")
+        return name
+
+class ShopSettingsForm(forms.ModelForm):
+    """نموذج إعدادات المحل"""
+
+    class Meta:
+        model = ShopSettings
+        fields = [
+            'shop_name', 'shop_name_english', 'logo', 'phone', 'mobile', 'email', 'website',
+            'address', 'city', 'state', 'postal_code', 'country', 'tax_number',
+            'commercial_register', 'license_number', 'invoice_prefix', 'invoice_footer',
+            'terms_and_conditions', 'currency_symbol', 'currency_name'
+        ]
+        widgets = {
+            'shop_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم المحل التجاري'
+            }),
+            'shop_name_english': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Shop Name in English'
+            }),
+            'logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم الهاتف الثابت'
+            }),
+            'mobile': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم الموبايل'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'البريد الإلكتروني'
+            }),
+            'website': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'الموقع الإلكتروني'
+            }),
+            'address': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'العنوان التفصيلي'
+            }),
+            'city': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'المدينة'
+            }),
+            'state': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'المحافظة'
+            }),
+            'postal_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'الرمز البريدي'
+            }),
+            'country': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'البلد'
+            }),
+            'tax_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'الرقم الضريبي'
+            }),
+            'commercial_register': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم السجل التجاري'
+            }),
+            'license_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم الترخيص'
+            }),
+            'invoice_prefix': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'بادئة رقم الفاتورة (مثل: INV)'
+            }),
+            'invoice_footer': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': 'نص يظهر في أسفل الفاتورة'
+            }),
+            'terms_and_conditions': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'الشروط والأحكام'
+            }),
+            'currency_symbol': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رمز العملة (مثل: ج.م)'
+            }),
+            'currency_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'اسم العملة (مثل: جنيه مصري)'
+            }),
+        }
+        labels = {
+            'shop_name': 'اسم المحل',
+            'shop_name_english': 'اسم المحل بالإنجليزية',
+            'logo': 'شعار المحل',
+            'phone': 'رقم الهاتف',
+            'mobile': 'رقم الموبايل',
+            'email': 'البريد الإلكتروني',
+            'website': 'الموقع الإلكتروني',
+            'address': 'العنوان',
+            'city': 'المدينة',
+            'state': 'المحافظة',
+            'postal_code': 'الرمز البريدي',
+            'country': 'البلد',
+            'tax_number': 'الرقم الضريبي',
+            'commercial_register': 'السجل التجاري',
+            'license_number': 'رقم الترخيص',
+            'invoice_prefix': 'بادئة رقم الفاتورة',
+            'invoice_footer': 'تذييل الفاتورة',
+            'terms_and_conditions': 'الشروط والأحكام',
+            'currency_symbol': 'رمز العملة',
+            'currency_name': 'اسم العملة',
+        }
+
+class InvoiceForm(forms.ModelForm):
+    """نموذج الفواتير"""
+
+    class Meta:
+        model = Invoice
+        fields = [
+            'invoice_type', 'invoice_date', 'due_date', 'customer', 'supplier',
+            'discount_percentage', 'tax_percentage', 'payment_method',
+            'payment_reference', 'notes'
+        ]
+        widgets = {
+            'invoice_type': forms.Select(attrs={'class': 'form-select'}),
+            'invoice_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'due_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'customer': forms.Select(attrs={'class': 'form-select'}),
+            'supplier': forms.Select(attrs={'class': 'form-select'}),
+            'discount_percentage': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100'
+            }),
+            'tax_percentage': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100'
+            }),
+            'payment_method': forms.Select(attrs={'class': 'form-select'}),
+            'payment_reference': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'رقم الشيك أو رقم التحويل'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'ملاحظات إضافية'
+            }),
+        }
+        labels = {
+            'invoice_type': 'نوع الفاتورة',
+            'invoice_date': 'تاريخ الفاتورة',
+            'due_date': 'تاريخ الاستحقاق',
+            'customer': 'العميل',
+            'supplier': 'المورد',
+            'discount_percentage': 'نسبة الخصم (%)',
+            'tax_percentage': 'نسبة الضريبة (%)',
+            'payment_method': 'طريقة الدفع',
+            'payment_reference': 'مرجع الدفع',
+            'notes': 'ملاحظات',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['customer'].queryset = Customer.objects.filter(is_active=True)
+        self.fields['supplier'].queryset = Supplier.objects.filter(is_active=True)
+
+        # Update choice labels to Arabic
+        self.fields['invoice_type'].choices = [
+            ('sale', 'فاتورة بيع'),
+            ('purchase', 'فاتورة شراء'),
+        ]
+
+        self.fields['payment_method'].choices = [
+            ('cash', 'نقداً'),
+            ('credit', 'آجل'),
+            ('bank_transfer', 'تحويل بنكي'),
+            ('check', 'شيك'),
+            ('card', 'بطاقة ائتمان'),
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        invoice_type = cleaned_data.get('invoice_type')
+        customer = cleaned_data.get('customer')
+        supplier = cleaned_data.get('supplier')
+
+        if invoice_type == 'sale' and not customer:
+            raise ValidationError("يجب اختيار عميل لفاتورة البيع")
+
+        if invoice_type == 'purchase' and not supplier:
+            raise ValidationError("يجب اختيار مورد لفاتورة الشراء")
+
+        return cleaned_data
+
+class InvoiceItemForm(forms.ModelForm):
+    """نموذج عناصر الفاتورة"""
+
+    class Meta:
+        model = InvoiceItem
+        fields = ['product', 'quantity', 'unit_price', 'discount_percentage', 'notes']
+        widgets = {
+            'product': forms.Select(attrs={'class': 'form-select'}),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0.01'
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0'
+            }),
+            'discount_percentage': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'min': '0',
+                'max': '100'
+            }),
+            'notes': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'ملاحظات'
+            }),
+        }
+        labels = {
+            'product': 'المنتج',
+            'quantity': 'الكمية',
+            'unit_price': 'سعر الوحدة',
+            'discount_percentage': 'نسبة الخصم (%)',
+            'notes': 'ملاحظات',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].queryset = Product.objects.filter(is_active=True)

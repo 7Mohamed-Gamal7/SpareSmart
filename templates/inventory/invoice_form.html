@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-form {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .form-section {
+        border: 2px solid #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .form-section h6 {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-secondary {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .invoice-type-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .invoice-type-option {
+        flex: 1;
+        padding: 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .invoice-type-option:hover {
+        border-color: #667eea;
+        background: #f8f9fa;
+    }
+    .invoice-type-option.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .invoice-type-option input[type="radio"] {
+        display: none;
+    }
+    .client-section {
+        display: none;
+    }
+    .client-section.active {
+        display: block;
+    }
+    .info-box {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    .info-box .info-icon {
+        color: #1976d2;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">{{ title }}</h2>
+                <p class="text-muted mb-0">إنشاء فاتورة بيع أو شراء جديدة</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:invoice_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-2"></i>العودة للفواتير
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" novalidate id="invoiceForm">
+        {% csrf_token %}
+        
+        <div class="invoice-form">
+            <!-- Invoice Type Selection -->
+            <div class="form-section">
+                <h6><i class="fas fa-file-invoice me-2"></i>نوع الفاتورة</h6>
+                <div class="invoice-type-selector">
+                    <label class="invoice-type-option" for="id_invoice_type_0">
+                        <input type="radio" name="invoice_type" value="sale" id="id_invoice_type_0" 
+                               {% if form.invoice_type.value == 'sale' %}checked{% endif %}>
+                        <div>
+                            <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                            <h6>فاتورة بيع</h6>
+                            <small>بيع منتجات للعملاء</small>
+                        </div>
+                    </label>
+                    <label class="invoice-type-option" for="id_invoice_type_1">
+                        <input type="radio" name="invoice_type" value="purchase" id="id_invoice_type_1"
+                               {% if form.invoice_type.value == 'purchase' %}checked{% endif %}>
+                        <div>
+                            <i class="fas fa-truck fa-2x mb-2"></i>
+                            <h6>فاتورة شراء</h6>
+                            <small>شراء منتجات من الموردين</small>
+                        </div>
+                    </label>
+                </div>
+                {% if form.invoice_type.errors %}
+                    <div class="text-danger">{{ form.invoice_type.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <!-- Left Column -->
+                <div class="col-lg-8">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-info-circle me-2"></i>المعلومات الأساسية</h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.invoice_date.id_for_label }}" class="form-label required-field">تاريخ الفاتورة</label>
+                                {{ form.invoice_date|add_class:"form-control" }}
+                                {% if form.invoice_date.errors %}
+                                    <div class="text-danger">{{ form.invoice_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.due_date.id_for_label }}" class="form-label">تاريخ الاستحقاق</label>
+                                {{ form.due_date|add_class:"form-control" }}
+                                {% if form.due_date.errors %}
+                                    <div class="text-danger">{{ form.due_date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Client Information -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-users me-2"></i>معلومات العميل/المورد</h6>
+                        
+                        <!-- Customer Section (for sale invoices) -->
+                        <div class="client-section" id="customerSection">
+                            <div class="mb-3">
+                                <label for="{{ form.customer.id_for_label }}" class="form-label required-field">العميل</label>
+                                {{ form.customer|add_class:"form-select" }}
+                                {% if form.customer.errors %}
+                                    <div class="text-danger">{{ form.customer.errors.0 }}</div>
+                                {% endif %}
+                                <div class="info-box">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <strong>ملاحظة:</strong> يمكنك إضافة عميل جديد من 
+                                    <a href="{% url 'inventory:customer_create' %}" target="_blank">هنا</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Supplier Section (for purchase invoices) -->
+                        <div class="client-section" id="supplierSection">
+                            <div class="mb-3">
+                                <label for="{{ form.supplier.id_for_label }}" class="form-label required-field">المورد</label>
+                                {{ form.supplier|add_class:"form-select" }}
+                                {% if form.supplier.errors %}
+                                    <div class="text-danger">{{ form.supplier.errors.0 }}</div>
+                                {% endif %}
+                                <div class="info-box">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <strong>ملاحظة:</strong> يمكنك إضافة مورد جديد من 
+                                    <a href="{% url 'inventory:supplier_create' %}" target="_blank">هنا</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-sticky-note me-2"></i>ملاحظات</h6>
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">ملاحظات الفاتورة</label>
+                            {{ form.notes|add_class:"form-control" }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger">{{ form.notes.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-lg-4">
+                    <!-- Financial Settings -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-calculator me-2"></i>الإعدادات المالية</h6>
+                        <div class="mb-3">
+                            <label for="{{ form.discount_percentage.id_for_label }}" class="form-label">نسبة الخصم (%)</label>
+                            {{ form.discount_percentage|add_class:"form-control" }}
+                            {% if form.discount_percentage.errors %}
+                                <div class="text-danger">{{ form.discount_percentage.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.tax_percentage.id_for_label }}" class="form-label">نسبة الضريبة (%)</label>
+                            {{ form.tax_percentage|add_class:"form-control" }}
+                            {% if form.tax_percentage.errors %}
+                                <div class="text-danger">{{ form.tax_percentage.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-credit-card me-2"></i>معلومات الدفع</h6>
+                        <div class="mb-3">
+                            <label for="{{ form.payment_method.id_for_label }}" class="form-label">طريقة الدفع</label>
+                            {{ form.payment_method|add_class:"form-select" }}
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger">{{ form.payment_method.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.payment_reference.id_for_label }}" class="form-label">مرجع الدفع</label>
+                            {{ form.payment_reference|add_class:"form-control" }}
+                            {% if form.payment_reference.errors %}
+                                <div class="text-danger">{{ form.payment_reference.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">رقم الشيك أو رقم التحويل (اختياري)</small>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>إنشاء الفاتورة
+                        </button>
+                        <a href="{% url 'inventory:invoice_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>إلغاء
+                        </a>
+                    </div>
+
+                    <!-- Help Box -->
+                    <div class="info-box">
+                        <h6><i class="fas fa-lightbulb info-icon"></i>نصائح</h6>
+                        <ul class="mb-0">
+                            <li>اختر نوع الفاتورة أولاً</li>
+                            <li>تأكد من اختيار العميل/المورد المناسب</li>
+                            <li>يمكنك إضافة المنتجات بعد إنشاء الفاتورة</li>
+                            <li>الخصم والضريبة اختياريان</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const invoiceTypeRadios = document.querySelectorAll('input[name="invoice_type"]');
+    const customerSection = document.getElementById('customerSection');
+    const supplierSection = document.getElementById('supplierSection');
+    const invoiceTypeOptions = document.querySelectorAll('.invoice-type-option');
+    
+    // Set initial invoice date to today
+    const invoiceDateField = document.querySelector('input[name="invoice_date"]');
+    if (invoiceDateField && !invoiceDateField.value) {
+        const today = new Date().toISOString().split('T')[0];
+        invoiceDateField.value = today;
+    }
+    
+    function updateClientSection() {
+        const selectedType = document.querySelector('input[name="invoice_type"]:checked');
+        
+        if (selectedType) {
+            if (selectedType.value === 'sale') {
+                customerSection.classList.add('active');
+                supplierSection.classList.remove('active');
+            } else if (selectedType.value === 'purchase') {
+                supplierSection.classList.add('active');
+                customerSection.classList.remove('active');
+            }
+        }
+        
+        // Update visual selection
+        invoiceTypeOptions.forEach(option => {
+            const radio = option.querySelector('input[type="radio"]');
+            if (radio.checked) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+    }
+    
+    // Add event listeners
+    invoiceTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateClientSection);
+    });
+    
+    // Initial setup
+    updateClientSection();
+});
+</script>
+{% endblock %}

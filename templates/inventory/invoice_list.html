@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}إدارة الفواتير - SpareSmart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    .invoice-table {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    .invoice-table .table {
+        margin-bottom: 0;
+    }
+    .invoice-table .table thead th {
+        background: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        padding: 1rem;
+    }
+    .invoice-table .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    .invoice-table .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .invoice-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-weight: 600;
+    }
+    .filter-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 0.7rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-primary:hover {
+        background: #667eea;
+        border-color: #667eea;
+        transform: translateY(-1px);
+    }
+    .page-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .status-draft { background: #6c757d; color: white; }
+    .status-confirmed { background: #17a2b8; color: white; }
+    .status-paid { background: #28a745; color: white; }
+    .status-partially_paid { background: #ffc107; color: #212529; }
+    .status-cancelled { background: #dc3545; color: white; }
+    .type-sale { background: #28a745; color: white; }
+    .type-purchase { background: #dc3545; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">إدارة الفواتير</h2>
+                <p class="text-muted mb-0">إنشاء وإدارة فواتير البيع والشراء</p>
+            </div>
+            <div>
+                <a href="{% url 'inventory:invoice_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>فاتورة جديدة
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stat-value">{{ total_invoices }}</div>
+                <div class="stat-label">إجمالي الفواتير</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stat-value">{{ sale_invoices }}</div>
+                <div class="stat-label">فواتير البيع</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stat-value">{{ purchase_invoices }}</div>
+                <div class="stat-label">فواتير الشراء</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stat-value">{{ total_sales|floatformat:0 }} ج.م</div>
+                <div class="stat-label">إجمالي المبيعات</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">البحث</label>
+                <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" 
+                       placeholder="رقم الفاتورة أو اسم العميل...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">نوع الفاتورة</label>
+                <select class="form-select" name="invoice_type">
+                    <option value="">جميع الأنواع</option>
+                    <option value="sale" {% if request.GET.invoice_type == 'sale' %}selected{% endif %}>فاتورة بيع</option>
+                    <option value="purchase" {% if request.GET.invoice_type == 'purchase' %}selected{% endif %}>فاتورة شراء</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">الحالة</label>
+                <select class="form-select" name="status">
+                    <option value="">جميع الحالات</option>
+                    <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>مسودة</option>
+                    <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>مؤكدة</option>
+                    <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>مدفوعة</option>
+                    <option value="partially_paid" {% if request.GET.status == 'partially_paid' %}selected{% endif %}>مدفوعة جزئياً</option>
+                    <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>ملغية</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">من تاريخ</label>
+                <input type="date" class="form-control" name="date_from" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-control" name="date_to" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Invoices Table -->
+    {% if invoices %}
+    <div class="invoice-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>رقم الفاتورة</th>
+                    <th>النوع</th>
+                    <th>العميل/المورد</th>
+                    <th>التاريخ</th>
+                    <th>المبلغ الإجمالي</th>
+                    <th>المبلغ المدفوع</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ invoice.invoice_number }}</div>
+                        <small class="text-muted">{{ invoice.created_at|date:"Y/m/d H:i" }}</small>
+                    </td>
+                    <td>
+                        <span class="badge invoice-badge type-{{ invoice.invoice_type }}">
+                            {{ invoice.get_invoice_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ invoice.client_name }}</div>
+                        {% if invoice.customer %}
+                            <small class="text-muted">{{ invoice.customer.get_customer_type_display }}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ invoice.invoice_date|date:"Y/m/d" }}</td>
+                    <td>
+                        <div class="fw-bold">{{ invoice.total_amount|floatformat:2 }} ج.م</div>
+                        {% if invoice.discount_amount > 0 %}
+                            <small class="text-muted">خصم: {{ invoice.discount_amount|floatformat:2 }} ج.م</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ invoice.paid_amount|floatformat:2 }} ج.م</div>
+                        {% if invoice.remaining_amount > 0 %}
+                            <small class="text-danger">متبقي: {{ invoice.remaining_amount|floatformat:2 }} ج.م</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge invoice-badge status-{{ invoice.status }}">
+                            {{ invoice.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'inventory:invoice_detail' invoice.id %}">
+                                        <i class="fas fa-eye me-2"></i>عرض
+                                    </a>
+                                </li>
+                                {% if invoice.status == 'draft' %}
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-edit me-2"></i>تعديل
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="printInvoice({{ invoice.id }})">
+                                        <i class="fas fa-print me-2"></i>طباعة
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                {% if invoice.status == 'draft' %}
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#"
+                                       onclick="return confirm('هل أنت متأكد من حذف هذه الفاتورة؟')">
+                                        <i class="fas fa-trash me-2"></i>حذف
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="صفحات الفواتير">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.invoice_type %}&invoice_type={{ request.GET.invoice_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">السابق</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.invoice_type %}&invoice_type={{ request.GET.invoice_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.invoice_type %}&invoice_type={{ request.GET.invoice_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">التالي</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">لا توجد فواتير</h4>
+        <p class="text-muted">ابدأ بإنشاء فاتورة جديدة</p>
+        <a href="{% url 'inventory:invoice_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>فاتورة جديدة
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function printInvoice(invoiceId) {
+    // Open invoice in new window for printing
+    window.open(`/inventory/invoices/${invoiceId}/print/`, '_blank');
+}
+</script>
+{% endblock %}
