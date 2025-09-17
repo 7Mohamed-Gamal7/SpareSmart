@@ -178,35 +178,59 @@
 
                     <!-- Product Selection -->
                     <div class="form-section">
-                        <h5 class="mb-3">
-                            <i class="fas fa-box me-2"></i>المنتج Information
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label">المنتج *</label>
-                                {{ form.product|add_class:"form-select" }}
-                                {% if form.product.errors %}
-                                    <div class="text-danger mt-1">{{ form.product.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">الكمية *</label>
-                                {{ form.quantity|add_class:"form-control" }}
-                                {% if form.quantity.errors %}
-                                    <div class="text-danger mt-1">{{ form.quantity.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">سعر الوحدة *</label>
-                                {{ form.unit_price|add_class:"form-control" }}
-                                {% if form.unit_price.errors %}
-                                    <div class="text-danger mt-1">{{ form.unit_price.errors.0 }}</div>
-                                {% endif %}
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">
+                                <i class="fas fa-box me-2"></i>المنتجات Information
+                            </h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="addProductBtn">
+                                <i class="fas fa-plus me-1"></i>إضافة منتج
+                            </button>
                         </div>
 
-                        <!-- Product Information Display -->
-                        <div id="productInfo" style="display: none;"></div>
+                        <!-- Products Container -->
+                        <div id="productsContainer">
+                            <!-- Initial Product Row -->
+                            <div class="product-row border rounded p-3 mb-3" data-row="0">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label class="form-label">المنتج *</label>
+                                        {{ form.product|add_class:"form-select product-select" }}
+                                        {% if form.product.errors %}
+                                            <div class="text-danger mt-1">{{ form.product.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">الكمية *</label>
+                                        {{ form.quantity|add_class:"form-control quantity-input" }}
+                                        {% if form.quantity.errors %}
+                                            <div class="text-danger mt-1">{{ form.quantity.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">سعر الوحدة *</label>
+                                        {{ form.unit_price|add_class:"form-control unit-price-input" }}
+                                        {% if form.unit_price.errors %}
+                                            <div class="text-danger mt-1">{{ form.unit_price.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">الإجمالي</label>
+                                        <div class="form-control-plaintext fw-bold item-total">0.00 ج.م</div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="d-grid">
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-product-btn" style="display: none;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Product Information Display -->
+                                <div class="product-info-display" style="display: none;"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Pricing & Discount -->
@@ -297,81 +321,169 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const productSelect = document.querySelector('select[name="product"]');
-    const quantityInput = document.querySelector('input[name="quantity"]');
-    const unitPriceInput = document.querySelector('input[name="unit_price"]');
+    let productRowCount = 1;
+    const productsContainer = document.getElementById('productsContainer');
+    const addProductBtn = document.getElementById('addProductBtn');
     const discountInput = document.querySelector('input[name="discount_percentage"]');
-    const productInfoDiv = document.getElementById('productInfo');
     const profitInfoDiv = document.getElementById('profitInfo');
-    
+
     // Event listeners
-    productSelect.addEventListener('change', handleProductChange);
-    quantityInput.addEventListener('input', calculateTotals);
-    unitPriceInput.addEventListener('input', calculateTotals);
+    addProductBtn.addEventListener('click', addProductRow);
     discountInput.addEventListener('input', calculateTotals);
+
+    // Initialize first row
+    initializeProductRow(document.querySelector('.product-row'));
     
     // Form validation
     document.getElementById('quickSaleForm').addEventListener('submit', validateForm);
-    
-    function handleProductChange() {
+
+    function addProductRow() {
+        const newRow = document.createElement('div');
+        newRow.className = 'product-row border rounded p-3 mb-3';
+        newRow.dataset.row = productRowCount;
+
+        newRow.innerHTML = `
+            <div class="row">
+                <div class="col-md-5">
+                    <label class="form-label">المنتج *</label>
+                    <select class="form-select product-select" name="additional_product_${productRowCount}" required>
+                        <option value="">اختر منتج</option>
+                        ${getProductOptions()}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">الكمية *</label>
+                    <input type="number" class="form-control quantity-input" name="additional_quantity_${productRowCount}" min="1" value="1" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">سعر الوحدة *</label>
+                    <input type="number" class="form-control unit-price-input" name="additional_unit_price_${productRowCount}" step="0.01" min="0.01" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">الإجمالي</label>
+                    <div class="form-control-plaintext fw-bold item-total">0.00 ج.م</div>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-product-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="product-info-display" style="display: none;"></div>
+        `;
+
+        productsContainer.appendChild(newRow);
+        initializeProductRow(newRow);
+        productRowCount++;
+        updateRemoveButtons();
+    }
+
+    function getProductOptions() {
+        const originalSelect = document.querySelector('select[name="product"]');
+        let options = '';
+        for (let i = 1; i < originalSelect.options.length; i++) {
+            const option = originalSelect.options[i];
+            options += `<option value="${option.value}">${option.text}</option>`;
+        }
+        return options;
+    }
+
+    function updateRemoveButtons() {
+        const rows = document.querySelectorAll('.product-row');
+        const removeButtons = document.querySelectorAll('.remove-product-btn');
+
+        removeButtons.forEach((btn, index) => {
+            if (rows.length > 1) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+    }
+
+    function initializeProductRow(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const unitPriceInput = row.querySelector('.unit-price-input');
+        const removeBtn = row.querySelector('.remove-product-btn');
+
+        // Event listeners
+        productSelect.addEventListener('change', function() {
+            handleProductChange(row);
+        });
+        quantityInput.addEventListener('input', calculateTotals);
+        unitPriceInput.addEventListener('input', calculateTotals);
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                row.remove();
+                updateRemoveButtons();
+                calculateTotals();
+            });
+        }
+    }
+
+    function handleProductChange(row) {
+        const productSelect = row.querySelector('.product-select');
+        const unitPriceInput = row.querySelector('.unit-price-input');
+        const productInfoDiv = row.querySelector('.product-info-display');
         const selectedOption = productSelect.options[productSelect.selectedIndex];
-        
+
         if (selectedOption.value) {
-            // Get product data from the option
-            const productText = selectedOption.text;
-            const stockMatch = productText.match(/Stock: (\d+)/);
-            const stock = stockMatch ? parseInt(stockMatch[1]) : 0;
-            
             // Fetch product price via AJAX
             fetch(`{% url 'sales:get_product_price' %}?product_id=${selectedOption.value}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         unitPriceInput.value = data.price;
-                        
+
                         // Display product information
                         let infoHtml = `
-                            <div class="product-info">
-                                <h6><i class="fas fa-info-circle me-2"></i>المنتج معلومات</h6>
+                            <div class="product-info mt-3">
+                                <h6><i class="fas fa-info-circle me-2"></i>معلومات المنتج</h6>
                                 <div class="row">
                                     <div class="col-4">
-                                        <strong>Available Stock:</strong><br>
-                                        <span class="${data.stock > 0 ? 'text-success' : 'text-danger'}">${data.stock} units</span>
+                                        <strong>المخزون المتاح:</strong><br>
+                                        <span class="${data.stock > 0 ? 'text-success' : 'text-danger'}">${data.stock} قطعة</span>
                                     </div>
                                     <div class="col-4">
                                         <strong>سعر البيع:</strong><br>
-                                        $${data.price}
+                                        ${data.price} ج.م
                                     </div>
                                     <div class="col-4">
                                         <strong>سعر التكلفة:</strong><br>
-                                        $${data.cost_price}
+                                        ${data.cost_price} ج.م
                                     </div>
                                 </div>
                             </div>
                         `;
-                        
+
                         if (data.stock === 0) {
                             infoHtml += `
-                                <div class="stock-warning">
+                                <div class="stock-warning mt-2">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>تحذير:</strong> This product is out of stock!
+                                    <strong>تحذير:</strong> هذا المنتج غير متوفر في المخزون!
                                 </div>
                             `;
                         } else if (data.stock < 5) {
                             infoHtml += `
-                                <div class="stock-warning">
+                                <div class="stock-warning mt-2">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>مخزون منخفض:</strong> Only ${data.stock} units remaining!
+                                    <strong>مخزون منخفض:</strong> متبقي ${data.stock} قطع فقط!
                                 </div>
                             `;
                         }
-                        
+
                         productInfoDiv.innerHTML = infoHtml;
                         productInfoDiv.style.display = 'block';
-                        
-                        // Store cost price for profit calculation
+
+                        // Store cost price and stock for calculations
                         productSelect.dataset.costPrice = data.cost_price;
-                        
+                        productSelect.dataset.stock = data.stock;
+
                         calculateTotals();
                     }
                 })
@@ -380,118 +492,147 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         } else {
             productInfoDiv.style.display = 'none';
-            profitInfoDiv.style.display = 'none';
             unitPriceInput.value = '';
             calculateTotals();
         }
     }
     
     function calculateTotals() {
-        const quantity = parseFloat(quantityInput.value) || 0;
-        const unitPrice = parseFloat(unitPriceInput.value) || 0;
+        const productRows = document.querySelectorAll('.product-row');
+        let grandSubtotal = 0;
+        let totalQuantity = 0;
+        let totalProfit = 0;
+        let hasValidItems = false;
+
+        // Calculate each row
+        productRows.forEach(row => {
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const unitPriceInput = row.querySelector('.unit-price-input');
+            const itemTotalDiv = row.querySelector('.item-total');
+
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitPrice = parseFloat(unitPriceInput.value) || 0;
+            const costPrice = parseFloat(productSelect.dataset.costPrice) || 0;
+
+            const itemSubtotal = quantity * unitPrice;
+            const itemProfit = (unitPrice - costPrice) * quantity;
+
+            // Update item total display
+            itemTotalDiv.textContent = `${itemSubtotal.toFixed(2)} ج.م`;
+
+            if (productSelect.value && quantity > 0 && unitPrice > 0) {
+                grandSubtotal += itemSubtotal;
+                totalQuantity += quantity;
+                totalProfit += itemProfit;
+                hasValidItems = true;
+            }
+        });
+
+        // Apply discount
         const discountPercentage = parseFloat(discountInput.value) || 0;
-        const costPrice = parseFloat(productSelect.dataset.costPrice) || 0;
-        
-        // Calculate amounts
-        const subtotal = quantity * unitPrice;
-        const discountAmount = (subtotal * discountPercentage) / 100;
-        const total = subtotal - discountAmount;
-        const profit = (unitPrice - costPrice) * quantity;
-        const profitMargin = costPrice > 0 ? ((unitPrice - costPrice) / costPrice * 100) : 0;
-        
+        const discountAmount = (grandSubtotal * discountPercentage) / 100;
+        const finalTotal = grandSubtotal - discountAmount;
+
         // Update display
-        document.getElementById('subtotalAmount').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('discountAmount').textContent = `$${discountAmount.toFixed(2)}`;
-        document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
-        document.getElementById('finalAmount').textContent = `$${total.toFixed(2)}`;
-        document.getElementById('displayQuantity').textContent = quantity;
-        document.getElementById('displayUnitPrice').textContent = `$${unitPrice.toFixed(2)}`;
-        document.getElementById('displayProfit').textContent = `$${profit.toFixed(2)}`;
-        
+        document.getElementById('subtotalAmount').textContent = `${grandSubtotal.toFixed(2)} ج.م`;
+        document.getElementById('discountAmount').textContent = `${discountAmount.toFixed(2)} ج.م`;
+        document.getElementById('totalAmount').textContent = `${finalTotal.toFixed(2)} ج.م`;
+        document.getElementById('finalAmount').textContent = `${finalTotal.toFixed(2)} ج.م`;
+        document.getElementById('displayQuantity').textContent = totalQuantity;
+        document.getElementById('displayUnitPrice').textContent = `${(grandSubtotal / totalQuantity || 0).toFixed(2)} ج.م`;
+        document.getElementById('displayProfit').textContent = `${totalProfit.toFixed(2)} ج.م`;
+
         // Update profit information
-        if (quantity > 0 && unitPrice > 0 && costPrice > 0) {
+        if (hasValidItems && totalProfit !== 0) {
             let profitClass = 'profit-indicator';
             let profitIcon = 'fa-arrow-up';
-            
-            if (profit < 0) {
+
+            if (totalProfit < 0) {
                 profitClass = 'stock-warning';
                 profitIcon = 'fa-arrow-down';
             }
-            
+
+            const profitMargin = grandSubtotal > 0 ? (totalProfit / grandSubtotal * 100) : 0;
             const profitHtml = `
                 <div class="${profitClass}">
                     <i class="fas ${profitIcon} me-2"></i>
-                    <strong>Profit Analysis:</strong> $${profit.toFixed(2)} 
-                    (${profitMargin.toFixed(1)}% margin)
+                    <strong>تحليل الربح:</strong> ${totalProfit.toFixed(2)} ج.م
+                    (${profitMargin.toFixed(1)}% هامش)
                 </div>
             `;
-            
+
             profitInfoDiv.innerHTML = profitHtml;
             profitInfoDiv.style.display = 'block';
         } else {
             profitInfoDiv.style.display = 'none';
         }
-        
+
         // Update button state
         const submitBtn = document.getElementById('completeSaleBtn');
-        if (total > 0 && quantity > 0) {
+        if (finalTotal > 0 && hasValidItems) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Sale - $${total.toFixed(2)}`;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>إتمام البيع - ${finalTotal.toFixed(2)} ج.م`;
         } else {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Sale`;
+            submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>إتمام البيع`;
         }
     }
     
     function validateForm(e) {
-        const quantity = parseFloat(quantityInput.value) || 0;
-        const unitPrice = parseFloat(unitPriceInput.value) || 0;
-        const productValue = productSelect.value;
         const customerValue = document.querySelector('select[name="customer"]').value;
-        
+        const productRows = document.querySelectorAll('.product-row');
+        let hasValidItems = false;
+        let totalAmount = 0;
+
         if (!customerValue) {
             e.preventDefault();
-            alert('Please select a customer.');
+            alert('يرجى اختيار العميل.');
             return false;
         }
-        
-        if (!productValue) {
+
+        // Validate each product row
+        for (let row of productRows) {
+            const productSelect = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const unitPriceInput = row.querySelector('.unit-price-input');
+
+            const productValue = productSelect.value;
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitPrice = parseFloat(unitPriceInput.value) || 0;
+            const stock = parseInt(productSelect.dataset.stock) || 0;
+
+            if (productValue && quantity > 0 && unitPrice > 0) {
+                hasValidItems = true;
+
+                // Check stock availability
+                if (quantity > stock) {
+                    e.preventDefault();
+                    alert(`مخزون غير كافي للمنتج. المتاح: ${stock}، المطلوب: ${quantity}`);
+                    return false;
+                }
+
+                totalAmount += quantity * unitPrice;
+            }
+        }
+
+        if (!hasValidItems) {
             e.preventDefault();
-            alert('Please select a product.');
+            alert('يرجى إضافة منتج واحد على الأقل مع كمية وسعر صحيحين.');
             return false;
         }
-        
-        if (quantity <= 0) {
-            e.preventDefault();
-            alert('Please enter a valid quantity.');
-            return false;
-        }
-        
-        if (unitPrice <= 0) {
-            e.preventDefault();
-            alert('Please enter a valid unit price.');
-            return false;
-        }
-        
-        // Check stock availability
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        const productText = selectedOption.text;
-        const stockMatch = productText.match(/Stock: (\d+)/);
-        const stock = stockMatch ? parseInt(stockMatch[1]) : 0;
-        
-        if (quantity > stock) {
-            e.preventDefault();
-            alert(`Insufficient stock. Available: ${stock}, Requested: ${quantity}`);
-            return false;
-        }
-        
+
+        // Apply discount
+        const discountPercentage = parseFloat(discountInput.value) || 0;
+        const discountAmount = (totalAmount * discountPercentage) / 100;
+        const finalTotal = totalAmount - discountAmount;
+
         // Confirm sale
-        const total = (quantity * unitPrice) * (1 - (parseFloat(discountInput.value) || 0) / 100);
-        if (!confirm(`Confirm sale of $${total.toFixed(2)}?`)) {
+        if (!confirm(`تأكيد البيع بمبلغ ${finalTotal.toFixed(2)} ج.م؟`)) {
             e.preventDefault();
             return false;
         }
-        
+
         return true;
     }
     

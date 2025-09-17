@@ -450,35 +450,128 @@ def installment_payment(request, installment_payment_id):
 @login_required
 @permission_required('create_sales')
 def quick_sale(request):
-    """Quick sale for simple cash transactions"""
+    """Quick sale for simple cash transactions with multiple products support"""
     if request.method == 'POST':
-        form = QuickSaleForm(request.POST)
-        
-        if form.is_valid():
-            try:
-                sale = form.create_sale(request.user)
-                
+        try:
+            # Handle multiple products from the enhanced form
+            customer_id = request.POST.get('customer')
+            payment_method = request.POST.get('payment_method', 'cash')
+            discount_percentage = Decimal(str(request.POST.get('discount_percentage', 0) or 0))
+
+            if not customer_id:
+                messages.error(request, 'يرجى اختيار العميل.')
+                return redirect('sales:quick_sale')
+
+            customer = Customer.objects.get(id=customer_id)
+
+            # Collect all products from the form
+            products_data = []
+
+            # Main product (original form fields)
+            main_product_id = request.POST.get('product')
+            main_quantity = request.POST.get('quantity')
+            main_unit_price = request.POST.get('unit_price')
+
+            if main_product_id and main_quantity and main_unit_price:
+                products_data.append({
+                    'product_id': main_product_id,
+                    'quantity': int(main_quantity),
+                    'unit_price': Decimal(str(main_unit_price))
+                })
+
+            # Additional products (from dynamic rows)
+            for key in request.POST.keys():
+                if key.startswith('additional_product_'):
+                    row_id = key.split('_')[-1]
+                    product_id = request.POST.get(f'additional_product_{row_id}')
+                    quantity = request.POST.get(f'additional_quantity_{row_id}')
+                    unit_price = request.POST.get(f'additional_unit_price_{row_id}')
+
+                    if product_id and quantity and unit_price:
+                        products_data.append({
+                            'product_id': product_id,
+                            'quantity': int(quantity),
+                            'unit_price': Decimal(str(unit_price))
+                        })
+
+            if not products_data:
+                messages.error(request, 'يرجى إضافة منتج واحد على الأقل.')
+                return redirect('sales:quick_sale')
+
+            # Create the sale with multiple products
+            with transaction.atomic():
+                # Create the sale
+                sale = Sale.objects.create(
+                    customer=customer,
+                    sale_type='cash',
+                    status='completed',
+                    created_by=request.user
+                )
+
+                subtotal = Decimal('0.00')
+
+                # Create sale items for each product
+                for product_data in products_data:
+                    product = Product.objects.get(id=product_data['product_id'])
+
+                    # Check stock availability
+                    if product_data['quantity'] > product.current_stock:
+                        raise ValueError(f'مخزون غير كافي للمنتج {product.name}. المتاح: {product.current_stock}، المطلوب: {product_data["quantity"]}')
+
+                    # Create sale item
+                    sale_item = SaleItem.objects.create(
+                        sale=sale,
+                        product=product,
+                        quantity=product_data['quantity'],
+                        unit_price=product_data['unit_price'],
+                        discount_percentage=0  # Individual item discount not supported in quick sale
+                    )
+
+                    subtotal += Decimal(str(sale_item.total_price))
+
+                    # Update product stock
+                    product.current_stock -= product_data['quantity']
+                    product.save()
+
+                # Apply overall discount and update sale totals
+                discount_amount = (subtotal * discount_percentage) / Decimal('100')
+                total_amount = subtotal - discount_amount
+
+                sale.subtotal = subtotal
+                sale.discount_amount = discount_amount
+                sale.total_amount = total_amount
+                sale.save()
+
+                # Create payment
+                payment = Payment.objects.create(
+                    sale=sale,
+                    amount=total_amount,
+                    payment_method=payment_method,
+                    received_by=request.user
+                )
+
                 # Log activity
                 ActivityLog.objects.create(
                     user=request.user,
                     action='create',
-                    description=f'Created quick sale: {sale.sale_number}',
+                    description=f'تم إنشاء بيع سريع: {sale.sale_number} ({len(products_data)} منتجات)',
                     content_object=sale
                 )
-                
-                messages.success(request, f'Quick sale {sale.sale_number} completed successfully.')
+
+                messages.success(request, f'تم إتمام البيع السريع {sale.sale_number} بنجاح.')
                 return redirect('sales:sale_detail', sale_id=sale.id)
-                
-            except Exception as e:
-                messages.error(request, f'Error creating quick sale: {str(e)}')
-    else:
-        form = QuickSaleForm()
-    
+
+        except Exception as e:
+            messages.error(request, f'خطأ في إنشاء البيع السريع: {str(e)}')
+
+    # GET request - show the form
+    form = QuickSaleForm()
+
     context = {
         'form': form,
-        'title': 'Quick Sale'
+        'title': 'البيع السريع'
     }
-    
+
     return render(request, 'sales/quick_sale.html', context)
 
 @login_required

@@ -173,10 +173,10 @@
                         <p class="mb-0"><strong>Sale Date:</strong> {{ sale.sale_date|date:"M d, Y" }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h6><i class="fas fa-dollar-sign me-2"></i>Financial Summary</h6>
-                        <p class="mb-1"><strong>الإجمالي Amount:</strong> ${{ sale.total_amount|floatformat:2 }}</p>
-                        <p class="mb-1"><strong>مدفوع Amount:</strong> ${{ sale.paid_amount|floatformat:2 }}</p>
-                        <p class="mb-0"><strong>الرصيد Due:</strong> <span class="text-danger fw-bold">${{ sale.balance_amount|floatformat:2 }}</span></p>
+                        <h6><i class="fas fa-money-bill me-2"></i>الملخص المالي</h6>
+                        <p class="mb-1"><strong>المبلغ الإجمالي:</strong> {{ sale.total_amount|floatformat:2 }} ج.م</p>
+                        <p class="mb-1"><strong>المبلغ المدفوع:</strong> {{ sale.paid_amount|floatformat:2 }} ج.م</p>
+                        <p class="mb-0"><strong>الرصيد المستحق:</strong> <span class="text-danger fw-bold">{{ sale.balance_amount|floatformat:2 }} ج.م</span></p>
                     </div>
                 </div>
             </div>
@@ -201,22 +201,22 @@
                                 <!-- Quick Amount Buttons -->
                                 <div class="quick-amount-buttons">
                                     <button type="button" class="quick-amount-btn" data-amount="{{ sale.balance_amount }}">
-                                        Full المبلغ<br>${{ sale.balance_amount|floatformat:2 }}
+                                        المبلغ الكامل<br>{{ sale.balance_amount|floatformat:2 }} ج.م
                                     </button>
                                     <button type="button" class="quick-amount-btn" data-amount="{% widthratio sale.balance_amount 2 1 %}">
-                                        Half المبلغ<br>${{ sale.balance_amount|floatformat:2|floatformat:0|add:"0"|mul:"0.5" }}
+                                        نصف المبلغ<br>{% widthratio sale.balance_amount 2 1 %} ج.م
                                     </button>
                                     <button type="button" class="quick-amount-btn" data-amount="100">
-                                        $100
+                                        100 ج.م
                                     </button>
                                     <button type="button" class="quick-amount-btn" data-amount="50">
-                                        $50
+                                        50 ج.م
                                     </button>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Remaining الرصيد</label>
-                                <div class="amount-display" id="remainingBalance">${{ sale.balance_amount|floatformat:2 }}</div>
+                                <label class="form-label">الرصيد المتبقي</label>
+                                <div class="amount-display" id="remainingBalance">{{ sale.balance_amount|floatformat:2 }} ج.م</div>
                             </div>
                         </div>
                     </div>
@@ -329,34 +329,34 @@
         <!-- Payment Summary -->
         <div class="col-lg-4">
             <div class="sale-summary">
-                <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>الدفع Summary</h5>
-                
-                <div class="amount-display" id="paymentAmount">$0.00</div>
-                
+                <h5 class="mb-4"><i class="fas fa-calculator me-2"></i>ملخص الدفع</h5>
+
+                <div class="amount-display" id="paymentAmount">0.00 ج.م</div>
+
                 <div class="summary-row">
-                    <span>Current Balance:</span>
-                    <span>${{ sale.balance_amount|floatformat:2 }}</span>
+                    <span>الرصيد الحالي:</span>
+                    <span>{{ sale.balance_amount|floatformat:2 }} ج.م</span>
                 </div>
-                
+
                 <div class="summary-row">
-                    <span>الدفع Amount:</span>
-                    <span id="displayPaymentAmount">$0.00</span>
+                    <span>مبلغ الدفع:</span>
+                    <span id="displayPaymentAmount">0.00 ج.م</span>
                 </div>
-                
+
                 <div class="summary-row">
-                    <span>New Balance:</span>
-                    <span id="newBalance">${{ sale.balance_amount|floatformat:2 }}</span>
+                    <span>الرصيد الجديد:</span>
+                    <span id="newBalance">{{ sale.balance_amount|floatformat:2 }} ج.م</span>
                 </div>
 
                 <div class="mt-4">
                     <h6>Sale معلومات</h6>
                     <div class="summary-row">
-                        <span>الإجمالي Amount:</span>
-                        <span>${{ sale.total_amount|floatformat:2 }}</span>
+                        <span>المبلغ الإجمالي:</span>
+                        <span>{{ sale.total_amount|floatformat:2 }} ج.م</span>
                     </div>
                     <div class="summary-row">
-                        <span>السابقly Paid:</span>
-                        <span>${{ sale.paid_amount|floatformat:2 }}</span>
+                        <span>المدفوع سابقاً:</span>
+                        <span>{{ sale.paid_amount|floatformat:2 }} ج.م</span>
                     </div>
                     <div class="summary-row">
                         <span>الدفع Method:</span>
@@ -438,21 +438,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const newBalance = Math.max(0, currentBalance - paymentAmount);
         
         // Update displays
-        document.getElementById('paymentAmount').textContent = `$${paymentAmount.toFixed(2)}`;
-        document.getElementById('displayPaymentAmount').textContent = `$${paymentAmount.toFixed(2)}`;
-        document.getElementById('newBalance').textContent = `$${newBalance.toFixed(2)}`;
-        document.getElementById('remainingBalance').textContent = `$${newBalance.toFixed(2)}`;
+        document.getElementById('paymentAmount').textContent = `${paymentAmount.toFixed(2)} ج.م`;
+        document.getElementById('displayPaymentAmount').textContent = `${paymentAmount.toFixed(2)} ج.م`;
+        document.getElementById('newBalance').textContent = `${newBalance.toFixed(2)} ج.م`;
+        document.getElementById('remainingBalance').textContent = `${newBalance.toFixed(2)} ج.م`;
         
         // Update submit button
         const submitBtn = document.getElementById('submitBtn');
         if (paymentAmount > 0 && paymentAmount <= currentBalance) {
             submitBtn.disabled = false;
             if (newBalance === 0) {
-                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>Complete Payment - $${paymentAmount.toFixed(2)}`;
+                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>إكمال الدفع - ${paymentAmount.toFixed(2)} ج.م`;
                 submitBtn.classList.remove('btn-record-payment');
                 submitBtn.classList.add('btn', 'btn-success');
             } else {
-                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>تسجيل دفعة - $${paymentAmount.toFixed(2)}`;
+                submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>تسجيل دفعة - ${paymentAmount.toFixed(2)} ج.م`;
                 submitBtn.classList.remove('btn-success');
                 submitBtn.classList.add('btn-record-payment');
             }
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (paymentAmount > currentBalance) {
-            alert(`Payment amount cannot exceed balance of $${currentBalance.toFixed(2)}.`);
+            alert(`مبلغ الدفع لا يمكن أن يتجاوز الرصيد ${currentBalance.toFixed(2)} ج.م.`);
             return false;
         }
         
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        return confirm(`Record payment of $${paymentAmount.toFixed(2)} via ${selectedMethod.replace('_', ' ')}?`);
+        return confirm(`تسجيل دفعة بمبلغ ${paymentAmount.toFixed(2)} ج.م عبر ${selectedMethod.replace('_', ' ')}؟`);
     }
     
     // Initialize

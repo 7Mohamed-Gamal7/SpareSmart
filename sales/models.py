@@ -84,8 +84,9 @@ class Sale(models.Model):
             
             self.sale_number = f"SAL-{timezone.now().year}-{new_number:06d}"
         
-        # Calculate balance
-        self.balance_amount = self.total_amount - self.paid_amount
+        # Calculate balance with Decimal conversion
+        from decimal import Decimal
+        self.balance_amount = Decimal(str(self.total_amount)) - Decimal(str(self.paid_amount))
         
         # Update payment status
         if self.balance_amount <= 0:
@@ -123,18 +124,29 @@ class SaleItem(models.Model):
     
     @property
     def profit(self):
-        return (self.unit_price - self.cost_price) * self.quantity
+        from decimal import Decimal
+        unit_price = Decimal(str(self.unit_price))
+        cost_price = Decimal(str(self.cost_price))
+        quantity = Decimal(str(self.quantity))
+        return (unit_price - cost_price) * quantity
     
     def save(self, *args, **kwargs):
-        # Calculate total price
-        discount_amt = (self.unit_price * self.quantity * self.discount_percentage) / 100
+        # Calculate total price using Decimal for precision
+        from decimal import Decimal
+
+        unit_price = Decimal(str(self.unit_price))
+        quantity = Decimal(str(self.quantity))
+        discount_pct = Decimal(str(self.discount_percentage or 0))
+
+        subtotal = unit_price * quantity
+        discount_amt = (subtotal * discount_pct) / Decimal('100')
         self.discount_amount = discount_amt
-        self.total_price = (self.unit_price * self.quantity) - discount_amt
-        
+        self.total_price = subtotal - discount_amt
+
         # Set cost price from product if not provided
         if not self.cost_price:
             self.cost_price = self.product.cost_price
-        
+
         super().save(*args, **kwargs)
     
     class Meta:
@@ -245,7 +257,8 @@ class Installment(models.Model):
     
     @property
     def remaining_balance(self):
-        return self.total_amount - self.total_paid
+        from decimal import Decimal
+        return Decimal(str(self.total_amount)) - Decimal(str(self.total_paid))
     
     class Meta:
         db_table = 'installments'
@@ -284,12 +297,16 @@ class InstallmentPayment(models.Model):
         if self.due_date < timezone.now().date() and self.status == 'pending':
             self.status = 'overdue'
         
-        # Update status based on payment
-        if self.paid_amount >= self.amount:
+        # Update status based on payment with Decimal conversion
+        from decimal import Decimal
+        paid_amount_decimal = Decimal(str(self.paid_amount))
+        amount_decimal = Decimal(str(self.amount))
+
+        if paid_amount_decimal >= amount_decimal:
             self.status = 'paid'
             if not self.paid_date:
                 self.paid_date = timezone.now().date()
-        elif self.paid_amount > 0:
+        elif paid_amount_decimal > 0:
             self.status = 'partial'
         
         super().save(*args, **kwargs)

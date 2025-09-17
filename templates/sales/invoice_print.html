@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فاتورة رقم {{ sale.sale_number }} - SpareSmart</title>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    
+    <style>
+        /* Print-specific styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .page-break {
+                page-break-after: always;
+            }
+            
+            .invoice-container {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .table {
+                font-size: 11pt;
+            }
+            
+            .btn {
+                display: none !important;
+            }
+        }
+        
+        /* Screen styles */
+        @media screen {
+            body {
+                background-color: #f5f5f5;
+                padding: 20px;
+            }
+            
+            .invoice-container {
+                background: white;
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 20mm;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                border-radius: 8px;
+            }
+        }
+        
+        /* Common styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .invoice-header {
+            border-bottom: 3px solid #0d6efd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .company-logo {
+            font-size: 2.5rem;
+            color: #0d6efd;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-number {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-right: 4px solid #0d6efd;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .items-table {
+            margin: 30px 0;
+        }
+        
+        .items-table th {
+            background: #0d6efd;
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+            border: none;
+        }
+        
+        .items-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .items-table .text-end {
+            text-align: left !important;
+        }
+        
+        .totals-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-right: 4px solid #28a745;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .total-row:last-child {
+            border-bottom: 2px solid #28a745;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #28a745;
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .status-completed { background: #d1edff; color: #0c63e4; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        
+        .payment-paid { background: #d1e7dd; color: #0f5132; }
+        .payment-partial { background: #fff3cd; color: #856404; }
+        .payment-unpaid { background: #f8d7da; color: #721c24; }
+        
+        .footer-note {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-align: center;
+        }
+        
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .btn-print {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .btn-print:hover {
+            background: #0b5ed7;
+        }
+        
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-back:hover {
+            background: #5c636a;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Controls -->
+    <div class="print-controls no-print">
+        <button onclick="window.print()" class="btn-print">
+            <i class="fas fa-print"></i> طباعة
+        </button>
+        <a href="{% url 'sales:sale_detail' sale.id %}" class="btn-back">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+    </div>
+
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="company-logo">
+                        <i class="fas fa-cogs"></i> {{ company_info.name }}
+                    </div>
+                    <div class="company-details">
+                        <div><strong>العنوان:</strong> {{ company_info.address }}</div>
+                        <div><strong>الهاتف:</strong> {{ company_info.phone }}</div>
+                        <div><strong>البريد الإلكتروني:</strong> {{ company_info.email }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-start">
+                    <div class="invoice-title">فاتورة</div>
+                    <div class="invoice-number">رقم الفاتورة: {{ sale.sale_number }}</div>
+                    <div class="invoice-date mt-2">
+                        <strong>تاريخ الفاتورة:</strong> {{ sale.sale_date|date:"d/m/Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer and Sale Information -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section">
+                    <div class="info-title">معلومات العميل</div>
+                    <div><strong>الاسم:</strong> {{ sale.customer.name }}</div>
+                    {% if sale.customer.phone %}
+                    <div><strong>الهاتف:</strong> {{ sale.customer.phone }}</div>
+                    {% endif %}
+                    {% if sale.customer.email %}
+                    <div><strong>البريد الإلكتروني:</strong> {{ sale.customer.email }}</div>
+                    {% endif %}
+                    {% if sale.customer.address %}
+                    <div><strong>العنوان:</strong> {{ sale.customer.address }}</div>
+                    {% endif %}
+                    {% if sale.customer.tax_number %}
+                    <div><strong>الرقم الضريبي:</strong> {{ sale.customer.tax_number }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-section">
+                    <div class="info-title">تفاصيل البيع</div>
+                    <div><strong>نوع البيع:</strong> 
+                        {% if sale.sale_type == 'cash' %}نقدي
+                        {% elif sale.sale_type == 'credit' %}آجل
+                        {% elif sale.sale_type == 'installment' %}تقسيط
+                        {% elif sale.sale_type == 'wholesale' %}جملة
+                        {% else %}{{ sale.get_sale_type_display }}{% endif %}
+                    </div>
+                    <div><strong>حالة البيع:</strong> 
+                        <span class="status-badge status-{{ sale.status }}">
+                            {% if sale.status == 'completed' %}مكتمل
+                            {% elif sale.status == 'pending' %}معلق
+                            {% elif sale.status == 'cancelled' %}ملغي
+                            {% else %}{{ sale.get_status_display }}{% endif %}
+                        </span>
+                    </div>
+                    <div><strong>حالة الدفع:</strong> 
+                        <span class="status-badge payment-{{ sale.payment_status }}">
+                            {% if sale.payment_status == 'paid' %}مدفوع
+                            {% elif sale.payment_status == 'partial' %}مدفوع جزئياً
+                            {% elif sale.payment_status == 'unpaid' %}غير مدفوع
+                            {% elif sale.payment_status == 'overdue' %}متأخر
+                            {% else %}{{ sale.get_payment_status_display }}{% endif %}
+                        </span>
+                    </div>
+                    {% if sale.due_date %}
+                    <div><strong>تاريخ الاستحقاق:</strong> {{ sale.due_date|date:"d/m/Y" }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-table">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">المنتج</th>
+                        <th style="width: 10%;">الكمية</th>
+                        <th style="width: 15%;">سعر الوحدة</th>
+                        <th style="width: 10%;">الخصم %</th>
+                        <th style="width: 15%;">مبلغ الخصم</th>
+                        <th style="width: 15%;">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sale.items.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td class="text-start">
+                            <strong>{{ item.product.name }}</strong>
+                            {% if item.product.sku %}
+                            <br><small class="text-muted">كود المنتج: {{ item.product.sku }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit_price|floatformat:2 }} ج.م</td>
+                        <td>{{ item.discount_percentage|floatformat:1 }}%</td>
+                        <td>{{ item.discount_amount|floatformat:2 }} ج.م</td>
+                        <td><strong>{{ item.total_price|floatformat:2 }} ج.م</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">لا توجد عناصر في هذه الفاتورة</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="row">
+            <div class="col-md-6">
+                {% if sale.notes %}
+                <div class="info-section">
+                    <div class="info-title">ملاحظات</div>
+                    <p>{{ sale.notes|linebreaks }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>المجموع الفرعي:</span>
+                        <span>{{ sale.subtotal|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% if sale.discount_amount > 0 %}
+                    <div class="total-row">
+                        <span>إجمالي الخصم:</span>
+                        <span>{{ sale.discount_amount|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% endif %}
+                    {% if sale.tax_amount > 0 %}
+                    <div class="total-row">
+                        <span>الضريبة:</span>
+                        <span>{{ sale.tax_amount|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% endif %}
+                    <div class="total-row">
+                        <span>المبلغ الإجمالي:</span>
+                        <span>{{ sale.total_amount|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% if sale.paid_amount > 0 %}
+                    <div class="total-row">
+                        <span>المبلغ المدفوع:</span>
+                        <span>{{ sale.paid_amount|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% endif %}
+                    {% if sale.balance_amount > 0 %}
+                    <div class="total-row">
+                        <span>الرصيد المتبقي:</span>
+                        <span>{{ sale.balance_amount|floatformat:2 }} ج.م</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        {% if sale.payments.exists %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="info-section">
+                    <div class="info-title">تفاصيل الدفع</div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>رقم الدفعة</th>
+                                    <th>المبلغ</th>
+                                    <th>طريقة الدفع</th>
+                                    <th>التاريخ</th>
+                                    <th>المستلم</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in sale.payments.all %}
+                                <tr>
+                                    <td>{{ payment.payment_number }}</td>
+                                    <td>{{ payment.amount|floatformat:2 }} ج.م</td>
+                                    <td>
+                                        {% if payment.payment_method == 'cash' %}نقدي
+                                        {% elif payment.payment_method == 'card' %}بطاقة ائتمان
+                                        {% elif payment.payment_method == 'bank_transfer' %}تحويل بنكي
+                                        {% elif payment.payment_method == 'check' %}شيك
+                                        {% elif payment.payment_method == 'mobile_payment' %}دفع محمول
+                                        {% elif payment.payment_method == 'credit' %}رصيد المتجر
+                                        {% else %}{{ payment.get_payment_method_display }}{% endif %}
+                                    </td>
+                                    <td>{{ payment.payment_date|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ payment.received_by.get_full_name|default:payment.received_by.username }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="footer-note">
+            <p><strong>شكراً لتعاملكم معنا</strong></p>
+            <p>تم إنشاء هذه الفاتورة بواسطة نظام SpareSmart لإدارة قطع الغيار</p>
+            <p>تاريخ الطباعة: {{ "now"|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+
+    <!-- Auto-print script (optional) -->
+    <script>
+        // Uncomment the line below if you want the page to auto-print when loaded
+        // window.onload = function() { window.print(); }
+
+        // Print function
+        function printInvoice() {
+            window.print();
+        }
+
+        // Keyboard shortcut for printing (Ctrl+P)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printInvoice();
+            }
+        });
+    </script>
+</body>
+</html>

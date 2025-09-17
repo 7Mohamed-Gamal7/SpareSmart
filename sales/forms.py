@@ -268,9 +268,9 @@ class QuickSaleForm(forms.Form):
     )
     
     product = forms.ModelChoiceField(
-        queryset=Product.objects.filter(is_active=True, current_stock__gt=0).order_by('name'),
+        queryset=Product.objects.filter(is_active=True).order_by('name'),
         required=True,
-        empty_label="Select Product",
+        empty_label="اختر منتج",
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     
@@ -302,6 +302,25 @@ class QuickSaleForm(forms.Form):
         initial='cash',
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Customize product display to show stock information
+        products = Product.objects.filter(is_active=True).order_by('name')
+        product_choices = [('', 'اختر منتج')]
+
+        for product in products:
+            stock_info = f"المخزون: {product.current_stock}"
+            if product.current_stock == 0:
+                stock_info += " (غير متوفر)"
+            elif product.current_stock <= product.reorder_level:
+                stock_info += " (مخزون منخفض)"
+
+            choice_text = f"{product.name} - {stock_info} - {product.selling_price} ج.م"
+            product_choices.append((product.id, choice_text))
+
+        self.fields['product'].choices = product_choices
     
     def clean(self):
         cleaned_data = super().clean()
@@ -338,11 +357,12 @@ class QuickSaleForm(forms.Form):
                 discount_percentage=discount_percentage
             )
             
-            # Update sale totals
-            sale.subtotal = sale_item.total_price
-            sale.total_amount = sale_item.total_price
+            # Update sale totals with Decimal conversion
+            from decimal import Decimal
+            sale.subtotal = Decimal(str(sale_item.total_price))
+            sale.total_amount = Decimal(str(sale_item.total_price))
             sale.save()
-            
+
             # Create payment
             payment = Payment.objects.create(
                 sale=sale,

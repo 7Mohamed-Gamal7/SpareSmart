@@ -134,30 +134,32 @@ def purchase_create(request):
         
         if form.is_valid() and formset.is_valid():
             try:
+                # Import Decimal at the beginning of the try block
+                from decimal import Decimal
+
                 with transaction.atomic():
                     purchase = form.save(commit=False)
                     purchase.created_by = request.user
                     purchase.save()
-                    
+
                     # Save items and calculate totals
                     subtotal = Decimal('0.00')
                     formset.instance = purchase
-                    
+
                     for item_form in formset:
                         if item_form.cleaned_data and not item_form.cleaned_data.get('DELETE', False):
                             item = item_form.save(commit=False)
                             item.purchase = purchase
                             item.save()
                             subtotal += Decimal(str(item.total_cost))
-                    
-                    # Update purchase totals
+
+                    # Update purchase totals with Decimal conversion
                     purchase.subtotal = subtotal
-                    purchase.total_amount = (
-                        subtotal +
-                        Decimal(str(purchase.tax_amount or 0)) +
-                        Decimal(str(purchase.shipping_cost or 0)) -
-                        Decimal(str(purchase.discount_amount or 0))
-                    )
+                    tax_amount = Decimal(str(purchase.tax_amount or 0))
+                    shipping_cost = Decimal(str(purchase.shipping_cost or 0))
+                    discount_amount = Decimal(str(purchase.discount_amount or 0))
+
+                    purchase.total_amount = subtotal + tax_amount + shipping_cost - discount_amount
                     purchase.balance_amount = purchase.total_amount
                     purchase.save()
                     
@@ -194,12 +196,12 @@ def purchase_detail(request, purchase_id):
     """View purchase order details"""
     purchase = get_object_or_404(
         Purchase.objects.select_related('supplier', 'created_by', 'updated_by', 'received_by')
-        .prefetch_related('items__product', 'payments'),
+        .prefetch_related('items__product', 'purchase_payments'),
         id=purchase_id
     )
     
     # Get payments
-    payments = purchase.payments.all().order_by('-payment_date')
+    payments = purchase.purchase_payments.all().order_by('-payment_date')
     
     # Get recent stock movements related to this purchase
     stock_movements = StockMovement.objects.filter(
@@ -381,12 +383,12 @@ def purchase_invoice(request, purchase_id):
     """View purchase invoice"""
     purchase = get_object_or_404(
         Purchase.objects.select_related('supplier', 'created_by')
-        .prefetch_related('items__product', 'payments'),
+        .prefetch_related('items__product', 'purchase_payments'),
         id=purchase_id
     )
     
     # Get payments
-    payments = purchase.payments.all().order_by('-payment_date')
+    payments = purchase.purchase_payments.all().order_by('-payment_date')
     
     context = {
         'purchase': purchase,
@@ -401,7 +403,7 @@ def purchase_invoice(request, purchase_id):
 def purchase_payment_list(request, purchase_id):
     """List payments for a purchase"""
     purchase = get_object_or_404(Purchase, id=purchase_id)
-    payments = purchase.payments.all().order_by('-payment_date')
+    payments = purchase.purchase_payments.all().order_by('-payment_date')
     
     context = {
         'purchase': purchase,
@@ -432,8 +434,9 @@ def purchase_payment_create(request, purchase_id):
                     payment.paid_by = request.user
                     payment.save()
                     
-                    # Update purchase paid amount
-                    purchase.paid_amount += payment.amount
+                    # Update purchase paid amount with Decimal conversion
+                    from decimal import Decimal
+                    purchase.paid_amount = Decimal(str(purchase.paid_amount)) + Decimal(str(payment.amount))
                     purchase.save()  # This will trigger balance calculation in model
                     
                     # Log activity

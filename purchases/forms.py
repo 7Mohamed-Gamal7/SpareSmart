@@ -312,13 +312,17 @@ class PurchasePaymentForm(forms.ModelForm):
         self.fields['payment_date'].initial = timezone.now().date()
 
     def clean_amount(self):
+        from decimal import Decimal
         amount = self.cleaned_data.get('amount')
         if amount and amount <= 0:
             raise ValidationError("Payment amount must be greater than 0.")
-        
-        if amount and amount > self.purchase.balance_amount:
-            raise ValidationError(f"Payment amount cannot exceed balance of ${self.purchase.balance_amount:.2f}")
-        
+
+        if amount:
+            amount_decimal = Decimal(str(amount))
+            balance_decimal = Decimal(str(self.purchase.balance_amount))
+            if amount_decimal > balance_decimal:
+                raise ValidationError(f"Payment amount cannot exceed balance of {balance_decimal:.2f} ج.م")
+
         return amount
 
 

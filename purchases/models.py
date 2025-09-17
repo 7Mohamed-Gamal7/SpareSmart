@@ -80,8 +80,11 @@ class Purchase(models.Model):
             
             self.purchase_number = f"PUR-{timezone.now().year}-{new_number:06d}"
         
-        # Calculate balance
-        self.balance_amount = self.total_amount - self.paid_amount
+        # Calculate balance with Decimal conversion
+        from decimal import Decimal
+        total_amount = Decimal(str(self.total_amount or 0))
+        paid_amount = Decimal(str(self.paid_amount or 0))
+        self.balance_amount = total_amount - paid_amount
         
         # Update payment status
         if self.balance_amount <= 0:
@@ -285,7 +288,10 @@ class PurchaseReturnItem(models.Model):
         return f"Return {self.purchase_item.product.name} x {self.quantity}"
     
     def save(self, *args, **kwargs):
-        self.total_amount = self.quantity * self.unit_cost
+        from decimal import Decimal
+        quantity = Decimal(str(self.quantity))
+        unit_cost = Decimal(str(self.unit_cost))
+        self.total_amount = quantity * unit_cost
         super().save(*args, **kwargs)
     
     class Meta:

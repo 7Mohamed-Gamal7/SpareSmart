@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block title %}فاتورة الشراء {{ purchase.purchase_number }} | سبير سمارت{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        margin: 2rem 0;
+    }
+    .invoice-header {
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+    }
+    .company-info {
+        text-align: right;
+    }
+    .company-logo {
+        font-size: 2.5rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    .invoice-title {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+    .invoice-number {
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+    .supplier-info, .invoice-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    .items-table {
+        margin: 2rem 0;
+    }
+    .items-table th {
+        background: #667eea;
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+    }
+    .items-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .total-section {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    .payment-history {
+        margin-top: 2rem;
+        border-top: 2px solid #dee2e6;
+        padding-top: 2rem;
+    }
+    .payment-table th {
+        background: #28a745;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 0.75rem;
+    }
+    .payment-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .print-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    @media print {
+        .print-button, .btn, .no-print {
+            display: none !important;
+        }
+        .invoice-container {
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 1rem !important;
+        }
+        body {
+            background: white !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Print Button -->
+    <button onclick="window.print()" class="btn btn-primary print-button no-print">
+        <i class="fas fa-print me-2"></i>طباعة
+    </button>
+
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="invoice-title">فاتورة شراء</div>
+                    <div class="invoice-number">{{ purchase.purchase_number }}</div>
+                </div>
+                <div class="col-md-6 company-info">
+                    <div class="company-logo">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3 class="mb-1">سبير سمارت</h3>
+                    <p class="mb-1">نظام إدارة قطع الغيار</p>
+                    <p class="mb-0">
+                        <i class="fas fa-phone me-2"></i>+20 123 456 7890<br>
+                        <i class="fas fa-envelope me-2"></i>info@sparesmart.com
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplier and Invoice Details -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="supplier-info">
+                    <h5 class="mb-3"><i class="fas fa-building me-2"></i>معلومات المورد</h5>
+                    <p class="mb-1"><strong>{{ purchase.supplier.name }}</strong></p>
+                    {% if purchase.supplier.contact_person %}
+                    <p class="mb-1">{{ purchase.supplier.contact_person }}</p>
+                    {% endif %}
+                    {% if purchase.supplier.phone %}
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i>{{ purchase.supplier.phone }}</p>
+                    {% endif %}
+                    {% if purchase.supplier.email %}
+                    <p class="mb-1"><i class="fas fa-envelope me-2"></i>{{ purchase.supplier.email }}</p>
+                    {% endif %}
+                    {% if purchase.supplier.address %}
+                    <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ purchase.supplier.address }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="invoice-details">
+                    <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>تفاصيل الفاتورة</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-2"><strong>تاريخ الطلب:</strong></p>
+                            <p class="mb-2"><strong>الحالة:</strong></p>
+                            <p class="mb-2"><strong>حالة الدفع:</strong></p>
+                            {% if purchase.expected_delivery_date %}
+                            <p class="mb-2"><strong>التسليم المتوقع:</strong></p>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-2">{{ purchase.order_date|date:"M d, Y" }}</p>
+                            <p class="mb-2">
+                                <span class="badge 
+                                    {% if purchase.status == 'received' %}bg-success
+                                    {% elif purchase.status == 'ordered' %}bg-primary
+                                    {% elif purchase.status == 'partial_received' %}bg-warning
+                                    {% elif purchase.status == 'cancelled' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ purchase.get_status_display }}
+                                </span>
+                            </p>
+                            <p class="mb-2">
+                                <span class="badge 
+                                    {% if purchase.payment_status == 'paid' %}bg-success
+                                    {% elif purchase.payment_status == 'partial' %}bg-warning
+                                    {% elif purchase.payment_status == 'overdue' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ purchase.get_payment_status_display }}
+                                </span>
+                            </p>
+                            {% if purchase.expected_delivery_date %}
+                            <p class="mb-2">{{ purchase.expected_delivery_date|date:"M d, Y" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="items-table">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">المنتج</th>
+                        <th style="width: 10%;">الكمية</th>
+                        <th style="width: 15%;">سعر الوحدة</th>
+                        <th style="width: 10%;">الخصم</th>
+                        <th style="width: 15%;">الإجمالي</th>
+                        <th style="width: 10%;">الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in purchase.items.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <div class="fw-bold">{{ item.product.name }}</div>
+                            <small class="text-muted">{{ item.product.sku }}</small>
+                        </td>
+                        <td class="text-center">
+                            {{ item.quantity_ordered }}
+                            {% if item.quantity_received != item.quantity_ordered %}
+                            <br><small class="text-muted">(مستلم: {{ item.quantity_received }})</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">{{ item.unit_cost|floatformat:2 }} ج.م</td>
+                        <td class="text-center">
+                            {% if item.discount_percentage > 0 %}
+                                {{ item.discount_percentage }}%
+                                <br><small class="text-muted">{{ item.discount_amount|floatformat:2 }} ج.م</small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-bold">{{ item.total_cost|floatformat:2 }} ج.م</td>
+                        <td class="text-center">
+                            {% if item.is_fully_received %}
+                                <span class="badge bg-success">مكتمل</span>
+                            {% elif item.quantity_received > 0 %}
+                                <span class="badge bg-warning">جزئي</span>
+                            {% else %}
+                                <span class="badge bg-secondary">معلق</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total Section -->
+        <div class="row">
+            <div class="col-md-6">
+                {% if purchase.notes %}
+                <div class="mb-3">
+                    <h6><i class="fas fa-sticky-note me-2"></i>ملاحظات:</h6>
+                    <p class="border p-3 rounded bg-light">{{ purchase.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="total-section">
+                    <div class="row mb-2">
+                        <div class="col-6">المجموع الفرعي:</div>
+                        <div class="col-6 text-end">{{ purchase.subtotal|floatformat:2 }} ج.م</div>
+                    </div>
+                    {% if purchase.tax_amount > 0 %}
+                    <div class="row mb-2">
+                        <div class="col-6">الضرائب:</div>
+                        <div class="col-6 text-end">{{ purchase.tax_amount|floatformat:2 }} ج.م</div>
+                    </div>
+                    {% endif %}
+                    {% if purchase.shipping_cost > 0 %}
+                    <div class="row mb-2">
+                        <div class="col-6">الشحن:</div>
+                        <div class="col-6 text-end">{{ purchase.shipping_cost|floatformat:2 }} ج.م</div>
+                    </div>
+                    {% endif %}
+                    {% if purchase.discount_amount > 0 %}
+                    <div class="row mb-2">
+                        <div class="col-6">الخصم:</div>
+                        <div class="col-6 text-end">-{{ purchase.discount_amount|floatformat:2 }} ج.م</div>
+                    </div>
+                    {% endif %}
+                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>الإجمالي:</strong></div>
+                        <div class="col-6 text-end"><strong>{{ purchase.total_amount|floatformat:2 }} ج.م</strong></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">المدفوع:</div>
+                        <div class="col-6 text-end text-success">{{ purchase.paid_amount|floatformat:2 }} ج.م</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6"><strong>المتبقي:</strong></div>
+                        <div class="col-6 text-end"><strong class="text-warning">{{ purchase.balance_amount|floatformat:2 }} ج.م</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        {% if payments %}
+        <div class="payment-history">
+            <h5 class="mb-3"><i class="fas fa-credit-card me-2"></i>تاريخ المدفوعات</h5>
+            <div class="table-responsive">
+                <table class="table payment-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الدفعة</th>
+                            <th>التاريخ</th>
+                            <th>المبلغ</th>
+                            <th>طريقة الدفع</th>
+                            <th>المرجع</th>
+                            <th>دفع بواسطة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.payment_number }}</td>
+                            <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                            <td class="text-success fw-bold">{{ payment.amount|floatformat:2 }} ج.م</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>{{ payment.reference_number|default:"-" }}</td>
+                            <td>{{ payment.paid_by.get_full_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted mb-1">شكراً لتعاملكم معنا</p>
+            <p class="text-muted small">تم إنشاء هذه الفاتورة بواسطة نظام سبير سمارت</p>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center no-print mb-4">
+        <a href="{% url 'purchases:purchase_detail' purchase.id %}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-right me-2"></i>رجوع للتفاصيل
+        </a>
+        <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-list me-2"></i>قائمة المشتريات
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Print functionality
+    const printBtn = document.querySelector('.print-button');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            window.print();
+        });
+    }
+    
+    // Keyboard shortcut for printing (Ctrl+P)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            window.print();
+        }
+    });
+});
+</script>
+{% endblock %}

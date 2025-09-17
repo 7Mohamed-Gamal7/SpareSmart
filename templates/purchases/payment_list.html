@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block title %}مدفوعات الشراء {{ purchase.purchase_number }} | سبير سمارت{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .info-card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .info-card .card-header {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-bottom: 2px solid #dee2e6;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 1rem 1.5rem;
+    }
+    
+    .payment-table th {
+        background: #28a745;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+    }
+    
+    .payment-table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .financial-summary {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+    
+    .financial-summary .amount {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .action-buttons .btn {
+        margin: 0.25rem;
+        border-radius: 25px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">
+                    <i class="fas fa-credit-card me-3"></i>مدفوعات الشراء
+                </h1>
+                <p class="mb-0 opacity-75">{{ purchase.purchase_number }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="action-buttons">
+                    <a href="{% url 'purchases:purchase_detail' purchase.id %}" class="btn btn-light">
+                        <i class="fas fa-arrow-right me-2"></i>رجوع للتفاصيل
+                    </a>
+                    {% if purchase.balance_amount > 0 %}
+                    <a href="{% url 'purchases:purchase_payment_create' purchase.id %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>دفعة جديدة
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Purchase Summary -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>ملخص الشراء</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <strong>المورد:</strong> 
+                                <a href="{% url 'inventory:supplier_detail' purchase.supplier.id %}" class="text-decoration-none">
+                                    {{ purchase.supplier.name }}
+                                </a>
+                            </div>
+                            <div class="mb-2">
+                                <strong>تاريخ الطلب:</strong> {{ purchase.order_date|date:"M d, Y" }}
+                            </div>
+                            <div class="mb-2">
+                                <strong>الحالة:</strong>
+                                <span class="badge status-badge 
+                                    {% if purchase.status == 'received' %}bg-success
+                                    {% elif purchase.status == 'ordered' %}bg-primary
+                                    {% elif purchase.status == 'partial_received' %}bg-warning
+                                    {% elif purchase.status == 'cancelled' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ purchase.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <strong>المبلغ الإجمالي:</strong> {{ purchase.total_amount|floatformat:2 }} ج.م
+                            </div>
+                            <div class="mb-2">
+                                <strong>المدفوع:</strong> <span class="text-success">{{ purchase.paid_amount|floatformat:2 }} ج.م</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>المتبقي:</strong> <span class="text-warning">{{ purchase.balance_amount|floatformat:2 }} ج.م</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments List -->
+            <div class="card info-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>قائمة المدفوعات</h5>
+                    {% if purchase.balance_amount > 0 %}
+                    <a href="{% url 'purchases:purchase_payment_create' purchase.id %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i>دفعة جديدة
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if payments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover payment-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>رقم الدفعة</th>
+                                    <th>التاريخ</th>
+                                    <th>المبلغ</th>
+                                    <th>طريقة الدفع</th>
+                                    <th>المرجع</th>
+                                    <th>دفع بواسطة</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td class="fw-bold">{{ payment.payment_number }}</td>
+                                    <td>{{ payment.payment_date|date:"M d, Y H:i" }}</td>
+                                    <td class="fw-bold text-success">{{ payment.amount|floatformat:2 }} ج.م</td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ payment.get_payment_method_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ payment.reference_number|default:"-" }}</td>
+                                    <td>{{ payment.paid_by.get_full_name }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if payment.status == 'completed' %}bg-success
+                                            {% elif payment.status == 'pending' %}bg-warning
+                                            {% elif payment.status == 'failed' %}bg-danger
+                                            {% elif payment.status == 'cancelled' %}bg-secondary
+                                            {% else %}bg-info{% endif %}">
+                                            {{ payment.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link btn-sm" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" onclick="viewPaymentDetails({{ payment.id }})">
+                                                    <i class="fas fa-eye me-2"></i>عرض التفاصيل</a></li>
+                                                {% if payment.status == 'pending' %}
+                                                <li><a class="dropdown-item" href="#" onclick="editPayment({{ payment.id }})">
+                                                    <i class="fas fa-edit me-2"></i>تعديل</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#" onclick="cancelPayment({{ payment.id }})">
+                                                    <i class="fas fa-times me-2"></i>إلغاء</a></li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-credit-card fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">لا توجد مدفوعات</h5>
+                        <p class="text-muted">لم يتم تسجيل أي مدفوعات لهذا الشراء بعد.</p>
+                        {% if purchase.balance_amount > 0 %}
+                        <a href="{% url 'purchases:purchase_payment_create' purchase.id %}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>تسجيل أول دفعة
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Financial Summary -->
+            <div class="financial-summary">
+                <h5 class="mb-3"><i class="fas fa-calculator me-2"></i>الملخص المالي</h5>
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <div class="amount">{{ purchase.total_amount|floatformat:2 }} ج.م</div>
+                        <small>المبلغ الإجمالي</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="amount text-success">{{ purchase.paid_amount|floatformat:2 }} ج.م</div>
+                        <small>المدفوع</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="amount text-warning">{{ purchase.balance_amount|floatformat:2 }} ج.م</div>
+                        <small>المتبقي</small>
+                    </div>
+                </div>
+                
+                {% if purchase.balance_amount > 0 %}
+                <hr style="border-color: rgba(255,255,255,0.3);">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <small>نسبة الدفع المكتملة</small>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        {% widthratio purchase.paid_amount purchase.total_amount 100 as payment_percentage %}
+                        <div class="progress-bar bg-light" role="progressbar" style="width: {{ payment_percentage }}%"></div>
+                    </div>
+                    <small class="text-light">{{ payment_percentage }}%</small>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>إجراءات سريعة</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if purchase.balance_amount > 0 %}
+                        <a href="{% url 'purchases:purchase_payment_create' purchase.id %}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>دفعة جديدة
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'purchases:purchase_detail' purchase.id %}" class="btn btn-primary">
+                            <i class="fas fa-eye me-2"></i>تفاصيل الشراء
+                        </a>
+                        
+                        <a href="{% url 'purchases:purchase_invoice' purchase.id %}" class="btn btn-info">
+                            <i class="fas fa-file-invoice me-2"></i>عرض الفاتورة
+                        </a>
+                        
+                        <a href="{% url 'purchases:purchase_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i>قائمة المشتريات
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Statistics -->
+            {% if payments %}
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>إحصائيات الدفع</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">عدد المدفوعات</small>
+                        <div class="fw-bold">{{ payments.count }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">متوسط الدفعة</small>
+                        <div class="fw-bold">
+                            {% if payments.count > 0 %}
+                                {% widthratio purchase.paid_amount payments.count 1 %} ج.م
+                            {% else %}
+                                0.00 ج.م
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">آخر دفعة</small>
+                        <div class="fw-bold">
+                            {% if payments %}
+                                {{ payments.first.payment_date|date:"M d, Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Payment list page loaded');
+});
+
+function viewPaymentDetails(paymentId) {
+    // Implement payment details view
+    alert('عرض تفاصيل الدفعة #' + paymentId);
+}
+
+function editPayment(paymentId) {
+    // Implement payment editing
+    alert('تعديل الدفعة #' + paymentId);
+}
+
+function cancelPayment(paymentId) {
+    if (confirm('هل أنت متأكد من إلغاء هذه الدفعة؟')) {
+        // Implement payment cancellation
+        alert('تم إلغاء الدفعة #' + paymentId);
+    }
+}
+</script>
+{% endblock %}
