@@ -205,8 +205,8 @@ def purchase_detail(request, purchase_id):
     
     # Get recent stock movements related to this purchase
     stock_movements = StockMovement.objects.filter(
-        reference__icontains=purchase.purchase_number
-    ).select_related('product', 'user').order_by('-created_at')[:10]
+        reference_number__icontains=purchase.purchase_number
+    ).select_related('product', 'created_by').order_by('-created_at')[:10]
     
     context = {
         'purchase': purchase,
